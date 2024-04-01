@@ -4,6 +4,16 @@
 
 This project implements a simple retrieval augmented generation (RAG) application. I developed this application using VS Code, Python, LangChain, and Docker. 
 
+## Demonstration
+
+Below is a demo of the appliaction. to simulate a production environment, the code was deployed to AWS using the following resources. 
+
+- Elastic Container Repository (ECR) - This repository were Docker images are kept.
+- Elastic Container Service (ECS) - Both the client and service endpoints were deployed to AWS's ECS.
+- Application Load Balancer - A load balancer was created to control access to the the Streamlit frontend client.   
+
+https://github.com/efarish/portfolio/assets/165571745/7bbe358c-acb8-4b4b-9a29-80fdbf003e90
+
 ## Architecture
 
 A simple microservices architechure is used. The Client and Server are deployed to two different endpoints. The application has four components: a corpus, a vector datastore, a frontend client, and a service endpoint. 
@@ -24,17 +34,7 @@ A Python class manages call to an Open AI 3.5 Turbo LLM model. This class also m
 
 A Streamlit frontend is used for submitting request to the RAG service. 
 
-## Deployment
 
-To simulate a production environment, the applictaion was deploy to AWS using the following resources. 
-
-- Elastic Container Repository (ECR) - This repository were Docker images are kept.
-- Elastic Container Service (ECS) - Both the client and service endpoints were deployed to AWS's ECS.
-- Application Load Balancer - A load balancer was created to control access to the the Streamlit frontend client.   
-
-## Demonstration
-
-https://github.com/efarish/portfolio/assets/165571745/7bbe358c-acb8-4b4b-9a29-80fdbf003e90
 
 
 
