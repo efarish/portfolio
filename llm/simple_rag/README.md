@@ -6,7 +6,7 @@ This project implements a simple retrieval augmented generation (RAG) applicatio
 
 ## Demonstration
 
-Below is a demo of the appliaction. to simulate a production environment, the code was deployed to AWS using the following resources. 
+Below is a demo of the appliaction. To simulate a production environment, the code was deployed to AWS using the following resources: 
 
 - Elastic Container Repository (ECR) - This repository were Docker images are kept.
 - Elastic Container Service (ECS) - Both the client and service endpoints were deployed to AWS's ECS.
