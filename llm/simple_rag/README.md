@@ -34,6 +34,8 @@ To simulate a production environment, the applictaion was deploy to AWS using th
 
 ## Demonstration
 
-<video width="320" height="240" controls>
-  <source src="assets/vid/rag1.mp4" type="video/mp4">
-</video>
+https://github.com/efarish/portfolio/assets/165571745/7bbe358c-acb8-4b4b-9a29-80fdbf003e90
+
+
+
+
