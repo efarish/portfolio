@@ -16,7 +16,7 @@ https://github.com/efarish/portfolio/assets/165571745/7bbe358c-acb8-4b4b-9a29-80
 
 ## Architecture
 
-A simple microservices architechure is used. The Client and Server are deployed to two different endpoints. The application has four components: a corpus, a vector datastore, a frontend client, and a service endpoint. 
+A simple microservices architecture is used. The Client and Server are deployed to two different endpoints. The application has four components: a corpus, a vector datastore, a service endpoint, and a frontend client. 
 
 ### Corpus
 
@@ -24,11 +24,11 @@ The source corpus used for indexing by the vector DB was the New International V
 
 ### Vector Database
 
-The open-source vector database Chroma is used to index the corpus. To simply using Chroma, the LangChain framework was used.
+The open-source vector database Chroma is used to index the corpus. To simplify using Chroma, the LangChain framework was used.
 
 ### Service
 
-A Python class manages call to an Open AI 3.5 Turbo LLM model. This class also manages access to the vector DB. 
+A Python class manages call to an Open AI 3.5 Turbo LLM model. LangChain was also used to access the OpenAI model. This class also manages access to the vector DB which is built once and then loaded from a directory after the first request. 
 
 ### Client
 
