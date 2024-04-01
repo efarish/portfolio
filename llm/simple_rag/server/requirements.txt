@@ -1,0 +1,7 @@
+langchain==0.1.10
+langchain-openai==0.0.8
+chromadb==0.4.24
+langchainhub==0.1.15
+xmltodict==0.13.0
+python-dotenv==1.0.1
+flask==3.0.2
