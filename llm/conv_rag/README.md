@@ -16,7 +16,6 @@ Project file descriptions are below:
 
 Below is a chat demonstrating that the history is maintained. It also demonstrates that if the context retrieved doesn't have the answer, the LLM will say so. An improvement to this behavior is Corrective RAG which I implemented a version of that here.
 
-<video width="320" height="240" controls>
-  <source src="assets/vid/conv_rag.mp4" type="video/mp4">
-</video>
+
+https://github.com/efarish/portfolio/assets/165571745/51822e9c-9082-4795-89aa-8a9df19bc396
 
