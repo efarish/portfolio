@@ -1,0 +1,6 @@
+langchain==0.1.12
+langchain-openai==0.0.8
+chromadb==0.4.24
+streamlit==1.32.2
+streamlit-chat==0.1.1
+nltk==3.8.1
