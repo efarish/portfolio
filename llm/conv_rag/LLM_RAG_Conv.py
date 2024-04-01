@@ -69,7 +69,7 @@ class LLM_RAG_Conv:
     def invoke(self, _query: str):
         """ Execute the query supplying context for the query and the chat history so far."""
         self.messages.append( self.augment_human_prompt(_query) )
-        #Of if the number of words in the context is larger that the maximum context size, 
+        #If the number of words in the context is larger that the maximum context size, 
         #  remove some of the prior chat history.
         while self.get_conversation_lenght() > MAX_CONTENT_SIZE - MAX_TOKENS:
             self.messages.pop(1) #remove the first message and the system message.
