@@ -34,6 +34,13 @@ A Python class manages call to an Open AI 3.5 Turbo LLM model. LangChain was als
 
 A Streamlit frontend is used for submitting request to the RAG service. 
 
+## Technology Summary
+
+
+- Streamlit for the frontend. 
+- LangChain for the LLM framework.
+- OpenAI 3.5 Turbo for the LLM model.
+- Chroma vector datastore.
 
 
 
