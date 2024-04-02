@@ -19,3 +19,11 @@ Below is a chat demonstrating that the history is maintained. It also demonstrat
 
 https://github.com/efarish/portfolio/assets/165571745/51822e9c-9082-4795-89aa-8a9df19bc396
 
+## Technologies Used
+
+- Streamlit for the frontend. 
+- LangChain for the LLM framework.
+- OpenAI 3.5 Turbo for the LLM model.
+- Chroma vector datastore.
+
+
