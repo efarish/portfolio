@@ -1,4 +1,4 @@
-Project: Fundamentals
+# Project: Fundamentals
 
 These projects illustrate basic machine learning concepts.
 

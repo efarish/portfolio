@@ -1,13 +1,13 @@
 # Project: Corrective RAG
 
-This project implements a variant of the Corrective RAG as described in the paper [Corrective Retrieval Augmented Generation](https://arxiv.org/pdf/2401.15884.pdf?ref=blog.langchain.dev)
+This project implements a variant of the Corrective RAG as described in the paper [Corrective Retrieval Augmented Generation](https://arxiv.org/pdf/2401.15884.pdf?ref=blog.langchain.dev).
 
 The features of Corrective RAG implemented are:
 - Evaluating the content retrieved from the vector database for relevance. 
 - Rewritting the search query if no documents were found or the documents found were deemed irrelevant. 
 - If the rewritten query does not find relevant documents, I inform the user no relevant documents were found. 
 
-In the paper, a Google search was done to find content in the event not relevant documents are found. I decided not to do that as I thought it more appropriate to restrict the reponse to a corpus of documents I trust. 
+In the paper, a Google search was done to find content in the event no relevant documents are found. I decided not to do that as I thought it more appropriate to restrict the reponse to a corpus of documents I trust. 
 
 The corpus indexed for the RAG were three papers on RAG:
 
