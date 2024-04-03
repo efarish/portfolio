@@ -1,4 +1,4 @@
-LLM projects:
+# LLM Projects
 
 Each project's README has a demo video.
 
