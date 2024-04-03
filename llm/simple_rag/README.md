@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project implements a simple retrieval augmented generation (RAG) application. I developed this application using VS Code, Python, LangChain, and Docker. 
+This project implements a simple retrieval augmented generation (RAG) application. I developed this application using VS Code, Python, LangChain, and Docker. The corpus indexed is the Bible. The indexing was done by the chapters of each book in the Bible.
 
 ## Demonstration
 
