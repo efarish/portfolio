@@ -7,7 +7,7 @@ The features of Corrective RAG implemented are:
 - Rewritting the search query if no documents were found or the documents found were deemed irrelevant. 
 - If the rewritten query does not find relevant documents, I inform the user no relevant documents were found. 
 
-In the paper, a Google search was done to find content in the event no relevant documents are found. I decided not to do that as I thought it more appropriate to restrict the reponse to a corpus of documents I trust. 
+In the paper, a Google search was done to find content in the event no relevant documents are found. I decided not to do that as I thought it more appropriate to restrict the reponse to a corpus of documents I trust. If no relevant context is found in the indexed corpus, the user is informed of this.
 
 The corpus indexed for the RAG were three papers on RAG:
 
