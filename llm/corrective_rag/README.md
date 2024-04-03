@@ -19,7 +19,7 @@ The application will be able to answer questions on these topics with a degree o
 
 ## Demonstration
 
-Below is a demo of the application. I use OpenAI's ChatGPT website to first do a query on Corrective RAG. Since this is a new use case for LLMs, nothing relevant is found. I then use the application I wrote (deployed to AWS EKS) to anwser the question. The source paper is cited at the end of the response.  
+Below is a demo of the application. I use OpenAI's ChatGPT website to first do a query on Corrective RAG. Since this is a new use case for LLMs, nothing relevant is found. I then use the application I wrote (deployed to AWS EKS) to anwser the question. The source paper is cited at the end of the response. I first enter questions that can be answered by documents contained in the corpus. I then ask a question that cannot be answered from the corpus to demonstrate the app's ability to evaluate relevant content.
 
 https://github.com/efarish/portfolio/assets/165571745/e26d7865-940a-4a66-b755-4efafe983801
 
