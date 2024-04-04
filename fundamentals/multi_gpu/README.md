@@ -10,7 +10,10 @@ After training, the model is evaluated using a F1 score.
 
 The dataset came from: https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud. 
 
-The training was done using AWS SageMaker on a ml.p3.8xlarge with 4 v100 GPUs with 16 gigs of memory.
+Two trainings were done using AWS SageMaker:
+
+- ml.p3.2xlarge with 1 v100 GPUs with 16 gigs of memory
+- ml.p3.8xlarge with 4 v100 GPUs with 64 gigs of memory
 
 Files: 
 
@@ -24,6 +27,6 @@ Below is a screen shot of using the `nvidia-smi` utility to see the GPU utilizat
 
 ![alt text](https://github.com/efarish/portfolio/blob/main/fundamentals/multi_gpu/assets/img/nvidia_v_gpu.png)
 
-Training on 1 V00 GPU and 4 GPUs takes 
+Interestingly, the training duration is the same when using 1 v100 GPU and 4 GPUs. This is probably due to my model not being large enough to evidence the benefit of using multiple GPUs.
 
 
