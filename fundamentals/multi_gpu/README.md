@@ -19,7 +19,7 @@ Files:
 
 - [train_multi_gpu.py](https://github.com/efarish/portfolio/blob/main/fundamentals/multi_gpu/train_multi_gpu.py) - A PyTorch script that builds and trains the model.
 - [MultiGPU_1_V100.ipynb](https://github.com/efarish/portfolio/blob/main/fundamentals/multi_gpu/MultiGPU_1_V100.ipynb) - The results of training the script on one V100 GPU.
-- [MultiGPU_1_V100.ipynb](https://github.com/efarish/portfolio/blob/main/fundamentals/multi_gpu/MultiGPU_1_V100.ipynb) - The results of training the script on o4 V100 GPUs.
+- [MultiGPU_4_V100.ipynb](https://github.com/efarish/portfolio/blob/main/fundamentals/multi_gpu/MultiGPU_4_V100.ipynb) - The results of training the script on o4 V100 GPUs.
 
 ## Results
 
