@@ -12,7 +12,7 @@ The dataset came from: https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud.
 
 Two trainings were done using AWS SageMaker:
 
-- ml.p3.2xlarge with 1 v100 GPUs with 16 gigs of memory
+- ml.p3.2xlarge with 1 v100 GPU with 16 gigs of memory
 - ml.p3.8xlarge with 4 v100 GPUs with 64 gigs of memory
 
 Files: 
