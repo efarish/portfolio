@@ -29,7 +29,7 @@ Below is a screen shot of using the `nvidia-smi` utility to see the GPU utilizat
 
 Interestingly, the training duration is the same when using 1 v100 GPU and 4 GPUs. This is probably due to my model not being large enough to evidence the benefit of using multiple GPUs.
 
-However, aside from the screenshot above, the evidence that training has been split amoung the 4 GPUs is seen by the number of steps taken for each epoc. For the 1 v100 GPU training, there are 24 steps for each epoc. The 4 v100 GPU training only takes 6 steps per epoc.
+However, aside from the screenshot above, the evidence that training has been split amoung the 4 GPUs is seen by the number of steps taken for each epoc. For the 1 v100 GPU training, there are 24 steps for each epoc. The 4 v100 GPU training only takes 6 steps per epoc which sums to 24 across the 4 GPUs.
 
 
 
