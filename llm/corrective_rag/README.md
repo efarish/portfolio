@@ -35,9 +35,7 @@ Technologies used for implementation:
 
 # Architecture
 
-A microservice architecture was used where the frontend Streamlit client and LLM service were deployed to different endpoints.
-
-# Deployment
-
 To simulate a production deployment for the demonstration above, I deployed the application to AWS EKS.
+
+A microservice architecture was used where the frontend Streamlit client and LLM service were deployed to different endpoints. These endpoints were deployed to AWS EKS with a NGINX ingress controller providing endpoint access and routing.
 
