@@ -6,4 +6,4 @@ Each project's README has a demo video.
 - [Simple Retrieval Augmented Generation (RAG)](https://github.com/efarish/portfolio/tree/main/llm/simple_rag)
 - [Conversational RAG](https://github.com/efarish/portfolio/tree/main/llm/conv_rag)
 - [Corrective RAG](https://github.com/efarish/portfolio/tree/main/llm/corrective_rag)
-- [Multi-Agent Supervsor](https://github.com/efarish/portfolio/tree/main/llm/agents)
+- [Multi-Agent Supervisor](https://github.com/efarish/portfolio/tree/main/llm/agents)
