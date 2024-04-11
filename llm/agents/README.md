@@ -21,9 +21,10 @@ The classes defined in the AgentSupervisor and Agents files implement this workf
 
 The technologies used are:
 
-1. LangChain
-2. LangGraph
-3. OpenAI 
+1. Python
+2. LangChain
+3. LangGraph
+4. OpenAI GPT 3.5 Turbo
 
 
 
