@@ -16,7 +16,7 @@ Even though the agents are simple, they illustrate the purpose of this design pa
   <img src="./assets/img/flow.png" width="300" />
 </p>
 
-See [this notebook]() for a demonstration of the application.
+See [this notebook](https://github.com/efarish/portfolio/blob/main/llm/agents/ClientNotebook.ipynb) for a demonstration of the application.
 
 
 
