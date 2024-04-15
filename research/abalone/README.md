@@ -1,4 +1,4 @@
-Project: XGBRegressor and LightGBM
+# Project: XGBRegressor and LightGBM
 
 This project experiments with XGBoost and LightGBM and uses scikit-optimize for hyperparameter optimization.
 
