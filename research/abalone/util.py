@@ -1,13 +1,11 @@
-import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
 from skopt.space import Real, Categorical, Integer
-import numpy as np;
+import lightgbm as lgb
+from xgboost import XGBRegressor
 
-
-def get_xgb_params(model):
+def get_xgb_params(_model=XGBRegressor(random_state=42)):
 
   params = {
-    #'model': [model],
+    'model': [_model],
     'model__n_estimators':      Integer(500, 3000),
     'model__eta':               Real(1e-3, 1),
     'model__gamma':             Real(0.0, 100),
@@ -26,10 +24,10 @@ def get_xgb_params(model):
   return params
   
 
-def get_lgbc_params(model, model_objective):
+def get_lgbc_params(_model=lgb.LGBMRegressor(random_state=42, verbosity=-1)):
   
   params  = {
-    'model': [model],
+    'model': [_model],
     'model__learning_rate': Real(0.01, 0.5, 'log-uniform'), # step size shrinkage used to prevent overfitting. Lower values = more accuracy but slower training
     'model__num_leaves': Integer(25, 250), # the maximum number of leaves in any tree
     'model__max_depth': Integer(6, 15), # the maximum depth of any tree
@@ -42,7 +40,7 @@ def get_lgbc_params(model, model_objective):
     'model__reg_lambda': Real(0, 100), # L2 regularization term on weights
     'model__class_weight': Categorical(['balanced', None]), # weighting of positive classes in binary classification problems
     'model__boosting_type': Categorical(['gbdt', 'dart']), # type of boosting algorithm to use
-    'model__objective': Categorical([model_objective]), # objective function to use for training
+    'model__objective': Categorical(['regression']), # objective function to use for training
     #'model__metric': Categorical(['aucpr']), # evaluation metric to use for early stopping and model selection
     'model__subsample': Real(0.1, 1.0, 'uniform'), # fraction of data samples used for each iteration
     #subsample_freq (int, optional (default=0)) – Frequency of subsample, <=0 means no enable. 
