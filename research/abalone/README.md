@@ -1,6 +1,6 @@
 # Project: XGBRegressor and LightGBM
 
-This project performs regression with [XGBoost](https://xgboost.readthedocs.io/en/stable/python/python_api.html) and [LightGBM](https://lightgbm.readthedocs.io/en/stable/) and uses [scikit-optimize Bayesian optimization](https://scikit-optimize.github.io/stable/) to tune hyperparameter. 
+This project performs regression with [XGBoost](https://xgboost.readthedocs.io/en/stable/python/python_api.html) and [LightGBM](https://lightgbm.readthedocs.io/en/stable/) utilizing [scikit-optimize Bayesian optimization](https://scikit-optimize.github.io/stable/) to tune hyperparameter. 
 
 The dataset used is the Abalone dataset and can be found [here](https://www.kaggle.com/competitions/playground-series-s4e4/submissions).
 
