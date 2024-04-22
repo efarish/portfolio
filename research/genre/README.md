@@ -16,6 +16,16 @@ Below is a summary of the MLP performances by dataset. Auto-encoders were used i
 
 While a best test accuracy of 64% doesn't seem impressive, this must be contextualized with the fact that there were 16 possible classification for each MP3 file. 
 
+## CNN Performance
+
+Keras was used to train a Convolutional neural network (CNN). Due to the amount of training time required, only 3 types of genres will included for training: Pop, Rock, and Electronic. Two types of datasets were used:
+
+1.  30 second MP3 file clips
+2.  3 second MP3 clips
+
+5-fold CV was done by dividing training images into 5 folders, using 4 for training and 1 for validation. To avoid data bledding issues, clips taken from the same song were kept either placed in the training or validation datasets.
+
+
 
 
 
