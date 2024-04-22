@@ -23,7 +23,16 @@ Keras was used to train a Convolutional neural network (CNN). Due to the amount 
 1.  30 second MP3 file clips
 2.  3 second MP3 clips
 
-5-fold CV was done by dividing training images into 5 folders, using 4 for training and 1 for validation. To avoid data bledding issues, clips taken from the same song were kept either placed in the training or validation datasets.
+Using those files, Mel-Spectrogram image files were created and these were the imags used for training. An example is below.
+
+![mel](https://github.com/efarish/portfolio/assets/165571745/078dacc1-ae45-4990-9dc8-bb9b6ca8d110)
+
+5-fold CV was done by dividing training images into 5 folders, using 4 for training and 1 for validation. To avoid data bledding issues, clips taken from the same song were either placed in the training or validation datasets. Below is a summary of the performances.
+
+![cnn](https://github.com/efarish/portfolio/assets/165571745/1b0cb36f-a70b-4be4-ad50-b25b29a3752d)
+
+
+
 
 
 
