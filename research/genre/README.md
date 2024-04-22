@@ -31,11 +31,15 @@ Using those files, Mel-Spectrogram image files were created and these were the i
 
 ![cnn](https://github.com/efarish/portfolio/assets/165571745/1b0cb36f-a70b-4be4-ad50-b25b29a3752d)
 
-Per the performance above, there is benefit to breaking the MP3 files into smaller clips. 
+## Performance Summary
 
-## Summary
+Per the data collected above:
 
-Based on the models trained for this analysis, the MLP has better performance. 
+1. Per the MLP training, using more data improves performance.
+2. There is a benefit to breaking the MP3 files into smaller clips.
+3. The CNN has better performance for comparable amounts of data.  
+
+
 
 
 
