@@ -8,3 +8,7 @@ New York City neighborhoods using data published by the New York City Police Dep
 for the year 2021.
 
 The Tableau public dashboard link is [here](https://public.tableau.com/app/profile/eric1075/viz/NYCCrimeStatisticsFor2021/DB).
+
+A screenshot of the Tablaeu dashboard is below.
+
+![Dashboard](https://github.com/efarish/portfolio/assets/165571745/97268e56-0182-460d-a537-0049d8dd8198)
