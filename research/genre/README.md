@@ -1,6 +1,6 @@
 # Project: Music Genre Classification Using FMA Dataset
 
-Using  a dataset released with this [paper](https://arxiv.org/abs/1612.01840), MLP and CNN models. The dataset consists of 917 GiB of 106,574 MP3 audio files. MLP and CNN models will attempt to classify the MP3 data into one of 16 genres. Example genres are Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Pop, and Rock.  
+Using  a dataset released with this [paper](https://arxiv.org/abs/1612.01840), MLP and CNN models. The dataset consists of 917 GiB of 106,574 MP3 audio files. MLP and CNN models were used to classify the MP3 data into one of 16 genres. Example genres are Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Pop, and Rock.  
 
 ![tracks](https://github.com/efarish/portfolio/assets/165571745/8b869a12-49bf-4ebf-998c-b970cfe4f8e6)
 
@@ -30,6 +30,12 @@ Using those files, Mel-Spectrogram image files were created and these were the i
 5-fold CV was done by dividing training images into 5 folders, using 4 for training and 1 for validation. To avoid data bledding issues, clips taken from the same song were either placed in the training or validation datasets. Below is a summary of the performances.
 
 ![cnn](https://github.com/efarish/portfolio/assets/165571745/1b0cb36f-a70b-4be4-ad50-b25b29a3752d)
+
+Per the performance above, there is benefit to breaking the MP3 files into smaller clips. 
+
+## Summary
+
+Based on the models trained for this analysis, the MLP has better performance. 
 
 
 
