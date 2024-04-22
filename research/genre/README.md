@@ -14,6 +14,8 @@ Below is a summary of the MLP performances by dataset. Auto-encoders were used i
 
 ![mlp](https://github.com/efarish/portfolio/assets/165571745/e945ed1b-ef03-4229-adf6-e08de36c58bb)
 
+While a best test accuracy of 64% doesn't seem impressive, this must be contextualized with the fact that there were 16 possible classification for each MP3 file. 
+
 
 
 
