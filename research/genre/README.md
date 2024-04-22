@@ -10,7 +10,7 @@ Keras and scikit-learn where used to train MLP models and used a randomized grid
 
 The dataset used for training were pre-extracted features released with paper mentioned above. The features consist of a number of audio spectra including Fourier transforms, Mel-frequence cepstral coefficients (MFCC) and Chroma CQT. These spectra were summarized into 7 summary statistics: Kurtosis, max value, min value, mean, median, skew, and standard deviation. These are the features used to train the models.
 
-Below is a summary of the MLP performances by dataset. Auto-encoders were used in an attempt to reduce the number of features used during training and are labeled as "AE" below. 
+Below is a summary of the MLP performances by dataset. Auto-encoders were used in an attempt to reduce the number of features used during training and are labeled as "Enc" below. 
 
 ![mlp](https://github.com/efarish/portfolio/assets/165571745/e945ed1b-ef03-4229-adf6-e08de36c58bb)
 
