@@ -1,4 +1,4 @@
-#Project: Music Genre Classification Using FMA Dataset
+# Project: Music Genre Classification Using FMA Dataset
 
 Using  a dataset released with this [paper](https://arxiv.org/abs/1612.01840), MLP and CNN models. The dataset consists of 917 GiB of 106,574 MP3 audio files. The models wil attempt to classify the MP3 data into one of 16 genres. Example genres are Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Pop, and Rock.  
 
