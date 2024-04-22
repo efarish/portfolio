@@ -18,7 +18,7 @@ While a best test accuracy of 64% doesn't seem impressive, this must be contextu
 
 ## CNN Performance
 
-Keras was used to train a Convolutional neural network (CNN). Due to the amount of training time required, only 3 types of genres will included for training: Pop, Rock, and Electronic. Two types of datasets were used:
+Keras was used to train a Convolutional neural network (CNN). Due to the amount of training time required, only 3 types of genres will included for training: Pop, Rock, and Electronic. Furthermore, only the small dataset consisting of 8k MP3 files will be used. Two types of datasets were used:
 
 1.  30 second MP3 file clips
 2.  3 second MP3 clips
