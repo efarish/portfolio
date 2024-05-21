@@ -1,6 +1,8 @@
 # Project: AutoGluon 
 
-Each project's README has a demo video.
+The code below is an exmple of using the SageMaker SKLearn container to train AutoGluon modes for a dataset. 
 
-- [Fine-tune a Hugging Face GPT2 model](https://github.com/efarish/portfolio/tree/main/llm/gpt_finetune)
+Below are the contents.
 
+- AutoGluonExample.ipynb: Notebook that submits Python scripts to a SageMaker SKLearn container to run a AutoGluon prototyping script.
+- The directory container_scipts: Pythobn scripts to run AutoGluon prototyping.
