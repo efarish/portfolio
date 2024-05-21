@@ -1,6 +1,6 @@
 # Project: AutoGluon 
 
-The code below is an exmple of using the SageMaker SKLearn container to train AutoGluon modes for a dataset. 
+The code in this project is an exmaple of using the SageMaker SKLearn container to train AutoGluon models for a dataset. 
 
 Below are the contents.
 
