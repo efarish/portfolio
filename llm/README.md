@@ -8,4 +8,4 @@ Each project's README has a demo video.
 - [Conversational RAG](https://github.com/efarish/portfolio/tree/main/llm/conv_rag)
 - [Corrective RAG](https://github.com/efarish/portfolio/tree/main/llm/corrective_rag)
 - [Multi-Agent Supervisor](https://github.com/efarish/portfolio/tree/main/llm/agents)
-- [Using LLMs to Create Graphs](https://github.com/efarish/portfolio/tree/main/llm/graph)
+- [Using an LLM to Create a Graph Database](https://github.com/efarish/portfolio/tree/main/llm/graph)
