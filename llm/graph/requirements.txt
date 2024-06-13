@@ -1,0 +1,11 @@
+langchain-openai==0.1.8
+langchain-community==0.2.3
+langchain==0.2.2
+neo4j==5.20.0
+python-dotenv==1.0.1
+nltk==3.8.1
+urllib3==2.2.1
+beautifulsoup4==4.12.3
+yfiles_jupyter_graphs==1.7.2
+numpy==1.26.4
+pandas==2.2.2
