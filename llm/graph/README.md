@@ -1,4 +1,4 @@
-# Graph Projects
+# Knowledge Graph Projects
 
 This project uses LangChain, OpenAI, neo4j, and yworks to visualize the entities and relationships from the first chapter of Frank Herbert's 1965 novel Dune.
 
