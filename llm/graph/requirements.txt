@@ -9,3 +9,4 @@ beautifulsoup4==4.12.3
 yfiles_jupyter_graphs==1.7.2
 numpy==1.26.4
 pandas==2.2.2
+faiss-cpu==1.8.0
