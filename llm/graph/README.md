@@ -1,10 +1,13 @@
 # Knowledge Graph Projects
 
-This project uses LangChain, OpenAI, neo4j, and yworks to visualize the entities and relationships from the first chapter of Frank Herbert's 1965 novel Dune.
+This projects uses LangChain, OpenAI, neo4j, and yWorks to create and utilize knowledge graphs.
 
-Files:
+ The data source for these projects is Frank Herbert's 1965 novel Dune which can be found here.
 
-1. Dune_Graph.ipynb - A Jupyter notebook.
-2. requirements.txt - Python module versions.
-3. graph.jpg - Snapshot of yworks graph widget.
+### Project 1
 
+The Dune_Graph.ipynb notebook identifies and visualizes the entities and relationships found in the source text.
+
+### Project 2 
+
+The Dune_Graph_RAG.ipynb notebook uses a knowledge graph to enchance RAG requests.
