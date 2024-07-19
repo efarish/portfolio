@@ -7,7 +7,7 @@ The first couple chapters of Frank Herbert's 1965 novel Dune will is the source 
 The approach used will:
 
 1. Load the source text and split it into chunks.
-2. Perform NER on the text splits (NER).
+2. Perform NER on the text splits.
 3. For the entities found, extract relationships between the entities.  
 4. Persist the entities and relationships into a graph database.
 
