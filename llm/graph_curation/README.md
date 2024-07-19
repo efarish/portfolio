@@ -1,6 +1,6 @@
 # Knowledge Graph Curation
 
-This project uses LangChain, OpenAI, neo4j, Pydantic, and yWorks to demonstrate NER NER (named entity recognition) NLP and examples of curating data prior to creating elements of a knowledge graph (KG).  
+This project uses LangChain, OpenAI, neo4j, Pydantic, and yWorks to demonstrate NER (named entity recognition) NLP and examples of curating data prior to creating elements of a knowledge graph (KG).  
 
 The first couple chapters of Frank Herbert's 1965 novel Dune will is the source text.
 
