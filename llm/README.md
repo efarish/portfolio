@@ -1,6 +1,6 @@
 # LLM Projects
 
-Each project's README has a demo video.
+Each project has a README describing the project.
 
 - [Fine-tune a Hugging Face GPT2 model](https://github.com/efarish/portfolio/tree/main/llm/gpt_finetune)
 - [Fine-tune a Llama 2 model](https://github.com/efarish/portfolio/tree/main/llm/llama_finetune)
