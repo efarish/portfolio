@@ -1,13 +1,18 @@
-# Knowledge Graph Projects
+# Knowledge Graph Curation
 
-This projects uses LangChain, OpenAI, neo4j, and yWorks to create and utilize knowledge graphs.
+This project uses LangChain, OpenAI, neo4j, Pydantic, and yWorks to demonstrate NER NER (named entity recognition) NLP and examples of curating data prior to creating elements of a knowledge graph (KG).  
 
- The data source for these projects is Frank Herbert's 1965 novel Dune which can be found [here](https://raw.githubusercontent.com/ganesh-k13/shell/master/test_search/www.glozman.com/TextPages/Frank%20Herbert%20-%20Dune.txt).
+The first couple chapters of Frank Herbert's 1965 novel Dune will is the source text.
 
-### Project 1
+The approach used will:
 
-The Dune_Graph.ipynb notebook identifies and visualizes the entities and relationships found in the source text.
+1. Load the source text and split it into chunks.
+2. Perform NER on the text splits (NER).
+3. For the entities found, extract relationships between the entities.  
+4. Persist the entities and relationships into a graph database.
 
-### Project 2 
+Along the way, the data will be curated to increase the usefulness of the KG. As an LLM is used, its necessary to review the indeterminate extraction results produced. 
 
-The Dune_Graph_RAG.ipynb notebook uses a knowledge graph to enchance RAG requests.
+An open information extraction approach will be used for creating the KG. This means the knowledge graph will not have a pre-defined schema. The node labels and edges defined will be created by the LLM.
+
+The purpose of this experiment is to demonstrate simple curation steps that can be taken when relying on a LLM to create a graph database. The steps taken could easily be implemented by a much more capable curation application.
