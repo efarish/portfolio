@@ -16,3 +16,5 @@ Along the way, the data will be curated to increase the usefulness of the KG. As
 An open information extraction approach will be used for creating the KG. This means the knowledge graph will not have a pre-defined schema. The node labels and edges defined will be created by the LLM.
 
 The purpose of this experiment is to demonstrate simple curation steps that can be taken when relying on a LLM to create a graph database. The steps taken could easily be implemented by a much more capable curation application.
+
+The results of the project can be viewed in the Jupyter Notebook file "Dune_Graph_Curating.ipynb".
