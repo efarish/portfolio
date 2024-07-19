@@ -1,4 +1,4 @@
-# Knowledge Graph Curation
+# Project: Knowledge Graph Curation
 
 This project uses LangChain, OpenAI, neo4j, Pydantic, and yWorks to demonstrate NER (named entity recognition) NLP and examples of curating data prior to creating elements of a knowledge graph (KG).  
 
