@@ -17,4 +17,7 @@ The modules discussed are implemented below using LangChain, OpenAI, Neo4j, Pyda
 
 The source corpus used for this project is Frank Herbert's 1965 novel Dune.
 
-Lets first import the code modules. Most of the Neo4j integration and LangChain code was placed in the utility script 'Dune_Graph_RAG_Util' to make this notebook more readable.
+The results of this project can be viewed in the Jupyter notebook distributed with this file. Below is visualization of the Neo4j knowledge graph created for this project.
+
+![image info](./HR_img_3.jpg)
+
