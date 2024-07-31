@@ -10,3 +10,4 @@ Each project has a README describing the project.
 - [Multi-Agent Supervisor](https://github.com/efarish/portfolio/tree/main/llm/agents)
 - [Using LLM to Create a Knowledge Graphs](https://github.com/efarish/portfolio/tree/main/llm/graph)
 - [Curation Of NER data when creating Knowledge Graphs](https://github.com/efarish/portfolio/tree/main/llm/graph_curation)
+- [A more efficient verion of RAG called HippoRAG](https://github.com/efarish/portfolio/tree/main/llm/hippo_rag)
