@@ -1,6 +1,6 @@
 # Knowledge Graph Projects
 
-This projects uses LangChain, OpenAI, neo4j, and yWorks to create and utilize knowledge graphs.
+This projects uses LangChain, OpenAI, Neo4j, and yWorks to create and utilize knowledge graphs.
 
  The data source for these projects is Frank Herbert's 1965 novel Dune which can be found [here](https://raw.githubusercontent.com/ganesh-k13/shell/master/test_search/www.glozman.com/TextPages/Frank%20Herbert%20-%20Dune.txt).
 
