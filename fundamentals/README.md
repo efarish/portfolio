@@ -1,6 +1,6 @@
 # Project: Fundamentals
 
-These projects illustrate basic machine learning concepts.
+These projects illustrate basic machine learning concepts. These projects contain examples of data preprocessing, model training, hyperparameter tuning, performance evaluations, and visualizations when appropriate. Frameworks used are Scikit-learn, NumPy, Pandas, PyTorch, and Matplotlib.
 
 - [Classification Examples](https://github.com/efarish/portfolio/blob/main/fundamentals/Classification_Examples.ipynb) contains examples of using various machine learning algorithms for classification. 
 - [Multi-Layer Perceptron vs Convolutional NN](https://github.com/efarish/portfolio/blob/main/fundamentals/MLP_vs_CNN_Classification.ipynb) in image classification.
