@@ -14,4 +14,4 @@ The Dune_Graph_RAG.ipynb notebook uses a knowledge graph to enchance RAG request
 
 Below is a visualizatoin of knowledge graph created by the projects above.
 
-![image info](./graph_2.jpg)
+![image info](./graph2.jpg)
