@@ -11,3 +11,7 @@ The Dune_Graph.ipynb notebook identifies and visualizes the entities and relatio
 ### Project 2 
 
 The Dune_Graph_RAG.ipynb notebook uses a knowledge graph to enchance RAG requests.
+
+Below is a visualizatoin of knowledge graph created by the projects above.
+
+![image info](./graph_2.jpg)
