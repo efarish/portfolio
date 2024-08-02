@@ -1,6 +1,6 @@
 # LLM Projects
 
-Below is a list of my LLM projcts. Each project has a README describing the project. All the code is in Python and the frameworks/platforms used are Hugging Face, LangChain, and Neo4j. LLM models utilized are different versions of OpenAI’s GPT and Meta’s Llama.
+Below are my LLM projcts. Each project has a README describing the project. All the code is in Python and the frameworks/platforms used are Hugging Face, LangChain, and Neo4j. LLM models utilized are different versions of OpenAI’s GPT and Meta’s Llama.
 
 ### Model Fine-tuning
 - [Fine-tune a Hugging Face GPT2 model](https://github.com/efarish/portfolio/tree/main/llm/gpt_finetune)
