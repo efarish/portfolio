@@ -15,7 +15,7 @@ The code below divides the implementation up into the following parts.
 
 The modules discussed are implemented below using LangChain, OpenAI, Neo4j, Pydantic, and yWorks.  
 
-The source corpus used for this project is Frank Herbert's 1965 novel Dune.
+The source corpus for these projects is Frank Herbert's 1965 novel Dune which can be found [here](https://raw.githubusercontent.com/ganesh-k13/shell/master/test_search/www.glozman.com/TextPages/Frank%20Herbert%20-%20Dune.txt).
 
 The results of this project can be viewed in the Jupyter notebook distributed with this file. Below is visualization of the Neo4j knowledge graph created for this project.
 
