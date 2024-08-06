@@ -2,7 +2,7 @@
 
 This application is based on PyTorch documentation examples to train a model using multiple GPUs. 
 
-The task I've chosen is classifying credit card activity as fradulent. 
+The task I've chosen is classifying credit card activity as fraudulent or not. 
 
 A simple PyTorch Sequential model is defined and trained.
 
