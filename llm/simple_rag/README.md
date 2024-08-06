@@ -8,7 +8,7 @@ This project implements a simple retrieval augmented generation (RAG) applicatio
 
 Below is a demo of the appliaction. To simulate a production environment, the code was deployed to AWS using the following resources: 
 
-- Elastic Container Repository (ECR) - This repository were Docker images are kept.
+- Elastic Container Repository (ECR) - This repository is where the custom Docker images were uploaded.
 - Elastic Container Service (ECS) - Both the client and service endpoints were deployed to AWS's ECS.
 - Application Load Balancer - A load balancer was created to control access to the the Streamlit frontend client.   
 
