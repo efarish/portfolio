@@ -10,6 +10,7 @@ Below are my LLM projcts. Each project has a README describing the project. All 
 - [Corrective RAG](https://github.com/efarish/portfolio/tree/main/llm/corrective_rag)
 - [Curation Of NER data when creating Knowledge Graphs](https://github.com/efarish/portfolio/tree/main/llm/graph_curation)
 - [HippoRAG: A more efficient verion of RAG utilizing Knowledge Graphs](https://github.com/efarish/portfolio/tree/main/llm/hippo_rag)
+- [Using DSPy to evalute RAG programs](https://github.com/efarish/dspy_rag/tree/main)
 ### Agentic Workflows
 - [Multi-Agent Supervisor](https://github.com/efarish/portfolio/tree/main/llm/agents)
 ### Model Fine-tuning
