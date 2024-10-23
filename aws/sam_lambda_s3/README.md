@@ -1,11 +1,13 @@
 # Project: AWS SAM Lambda File Upload
 
-This project contains source code and supporting files for an AWS serverless application deployed using Serverless Application Model (AWS SAM) to upload files to an Amazon S3 bucket.
+This project contains source code and supporting files for an AWS serverless application to load files to Amazon S3 using a Lambda endpoint. AWS Serverless Application Model (AWS SAM) is used for deployment and VS Code's AWS 
 
-- hello_world - Code for the application's Lambda function.
-- events - Invocation events that you can use to invoke the function.
-- tests - Unit tests for the application code. 
-- template.yaml - A template that defines the application's AWS resources.
+Below are the steps used to create this project. 
+
+1. Install the AWS CLI and configure it with an AWS account's credentials.
+1. Install the AWS SAM CLI.
+1. In VS Code, install the AWS Toolkit extension.
+
 
 The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
 
