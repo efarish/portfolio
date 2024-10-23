@@ -3,19 +3,47 @@ import base64
 import boto3
 import time
 import io
+import os
+
+from dotenv import load_dotenv
 
 GET_PATH = '/getInfo'
 POST_PATH = '/upload'
 POST_PATH_2 = '/upload2'
 
+load_dotenv()
+
+s3_bucket = os.getenv("S3_BUCKET")
+
 def deserialize_image(json_string):
+    """
+    Function used to deserialize POST body that was serialized using json.dumps. The image 
+      value was serialized using base64.b64encode. An example is below.
+
+    def serialize_image(file_path):
+        with open(file_path, 'rb') as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode('utf-8') 
+        data = {'image': encoded_image}
+        json_string = json.dumps(data)
+        return json_string
+
+        url = api + '/upload2'
+        file_path = "./bkr.png"
+
+        data = serialize_image(file_path)
+        response = requests.post(url, data=data)
+
+    """
     data = json.loads(json_string)
     image_bytes = base64.b64decode(data['image'])
     return io.BytesIO(image_bytes)
 
 def lambda_handler(event, context):
-    print('EVENT')
-    #print(event)
+    """
+    Lambda event handler. This code assume the API Gateway 
+    """
+    s3_bucket = 'rickmartelimagestore'
+
     if event['rawPath'] == GET_PATH:
         return {
             'statusCode': 200,
@@ -28,7 +56,7 @@ def lambda_handler(event, context):
         s3 = boto3.client('s3')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         key = f'IMG_{timestr}.png'
-        s3_upload = s3.put_object(Bucket='rickmartelimagestore', Key=key, Body=decode_body)
+        s3_upload = s3.put_object(Bucket=s3_bucket, Key=key, Body=decode_body)
         return {
             'statusCode': 200,
             'body': json.dumps('Post 1 called!')
@@ -42,7 +70,7 @@ def lambda_handler(event, context):
         s3 = boto3.client('s3')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         key = f'IMG_{timestr}.png'
-        s3_upload = s3.put_object(Bucket='rickmartelimagestore', Key=key, Body=data.getvalue())        
+        s3_upload = s3.put_object(Bucket=s3_bucket, Key=key, Body=data.getvalue())        
         return {
             'statusCode': 200,
             'body': json.dumps('Post 2 called!')
