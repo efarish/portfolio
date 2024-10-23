@@ -1,18 +1,3 @@
-<style>
-	ol {
-      		counter-reset: section;
-		      list-style-type: none;
-	}
-  	tbody, details {
-      		contain: style;
-	}
-	ol > li::before {
-      		font-weight: 700;
-		      counter-increment: section;
-		      content: counters(section, ".") ". ";
-	}
-</style>
-
 # Project: AWS SAM Lambda File Upload
 
 This project contains source code and supporting files for an AWS serverless application to load files to Amazon S3 using a Lambda endpoint. The AWS Serverless Application Model (SAM CLI) is used for deployment. SAM CLI is an extension of the AWS CLI that enables building and testing AWS applications. VS Code's AWS Toolkit extension is used for integration with AWS.
