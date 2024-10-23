@@ -120,6 +120,8 @@ sam build
 
 A directory called `.aws-sam` will be created. 
 
+NOTE: The app.py file in the `upload` directory loads properties from a `.env` file. For some reason, the `sam build` command is not including this file. I had to manually move the `.env` file to the `build` directory. I have not yet figured out how to fix this.
+
 ### Build The Application
 
 To deploy the application, run the PowerShell command below.
