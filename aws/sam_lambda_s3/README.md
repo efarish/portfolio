@@ -1,6 +1,6 @@
-# sam-app-upload
+# Project: AWS SAM Lambda File Upload
 
-This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
+This project contains source code and supporting files for an AWS serverless application deployed using Serverless Application Model (AWS SAM) to upload files to an Amazon S3 bucket.
 
 - hello_world - Code for the application's Lambda function.
 - events - Invocation events that you can use to invoke the function.
