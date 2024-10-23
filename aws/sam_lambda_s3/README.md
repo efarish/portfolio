@@ -122,18 +122,25 @@ A directory called `.aws-sam` will be created.
 
 NOTE: The app.py file in the `upload` directory loads properties from a `.env` file. For some reason, the `sam build` command is not including this file. I had to manually move the `.env` file to the `build` directory. I have not yet figured out how to fix this.
 
-### Build The Application
+### Deploy The Application
 
-To deploy the application, run the PowerShell command below.
+To deploy the application, run the PowerShell command below. Accept the defaults except for the prompts below.
+
+1. `UploadImage has no authentication. Is this okay? [y/N]:` - This prompt is informing you that an authorization mechanism has not be specified for the API Gateway. You can proceed without having one **but be aware that anyone will be able to call you endpoint**. Proceed with caution.
+2. `Deploy this changeset? [y/N]:` - Select `y` to provision your application.
 
 
 ```bash
 sam deploy --guided
 ```
 
-UploadImage has no authentication. Is this okay? [y/N]:
-Deploy this changeset? [y/N]:
+In CloudFormation web console, a stack called `sam-app-upload` has been created. Use the stack's `Resources` tab to inspect all the resources created for this stack. Among them should be an API Gateway and Lambda function. 
 
-In CloudFormation, a stack called `sam-app-upload` has been created. Deleting the application can be done from this screen. 
+## Testing The Application
 
+In this distribution's `client` folder is a Jupyter notebook that can be used to test the Lambda endpoint.
+
+## AWS Cleanup 
+
+To delete all the resources created for this project, in the AWS console go back to the CloudFormation service and find you application in the `Stacks` screen. Select the stack and hit the `Delete` button. This will delete all the resources created for the project.
 

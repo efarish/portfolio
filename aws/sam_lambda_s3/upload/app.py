@@ -39,7 +39,8 @@ def deserialize_image(json_string):
 
 def lambda_handler(event, context):
     """
-    Lambda event handler. This code assume the API Gateway 
+    Lambda event handler. This code assume the API Gateway sends a Payload format version 2, which should be default format 
+      when the `template.yaml` file's  `Type` is set to `HttpApi`.
     """
 
     if event['rawPath'] == GET_PATH:
@@ -64,7 +65,6 @@ def lambda_handler(event, context):
         decode_body = base64.b64decode(body)
         data = deserialize_image(decode_body) 
         print(f'{type(data)=}')
-        #print(data)
         s3 = boto3.client('s3')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         key = f'IMG_{timestr}.png'
