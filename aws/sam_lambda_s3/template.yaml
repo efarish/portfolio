@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-app-upload
+
+  Sample SAM Template for sam-app-upload
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+  UploadImage:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: upload/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:*
+              Resource: arn:aws:logs:*:*:*
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource: arn:aws:s3:::*
+      RecursiveLoop: Terminate
+      SnapStart:
+        ApplyOn: None
+      Events:
+        Api1:
+          Type: HttpApi
+          Properties:
+            Path: /getInfo
+            Method: get
+        Api2:
+          Type: HttpApi
+          Properties:
+            Path: /upload
+            Method: post
+        Api3:
+          Type: HttpApi
+          Properties:
+            Path: /upload2
+            Method: post
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+
+
+
+
