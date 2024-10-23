@@ -1,19 +1,18 @@
-import json
 import base64
-import boto3
-import time
 import io
+import json
 import os
+import time
 
+import boto3
 from dotenv import load_dotenv
-
-GET_PATH = '/getInfo'
-POST_PATH = '/upload'
-POST_PATH_2 = '/upload2'
 
 load_dotenv()
 
-s3_bucket = os.getenv("S3_BUCKET")
+S3_BUCKET   = os.getenv("S3_BUCKET")
+GET_PATH    = '/' + os.getenv("GET_PATH")
+POST_PATH   = '/' + os.getenv("POST_PATH")
+POST_PATH_2 = '/' + os.getenv("POST_PATH_2")
 
 def deserialize_image(json_string):
     """
@@ -42,7 +41,6 @@ def lambda_handler(event, context):
     """
     Lambda event handler. This code assume the API Gateway 
     """
-    s3_bucket = 'rickmartelimagestore'
 
     if event['rawPath'] == GET_PATH:
         return {
@@ -56,7 +54,7 @@ def lambda_handler(event, context):
         s3 = boto3.client('s3')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         key = f'IMG_{timestr}.png'
-        s3_upload = s3.put_object(Bucket=s3_bucket, Key=key, Body=decode_body)
+        s3_upload = s3.put_object(Bucket=S3_BUCKET, Key=key, Body=decode_body)
         return {
             'statusCode': 200,
             'body': json.dumps('Post 1 called!')
@@ -70,8 +68,13 @@ def lambda_handler(event, context):
         s3 = boto3.client('s3')
         timestr = time.strftime("%Y%m%d_%H%M%S")
         key = f'IMG_{timestr}.png'
-        s3_upload = s3.put_object(Bucket=s3_bucket, Key=key, Body=data.getvalue())        
+        s3_upload = s3.put_object(Bucket=S3_BUCKET, Key=key, Body=data.getvalue())        
         return {
             'statusCode': 200,
             'body': json.dumps('Post 2 called!')
+        }
+    else:
+        return {
+            'statusCode': 404,
+            'body': json.dumps('Unknown path.')
         }

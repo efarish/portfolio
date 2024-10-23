@@ -115,7 +115,7 @@ Below is the directory tree after the updates.
 The command below builds the application. Run it in PowerShell and in the project directory created by the SAM CLI
 
 ```bash
-sam build --use-container
+sam build 
 ```
 
 A directory called `.aws-sam` will be created. 
