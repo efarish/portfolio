@@ -112,7 +112,7 @@ Click on the icon and the app should start. On my phone, after hitting the `Play
 ![Android Screenshot](./assets/img/screenshot1.jpg)
 
 
-## Setup Debugging
+## Start Debugging
 
 To view debug, in the Ubuntu virtual environment shell, run the command below.
 
