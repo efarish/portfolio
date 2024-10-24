@@ -117,6 +117,14 @@ sam deploy --guided
 
 In the CloudFormation web console, a stack called `sam-app-upload` will appear created. Use the stack's `Resources` tab to inspect all the resources created for this stack. Among them should be an API Gateway and Lambda function. 
 
+Below is a screenshot of the API Gateway endpoint created.
+
+![alt text](./asset/img/apigw.jpg)
+
+Below is a screenshot of the Lambda function created.
+
+![alt text](./asset/img/lambda.jpg)
+
 ## Testing The Application
 
 In this distribution's `client` folder is a Jupyter notebook that can be used to test the Lambda endpoint.
