@@ -109,7 +109,7 @@ Check you phone that the app was installed. You should see the `bkr.png` icon wi
 Click on the icon and the app should start. On my phone, after hitting the `Play` button, the app looks like the screenshot below.
 
 
-[Android Screenshot](./assets/img/screenshot1.jpg)
+![Android Screenshot](./assets/img/screenshot1.jpg)
 
 
 ## Setup Debugging
@@ -126,6 +126,6 @@ If you provided an endpoint that can accept POSTs of image files, the endpoint s
 
 Example debug output is below.
 
-[Debug output](./assets/img/log1.jpg)
+![Debug output](./assets/img/log1.jpg)
 
 
