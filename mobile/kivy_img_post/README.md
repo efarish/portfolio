@@ -1,4 +1,4 @@
-# Project: Post An Image To AWS S3 From Android Phone
+# Project: Post An Image To A HTTP Endpoint From Android Phone
 
 This project use the open-source Kivy framework to deploy a simple Python app to an Android phone. This simple app uses the phone's camera to take a picture, copy the image to the phone's download directory, and post the picture to an HTTP endpoint.
 
