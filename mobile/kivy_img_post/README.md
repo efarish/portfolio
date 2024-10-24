@@ -38,7 +38,7 @@ Below are the required installations for this project. Prior to executing these 
 
 ## The App
 
-Most of the code contained in this distribution's `main.py` file came from the Kivy example found [here]](https://kivy.org/doc/stable/examples/gen__camera__main__py.html). I customized it make a HTTP request to a HTTP endpoint. As mentioned above, If you don't have an endpoint available taht can accept an image POST, thoses lines can be removed from the script.
+Most of the code contained in this distribution's `main.py` file came from the Kivy example found [here](https://kivy.org/doc/stable/examples/gen__camera__main__py.html). I customized it make a HTTP request to a HTTP endpoint. As mentioned above, If you don't have an endpoint available taht can accept an image POST, thoses lines can be removed from the script.
 
 ## Project Build
 
