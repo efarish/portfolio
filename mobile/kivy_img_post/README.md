@@ -1,8 +1,8 @@
 # Project: Post An Image To A HTTP Endpoint From Android Phone
 
-This project use the open-source Kivy framework to deploy a simple Python app to an Android phone. This simple app uses the phone's camera to take a picture, copy the image to the phone's download directory, and post the picture to an HTTP endpoint.
+This project use the open-source Kivy framework to build a simple Python app for an Android phone. The app uses the phone's camera to take a picture, copy the image to the phone's download directory, and post the picture to an HTTP endpoint.
 
-To avoid having to provide an endpoint to post to, the Python request post in the `main.py` file can be removed. For my development, I used a AWS Gateway/Lambda endpoint project I developed. The code and steps for deployment can be found [here](https://github.com/efarish/portfolio/tree/main/aws/sam_lambda_s3).
+To avoid having to provide an endpoint to run the app, the Python POST request in the `main.py` script can be removed. For my development, I used a AWS Gateway/Lambda endpoint deployed using project I developed. The code and steps for deployment can be found [here](https://github.com/efarish/portfolio/tree/main/aws/sam_lambda_s3).
 
 The hardest part of this projects was setting up the development workstation. I provide the details of doing that below.
 
