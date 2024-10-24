@@ -8,4 +8,4 @@ The types of projects in this portfolio are:
 - [Research Projects](https://github.com/efarish/portfolio/tree/main/research): My application of Data Science techniques.
 - [AWS Projects](https://github.com/efarish/portfolio/tree/main/aws): Examples of using AWS services like SageMaker, S3, Lambda, and API Gateway.
 - [Fundamentals](https://github.com/efarish/portfolio/tree/main/fundamentals): Examples of using commmon ML algorithms for various tasks.
-- [Mobile Application](https://github.com/efarish/portfolio/tree/main/mobile/kivy_img_post): A demonstration project show how Python can be used to created mobile device applications and integrate them with cloud services like AWS.
+- [Mobile Application](https://github.com/efarish/portfolio/tree/main/mobile/kivy_img_post): A demonstration project showing how Python can be used to created mobile device applications and integrate them with cloud services like AWS.
