@@ -86,7 +86,7 @@ The last statement should list your connected phone.
 
 ### Ubuntu
 
-In an Ubuntu environment shell, run the following Andriod Bridge commands.
+In an Ubuntu environment shell, run the following Andriod Bridge commands. Be sure to pay attention to the device you are connecting to as you may be prompted to allow the connection.
 
 ```bash
 adb connect <YOUR PHONE IP HERE>:5555
