@@ -6,6 +6,10 @@ from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 
+"""
+Configure Kivy GUI. This configuration connnects 
+  the GUI class method LaunchProc.launch.
+"""
 Builder.load_string('''
 <LaunchProc>:
     orientation: "vertical"
@@ -22,7 +26,7 @@ Builder.load_string('''
 def worker(q):
     """
     Method called by worker threads started by clicking on 
-      window Launch button.  
+      GUI's Launch button.  
     """
     print('Worker running...')
     q.put(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))

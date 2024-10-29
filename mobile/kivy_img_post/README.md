@@ -86,10 +86,10 @@ The last statement should list your connected phone.
 
 ### Ubuntu
 
-In an Ubuntu environment shell, run the following Andriod Bridge commands.
+In an Ubuntu environment shell, run the following Andriod Bridge commands. Be sure to pay attention to the device you are connecting to as you may be prompted to allow the connection.
 
 ```bash
-adb connect 192.168.1.151:5555
+adb connect <YOUR PHONE IP HERE>:5555
 adb devices
 ```
 
@@ -100,7 +100,7 @@ The last statement should list your connected phone.
 In the project directory on Ubuntu, run the command below. This will deploy the android package to the connected phone.
 
 ```bash
-adb -s 192.168.1.151:5555 install ./bin/FILE NAME OF PACKAGE CREATED IN THE BUILD ABOVE.apk
+adb -s <YOUR PHONE IP HERE>:5555 install ./bin/FILE NAME OF PACKAGE CREATED IN THE BUILD ABOVE.apk
 ```
 
 When running this command, pay attention to your phone as you may be prompted to allow the app to access your phone.
@@ -118,7 +118,7 @@ Click on the icon and the app should start. On my phone, after hitting the `Play
 To view debug debug message as the app is running, in an Ubuntu shell, run the command below.
 
 ```bash
-adb -s 192.168.1.151:5555 logcat *:S python:D
+adb -s <YOUR PHONE IP HERE>:5555 logcat *:S python:D
 ```
 
 You should now see some debug messages. Click the app's `Capture` button to generate some additional debug messages.
