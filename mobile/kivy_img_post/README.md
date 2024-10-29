@@ -129,10 +129,6 @@ Below is example debug output.
 
 ![Debug output](./assets/img/log1.jpg)
 
-## TODO 
-
-Add multi-threading.
-
 ## Conclusion
 
 While not complicated, this projects demonstrates using Python code to develop a mobile application for an Android phone. Buildozer also supports creating deployments for the Apple iPhone as well. Furthermore, being able to post data to endpoints allows for integration with cloud service providers like IBM, AWS, and Google. 
