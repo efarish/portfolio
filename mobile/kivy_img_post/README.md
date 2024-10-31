@@ -109,11 +109,15 @@ When running this command, pay attention to your phone as you may be prompted to
 
 Check that the app was installed to your phone. You should see the `bkr.png` icon with a `Cam App`  label on your phone. 
 
-Click on the icon and the app should start. On my phone, after hitting the `Play` button, the app looks like the screenshot below.
+## Run The App
 
+Click on the icon and the app should start. On my phone, after hitting the `Play` button, the app looks like the screenshot below.
 
 ![Android Screenshot](./assets/img/screenshot1.jpg)
 
+Taking a picture submits the image to the endpoint. The AWS endpoint used for the project saves the file to AWS S3 and uses AWS Rekognition to identify the objects in the picture. Below is a screenshot of the app in action.
+
+![Android Screenshot](./assets/img/remote1.jpg)
 
 ## Start Debugging
 
