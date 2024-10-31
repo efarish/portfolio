@@ -1,6 +1,16 @@
 # Project: AWS SAM Lambda File Upload
 
-This project contains source code and supporting files for an AWS serverless application to load files to Amazon S3 using a Lambda endpoint. The AWS Serverless Application Model (SAM CLI) is used for deployment. SAM CLI is an extension of the AWS CLI that enables building and testing AWS applications. VS Code's AWS Toolkit extension is used for integration with AWS.
+This project contains source code and supporting files for an AWS serverless application to load images to Amazon S3 and identify objects in the picture using a Lambda endpoint. The AWS Serverless Application Model (SAM CLI) is used for deployment. SAM CLI is an extension of the AWS CLI that enables building and testing AWS applications. VS Code's AWS Toolkit extension is used for integration with AWS.
+
+## Lambda Implementation
+
+The Lambda function in this project expects an image file and does a couple things:
+
+1. Post the image to S3.
+1. Uses Rekognition to get the labels of objects found in the image.
+1. Returns the labels found in the Lambda response to the calling client.
+
+The code is pretty simple but does show how easy it is to integrate Lambda with other AWS services.
 
 ## Project Setup
 
@@ -132,4 +142,6 @@ In this distribution's `client` folder is a Jupyter notebook that can be used to
 ## AWS Cleanup 
 
 To delete all the resources created for this project, in the AWS console go back to the CloudFormation service and find you application in the `Stacks` screen. Select the stack and hit the `Delete` button. This will delete all the resources created for the project.
+
+
 

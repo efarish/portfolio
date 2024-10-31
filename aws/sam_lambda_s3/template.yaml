@@ -31,6 +31,10 @@ Resources:
                 - s3:GetObject
                 - s3:PutObject
               Resource: arn:aws:s3:::*
+            - Effect: Allow
+              Action:
+                - rekognition:DetectLabels
+              Resource: "*"
       RecursiveLoop: Terminate
       SnapStart:
         ApplyOn: None
