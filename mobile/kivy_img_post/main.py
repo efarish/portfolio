@@ -32,9 +32,9 @@ def worker(q, img_file):
         with open(img_file, 'rb') as image_file:
                 response = requests.post(URL, data=image_file)
         if response.status_code == 200:
-            response_msg = "Image uploaded successfully!"
+            response_msg = response.text
         else:
-            response_msg = f"Error uploading image: {response.status_code}" 
+            response_msg = f"Error uploading image: {response.status_code}, {response.text}" 
         print(response_msg)    
         print(f'{response.status_code=}')
         print(f'{response.text=}') 
