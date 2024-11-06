@@ -18,7 +18,7 @@ from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 
-URL = ' TODO ' #SET ENDPOINT URL HERE!!!!! 
+URL = ' TODO ' #SET ENDPOINT URL HERE!!!!!
 
 Builder.load_file('./kivy.kv')
 
