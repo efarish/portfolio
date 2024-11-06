@@ -14,13 +14,22 @@ GET_PATH    = '/' + os.getenv("GET_PATH")
 POST_PATH   = '/' + os.getenv("POST_PATH")
 POST_PATH_2 = '/' + os.getenv("POST_PATH_2")
 
-def detect_labels(imageFile) -> str:
+def detect_labels(imageFile, category_filter=['Plants and Flowers']) -> str:
     session = boto3.Session()
     client = session.client('rekognition')
     s3 = boto3.resource('s3')
     s3_object = s3.Object(S3_BUCKET, imageFile)
     image = s3_object.get()['Body'].read()
-    response = client.detect_labels(Image={'Bytes': image},MaxLabels=5,MinConfidence=70.0)
+    response = client.detect_labels(Image={'Bytes': image},
+                                    MaxLabels=5,
+                                    MinConfidence=70.0,
+                                    Features=["GENERAL_LABELS"],
+                                    Settings={"GeneralLabels": {
+                                                                "LabelCategoryInclusionFilters": category_filter,
+                                                                "LabelExclusionFilters": ['Plant', 'Flower']
+                                                                }
+                                            }
+                                    )
     rek_response = 'Detected labels:'
     for label in response['Labels']:
         rek_response += f"\nLabel: {label['Name']}, Conf: {label['Confidence']:.1f}"
