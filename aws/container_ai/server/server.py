@@ -5,8 +5,6 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, request
 
-FLASK_SERVER_PORT=os.environ.get('FLASK_SERVER_PORT', '')
-
 app = Flask(__name__)
 
 load_dotenv()
