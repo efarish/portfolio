@@ -25,7 +25,7 @@ Resources:
       Family: ecs2-server
       ContainerDefinitions:
         - Name: server
-          Image: 598185244415.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
+          Image: <YOUR ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
           Cpu: '1024'
           PortMappings:
             - Name: '9090'
@@ -50,8 +50,8 @@ Resources:
               awslogs-stream-prefix: ecs
             SecretOptions: []
           SystemControls: []
-      TaskRoleArn: arn:aws:iam::598185244415:role/sam-app-upload-UploadImageRole-tf9V90jzGYcA
-      ExecutionRoleArn: arn:aws:iam::598185244415:role/ecsTaskExecutionRole
+      TaskRoleArn: arn:aws:iam::<YOUR ACCT ID>:role/sam-app-upload-UploadImageRole-tf9V90jzGYcA
+      ExecutionRoleArn: arn:aws:iam::<YOUR ACCT ID>:role/ecsTaskExecutionRole
       NetworkMode: awsvpc
       Volumes: []
       PlacementConstraints: []
