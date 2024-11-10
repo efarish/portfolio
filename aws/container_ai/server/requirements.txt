@@ -1,2 +1,6 @@
 python-dotenv
-flask
+fastapi
+uvicorn
+python-multipart
+pydantic
+boto3
