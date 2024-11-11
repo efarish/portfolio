@@ -1,10 +1,12 @@
 # Project: Access AWS Services From Docker
 
+WORK IN PROGRESS
+
 This project demonstrates using AWS services within a docker container which AWS makes very easy to do.
 
-Below are the steps to build and test the Docker image locally, deploy it to AWS ECR, create the ECS cluster, and run a ECS task. 
+Below are the steps to build and test the Docker image locally, deploy it to AWS ECR, and create a ECS cluster. 
 
-To demonstrate accessing AWS services, the Docker container copies to S3 files posted to an FastAPI endpoint.
+To demonstrate accessing AWS services, the Docker container exposes a FastAPI endpoint that copies posted files to S3.
 
 This project demonstrates providing AWS credentials to a Docker container in two cases:
 
@@ -43,7 +45,7 @@ docker tag ecs1/server <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:s
 
 # Test Locally
 
-Since the endpoint will use the AWS S3 services, credentials will need to be provided. An easy way to do this is provide the credentials through environment variables when the container is started. Below is an example.
+Since the endpoint will use the AWS S3 service, credentials will need to be provided. An easy way to do this is provide the credentials through environment variables when the container is started. Below is an example.
 
 ```bash
 docker container run -p 9090:9090 -e AWS_ACCESS_KEY_ID='YOUR AWS ACCT ID' -e AWS_SECRET_ACCESS_KEY='YOUR AWS ACCT KEY' ecs1/server  
@@ -60,39 +62,9 @@ docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
 
 # Provision ECS Cluster in AWS
 
-I used AWS CloudFormation and SAM to provision an ECS cluster and a single task definition that references the image loaded to ECR.  The file `./template.yaml` has the CloudFormation configuration to provision the cluster. A couple notes on the template file.
+I used AWS CloudFormation and SAM to provision an ECS cluster and a single task definition that references the image loaded to ECR.  The file `./template.yaml` has the CloudFormation configuration to provision the cluster. A couple note(s) on the template file.
 
 1. The `Image` property needs to be customized to reference the ECR Docker image uploaded previously. 
-1. The `TaskRoleArn` property needs to reference an AWS account role that gives access to whatever AWS services your endpoint will need. Below is an example policy that provides access to CloudWatch logs, S3, and Rekognition (AWS's cloud-based image and video analysis service). 
-```
-{
-	"Statement": [
-		{
-			"Action": [
-				"logs:*"
-			],
-			"Resource": "arn:aws:logs:*:*:*",
-			"Effect": "Allow"
-		},
-		{
-			"Action": [
-				"s3:GetObject",
-				"s3:PutObject"
-			],
-			"Resource": "arn:aws:s3:::*",
-			"Effect": "Allow"
-		},
-		{
-			"Action": [
-				"rekognition:DetectLabels"
-			],
-			"Resource": "*",
-			"Effect": "Allow"
-		}
-	]
-}
-```
-1. The `ExecutionRoleArn` property needs to reference a role available in the AWS account that contains the policy `AmazonECSTaskExecutionRolePolicy`. 
 
 To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in this distribution's `sam-app-ec1` directory as it has the template file.
 
@@ -101,17 +73,11 @@ sam build
 sam deploy
 ```
 
-# Run The ECS Cluster in AWS
-
-In the AWS console, go the the ECS service, on Task Definitions screen select newly defined task, select `Deploy->Run`, on the create screen, select the `ecs1` cluster created for this project, and then deploy the task to the cluster by clicking the create task button. 
-
-A public IP will be available on the cluster task's configuration screen. Use that IP and the Jupyter notebook in this distribution's `client` directory to test the endpoint. 
+At this point, an AWS ECS cluster should be deployed. Within it will be a service and a single task. In the task's configuration screen, find the public IP. Use that IP and the notebook in this distribution's `./client` folder to test the ECS endpoint.
 
 # AWS Clean Up
 
-At this point you'll have a task running in the ECS cluster created for this project. To avoid unwanted AWS charges, the task must be terminated. Go to the AWS ECS console, click on the cluster created for this project, open the `Tasks` tab, and stop the task. 
-
-Next, to remove the resources created for this project: go to CloudFormation in the AWS console, find the stack with the name `sam-app-ecs1` and delete it.
+To avoid unwanted AWS charges, the CloudFormation stack for this project must be deleted. Go to CloudFormation in the AWS console, find the stack with the name `sam-app-ecs1` and delete it.
 
 Finally, in the AWS console go to the ECR screen screen and remove the Docker image used for this project.
 
@@ -119,5 +85,8 @@ Finally, in the AWS console go to the ECR screen screen and remove the Docker im
 
 This simple project demonstrated accessing AWS services from a Docker container running locally and in AWS ECS.   
 
-
+TODO 
+1. Add App Load Balancer (maybe VPC?)
+1. Add Api Gateway 
+1. Add Authentication/Authorization
 

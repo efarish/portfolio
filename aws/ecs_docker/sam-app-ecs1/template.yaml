@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: The template used to create a ECS cluster and task using ECR image.
+Parameters:
+  ECSClusterName:
+    Type: String
+    Description: Specifies the ECS Cluster Name with which the resources would be associated
+    Default: ecs1
+  ECSServiceName:
+    Type: String
+    Default: ecs1-service
+  SecurityGroupIDs:
+    Type: CommaDelimitedList
+    Default: sg-ba1305ec
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Default: subnet-1b342947,subnet-beb379b0,subnet-7ff0d441,subnet-86ccd3a8,subnet-f7a3b290,subnet-ac8929e1
+  VpcID:
+    Type: String
+    Default: vpc-b78fa2cd
+  LoadBalancerName:
+    Type: String
+    Default: ''
+Resources:
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+          Action: ['sts:AssumeRole']
+          Condition:
+            ArnLike:
+              aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+            StringEquals:
+              aws:SourceAccount: !Ref AWS::AccountId
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ecr-iam-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - '*'
+                Sid: ''
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties: 
+      CapacityProviders: 
+        - FARGATE
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Base: 0
+          Weight: 1
+      TaskDefinition: !Ref "TaskDefinition"
+      ServiceName: ecs1-service
+      SchedulingStrategy: REPLICA
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: !Ref SecurityGroupIDs
+          Subnets: !Ref SubnetIDs
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      DeploymentController:
+        Type: ECS
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags: []
+      EnableECSManagedTags: true
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties: 
+      Family: ecs1-server
+      ContainerDefinitions:
+        - Name: server
+          Image: <A AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
+          Cpu: '1024'
+          PortMappings:
+            - Name: '9090'
+              ContainerPort: 9090
+              HostPort: 9090
+              Protocol: tcp
+              AppProtocol: http
+          Essential: true
+          Environment: []
+          EnvironmentFiles: []
+          MountPoints: []
+          VolumesFrom: []
+          Ulimits: []
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/ecs1-server
+              mode: non-blocking
+              awslogs-create-group: 'true'
+              max-buffer-size: 25m
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: ecs
+            SecretOptions: []
+          SystemControls: []
+      TaskRoleArn: !Ref ECSTaskRole
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      NetworkMode: awsvpc
+      Volumes: []
+      PlacementConstraints: []
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '1024'
+      Memory: '3072'
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX
+Outputs:
+  ClusterName:
+    Description: The cluster used to create the service.
+    Value: !Ref ECSClusterName
+  ECSService:
+    Description: The created service.
+    Value: !Ref ECSService
