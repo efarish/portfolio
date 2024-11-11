@@ -62,9 +62,12 @@ docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
 
 # Provision ECS Cluster in AWS
 
-I used AWS CloudFormation and SAM to provision an ECS cluster and a single task definition that references the image loaded to ECR.  The file `./template.yaml` has the CloudFormation configuration to provision the cluster. A couple note(s) on the template file.
+I used AWS CloudFormation and SAM to provision an ECS cluster and a single task definition that references the image loaded to ECR. The file `./template.yaml` has the CloudFormation configuration to provision the cluster. This file specifies the following resources to be created in AWS.
 
-1. The `Image` property needs to be customized to reference the ECR Docker image uploaded previously. 
+- Fargate Task Definition
+- Fargate Cluster
+- Fargate Service
+- Application Load Balancer (TODO) 
 
 To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in this distribution's `sam-app-ec1` directory as it has the template file.
 
@@ -73,7 +76,7 @@ sam build
 sam deploy
 ```
 
-At this point, an AWS ECS cluster should be deployed. Within it will be a service and a single task. In the task's configuration screen, find the public IP. Use that IP and the notebook in this distribution's `./client` folder to test the ECS endpoint.
+At this point, an AWS ECS cluster should be deployed. Within it will be a service and a single task. In the task's configuration screen, find the public IP. Use that IP and the notebook in this distribution's `./client` folder to test the ECS endpoint. 
 
 # AWS Clean Up
 
