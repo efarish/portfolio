@@ -38,7 +38,7 @@ def detect_labels(imageFile, category_filter=['Plants and Flowers']) -> str:
 def deserialize_image(json_string):
     """
     Function used to deserialize POST body that was serialized using json.dumps. The image 
-      value was serialized using base64.b64encode. An example is below.
+      value was serialized using base64.b64encode. 
     """
     data = json.loads(json_string)
     image_bytes = base64.b64decode(data['image'])
