@@ -13,9 +13,13 @@ S3_BUCKET = os.getenv("S3_BUCKET")
 
 app = FastAPI()
 
+@app.get('/')
+def health_check():
+    return {'message': 'The container is up.'}
+
 @app.get('/getInfo')
 def read_me():
-    return {'message': 'Hello, World!'}
+    return {'message': 'Hi from the ECS container.'}
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):

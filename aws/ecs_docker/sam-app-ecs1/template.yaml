@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
 Description: The template used to create a ECS cluster and task using ECR image.
 Parameters:
   ECSClusterName:
@@ -21,11 +22,19 @@ Parameters:
     Type: String
     Default: ''
 Resources:
+  VPC:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./vpc.yml
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/ecs1-server
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Statement:
+        Statement:        
         - Effect: Allow
           Principal:
             Service: [ecs-tasks.amazonaws.com]
@@ -57,6 +66,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                   - s3:GetObject
@@ -84,8 +94,8 @@ Resources:
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
-          SecurityGroups: !Ref SecurityGroupIDs
-          Subnets: !Ref SubnetIDs
+          SecurityGroups: [!GetAtt VPC.Outputs.SG]
+          Subnets:  [!GetAtt "VPC.Outputs.PublicSubnet1", !GetAtt VPC.Outputs.PublicSubnet2]
       PlatformVersion: LATEST
       DeploymentConfiguration:
         MaximumPercent: 200
@@ -99,6 +109,10 @@ Resources:
         Enabled: false
       Tags: []
       EnableECSManagedTags: true
+      LoadBalancers:
+        - ContainerName: "server"
+          ContainerPort: 9090
+          TargetGroupArn: !GetAtt VPC.Outputs.LB
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties: 
@@ -122,11 +136,10 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: /ecs/ecs1-server
+              awslogs-group: !Ref LogGroup
               mode: non-blocking
-              awslogs-create-group: 'true'
               max-buffer-size: 25m
-              awslogs-region: us-east-1
+              awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: ecs
             SecretOptions: []
           SystemControls: []
@@ -149,3 +162,6 @@ Outputs:
   ECSService:
     Description: The created service.
     Value: !Ref ECSService
+  FQDN:
+    Description: URL for your application
+    Value: !GetAtt VPC.Outputs.PublicLBFQDN
