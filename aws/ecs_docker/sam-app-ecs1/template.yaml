@@ -1,6 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: The template used to create a ECS cluster and task using ECR image.
+
 Parameters:
   ECSClusterName:
     Type: String
@@ -21,6 +22,7 @@ Parameters:
   LoadBalancerName:
     Type: String
     Default: ''
+
 Resources:
   VPC:
     Type: AWS::Serverless::Application
@@ -90,12 +92,12 @@ Resources:
       TaskDefinition: !Ref "TaskDefinition"
       ServiceName: ecs1-service
       SchedulingStrategy: REPLICA
-      DesiredCount: 1
+      DesiredCount: 2
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
+          AssignPublicIp: DISABLED
           SecurityGroups: [!GetAtt VPC.Outputs.SG]
-          Subnets:  [!GetAtt "VPC.Outputs.PublicSubnet1", !GetAtt VPC.Outputs.PublicSubnet2]
+          Subnets:  [!GetAtt "VPC.Outputs.PrivateSubnet1", !GetAtt VPC.Outputs.PrivateSubnet2]
       PlatformVersion: LATEST
       DeploymentConfiguration:
         MaximumPercent: 200
