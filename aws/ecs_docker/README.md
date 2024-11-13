@@ -1,14 +1,16 @@
 # Project: Access AWS Services From Docker
 
-WORK IN PROGRESS
+WORK-IN-PROGRESS
 
-This project demonstrates using AWS services within a docker container which AWS makes very easy to do.
+This project demonstrates using AWS services within a docker container deployed to an AWS ECS cluster.
 
-Below are the steps to build and test the Docker image locally, deploy it to AWS ECR, and create a ECS cluster. 
+Below are the steps to build and test the Docker image, deploy it to AWS ECR, and use it to create a container an ECS cluster.
 
-To demonstrate accessing AWS services, the Docker container exposes a FastAPI endpoint that copies posted files to S3.
+CloudFormation and SAM are are used to provision everything. Not just the ECS cluster, but also a VPC and Application Load Balancer.  
 
-This project demonstrates providing AWS credentials to a Docker container in two cases:
+The endpoint deployed with the Docker container exposes a FastAPI endpoint that copies posted files to S3.
+
+This project demonstrates two cases of providing AWS credentials to the Docker container to access AWS services (e.g. AWS S3):
 
 1. When testing the Docker container locally. 
 1. When running the Docker container in AWS ECS.
@@ -64,7 +66,7 @@ docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
 
 I used AWS CloudFormation and SAM to provision the stack defined in `./sam-app-ecs1/template.yaml`. This file specifies the following resources to be created in AWS.
 
-- A VPC with two public subnets
+- A VPC with two public and private subnets
 - Fargate Task Definition
 - Fargate Cluster
 - Fargate Service
@@ -102,6 +104,6 @@ Finally, in the AWS console go to the ECR screen screen and remove the Docker im
 Using CloudFormation and SAM greatly expedites the creation of AWS applications. This simple project demonstrated accessing AWS services from a Docker container run locally and in AWS ECS.   
 
 TODO 
-1. Add Api Gateway 
+1. Add Api Gateway/Cloud Map
 1. Add Authentication/Authorization
 
