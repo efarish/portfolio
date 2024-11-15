@@ -221,13 +221,13 @@ Resources:
     DependsOn: VPCInternetGateway
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: public-http-lb
-      Scheme: internet-facing
+      Name: private-http-lb
+      Scheme: internal
       SecurityGroups:
         - !Ref PublicHTTPSecurityGroup
       Subnets:
-        - !Ref PublicSubnet1
-        - !Ref PublicSubnet2
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
       Type: application
 
   PublicLBTargetGroup:
@@ -237,7 +237,7 @@ Resources:
       HealthCheckIntervalSeconds: 10 # Default is 30.
       HealthyThresholdCount: 2       # Default is 5.
       HealthCheckTimeoutSeconds: 5
-      Name: public-tg
+      Name: private-tg
       VpcId: !Ref VPC
       Protocol: HTTP
       TargetGroupAttributes:
@@ -305,3 +305,5 @@ Outputs:
     Value: !Ref PublicLBTargetGroup
   SG:
     Value: !Ref PublicHTTPSecurityGroup
+  PublicLBListener:
+    Value: !Ref PublicLBListener

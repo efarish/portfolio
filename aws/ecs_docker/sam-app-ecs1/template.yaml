@@ -10,24 +10,20 @@ Parameters:
   ECSServiceName:
     Type: String
     Default: ecs1-service
-  SecurityGroupIDs:
-    Type: CommaDelimitedList
-    Default: sg-ba1305ec
-  SubnetIDs:
-    Type: CommaDelimitedList
-    Default: subnet-1b342947,subnet-beb379b0,subnet-7ff0d441,subnet-86ccd3a8,subnet-f7a3b290,subnet-ac8929e1
-  VpcID:
-    Type: String
-    Default: vpc-b78fa2cd
-  LoadBalancerName:
-    Type: String
-    Default: ''
 
 Resources:
+
+  #---------------------------------------------------------------------
+  # Deploys VPC
+  #---------------------------------------------------------------------
   VPC:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./vpc.yml
+
+  #---------------------------------------------------------------------
+  # Deploys ECS
+  #---------------------------------------------------------------------
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -157,13 +153,120 @@ Resources:
       RuntimePlatform:
         CpuArchitecture: X86_64
         OperatingSystemFamily: LINUX
+
+  #---------------------------------------------------------------------
+  # Deploy API GW VPC Link
+  #---------------------------------------------------------------------
+  APIGWVPClinkSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !GetAtt VPC.Outputs.VPCID
+      GroupName: vpclink-security-group
+      GroupDescription: APIGW vpclink security group
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+
+  PrivateAPIGWvpcLink:  
+    Type: AWS::ApiGatewayV2::VpcLink
+    Properties: 
+      Name: private-apigw-vpclink
+      SecurityGroupIds: 
+        - !Ref APIGWVPClinkSG
+      SubnetIds: 
+        - !GetAtt "VPC.Outputs.PrivateSubnet1"
+        - !GetAtt "VPC.Outputs.PrivateSubnet2"
+
+  # -------------------------------------------------------------------------
+  # Deploy API GW HTTP API route and integration to private ALB via VPC Link
+  # -------------------------------------------------------------------------
+  HttpApiALB:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: alb-HTTP-api
+      Description: HTTP API ALB
+      ProtocolType: HTTP
+
+  APIRoute1:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiALB
+      RouteKey: 'GET /'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute2:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiALB
+      RouteKey: 'GET /getInfo'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute3:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiALB
+      RouteKey: 'POST /upload'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApiALB
+      Description: Private ALB Integration
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      ConnectionType: VPC_LINK
+      ConnectionId: 
+        !Ref PrivateAPIGWvpcLink
+      IntegrationUri: !GetAtt "VPC.Outputs.PublicLBListener" 
+      PayloadFormatVersion: '1.0'
+
+  APIStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: $default
+      AutoDeploy: true
+      ApiId: !Ref HttpApiALB
+
+# -------------------------------------------------------------------------
+# Information about the stack.
+# -------------------------------------------------------------------------
 Outputs:
+  VpcId:
+    Description: VPC ID
+    Value: !GetAtt VPC.Outputs.VPCID
   ClusterName:
     Description: The cluster used to create the service.
     Value: !Ref ECSClusterName
   ECSService:
     Description: The created service.
     Value: !Ref ECSService
+  PublicLBListener:
+    Description: LB Listener ID
+    Value: !GetAtt VPC.Outputs.PublicLBListener
   FQDN:
     Description: URL for your application
     Value: !GetAtt VPC.Outputs.PublicLBFQDN
+  PrivateSubnet1:
+    Description: Private Subnet 1
+    Value: !GetAtt "VPC.Outputs.PrivateSubnet1"
+  PrivateSubnet2:
+    Description: Private Subnet 2
+    Value: !GetAtt "VPC.Outputs.PrivateSubnet2"
+  APIURL:
+    Description: API Gateway URL
+    Value: !Sub https://${HttpApiALB}.execute-api.${AWS::Region}.amazonaws.com/ 
+
+
+    
