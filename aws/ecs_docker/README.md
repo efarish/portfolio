@@ -1,29 +1,55 @@
-# Project: Access AWS Services From Docker
+# Project: Building An ECS Stack
 
-WORK-IN-PROGRESS
+This project demonstrates using Docker, ECS, and CloudFormation to deploy a very simple microservice.
 
-This project demonstrates using AWS services within a docker container deployed to an AWS ECS cluster.
+Below is a summary of the AWS resources provisioned for this this stack:
 
-Below are the steps to build and test the Docker image, deploy it to AWS ECR, and use it to create a container an ECS cluster.
+- A VPC with two public and private subnets and supporting gateways.
+- Fargate Task Definition, Cluster, and Service deployed to the private subnets. 
+- An internal facing Application Load Balancer.
+- An API Gateway along with a VPC link to the private Application Load Balancer.
 
-CloudFormation and SAM are are used to provision everything. Not just the ECS cluster, but also a VPC and Application Load Balancer.  
+**NOTE**: The charges for this stack can accumulate quickly. In particular, the ELB and NAT Gateways. Be sure to delete the stack when done. See [section 'AWS Cleanup'](#cleanup) for options to delete the stack.  
 
-The endpoint deployed with the Docker container exposes a FastAPI endpoint that copies posted files to S3.
+Below are a couple options for reducing the cost of this stack:
 
-This project demonstrates two cases of providing AWS credentials to the Docker container to access AWS services (e.g. AWS S3):
+1. Remove the VPC created and the references to it and use the AWS account default VPC.
+1. Reduce the number of public/private subnets and the NAT Gateway that connects them.
+1. Git rid of the public subnets and the Internet/NAT Gateways and use AWS Private Links to the services needed by the container app (S3) and ECS (EDR and Secrets Manager).
+1. Reduce the number of tasks created by the ECS.
+1. Use AWS Cloud Map instead of an application load balancer to integrate the API Gateway and ECS.  
 
-1. When testing the Docker container locally. 
-1. When running the Docker container in AWS ECS.
+Below are the steps to:
+
+- Build and test the Docker image and deploy it to AWS ECR.
+- Create the ECS stack using CloudFormation.  
+
+The Docker container exposes a FastAPI endpoint that copies posted files to S3.
+
+This project demonstrates two use cases of providing AWS credentials to the Docker container to access AWS services (e.g. AWS S3):
+
+- When testing the Docker container locally. 
+- When running the Docker container in AWS ECS.
+
+You'll need the following to run this project:
+
+- Configured AWS and SAM command line clients.
+- Docker
+
+I found these CloudFormation examples useful:
+
+- [API Gateway Integrations examples](https://github.com/aws-samples/aws-apigw-http-api-private--integrations/blob/main/templates/APIGW-HTTP-private-integration-ALB-ecs.yml) 
+- [Fargate Example](https://containersonaws.com/pattern/sam-fargate)
 
 # The App
 
-In the `./server` directory are the files to build the Docker image. The `main.py` script contains an endpoint that supports GET and POST requests. The POST copies files to S3. The web framework FastAPI is used to implement the endpoint.  
+In the `./server` directory are the files to build the Docker image. The `main.py` script contains an endpoint that supports GET and POST requests. The POST copies files to AWS S3. The web framework FastAPI is used to implement the endpoint.  
 
-NOTE: The `.env` file included with this distribution needs to be updated to reference a valid AWS S3 bucket for the account used for this project.
+NOTE: The `.env` file included with this distribution needs to be updated to reference a valid AWS S3 bucket in the AWS account used for this project.
 
 # Docker Build
 
-Using the Docker file in the `./server` folder, a very simple endpoint container is created. 
+Using the Docker file in the `./server` folder, run the commands below. 
 
 ```bash
 docker build -t ecs1/server .
@@ -31,7 +57,7 @@ docker container run -d -p 9090:9090 ecs1/server
 docker ps
 ```
 
-There should now be a container running in Docker. Try to access the container endpoint at `http://localhost:9090` in a web browser or using the client Jupyter notebook in this distribution's `client` directory. 
+In your local docker instance, there should now be a container listed in the output of the `docker ps` command above. Try to access the container endpoint at `http://localhost:9090` in a web browser or using the client Jupyter notebook in this distribution's `client` directory. 
 
 Now shutdown the container.
 
@@ -62,48 +88,43 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
 ```
 
-# Provision ECS Cluster in AWS
+# Provision A CloudFormation Stack in AWS
 
-I used AWS CloudFormation and SAM to provision the stack defined in `./sam-app-ecs1/template.yaml`. This file specifies the following resources to be created in AWS.
+I used AWS CloudFormation and SAM to provision the stack defined in `./sam-app-ecs1/template.yaml` and `./sam-app-ecs1/vpc.yml`. 
 
-- A VPC with two public and private subnets
-- Fargate Task Definition
-- Fargate Cluster
-- Fargate Service
-- An Application Load Balancer
-
-To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in this distribution's `sam-app-ec1` directory as thats where the SAM template file is.
+To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in this distribution's `sam-app-ec1` directory as thats where the SAM template files are.
 
 ```bash
 sam build
 sam deploy
 ```
 
-The deployment will take a few minutes. Status messages will appear in the console and deployment progresses. The deployment can also be monitored in CloudFormation.
+The deployment will take a few minutes. Status messages will appear in the console as deployment progresses. The deployment can also be monitored in CloudFormation.
 
-When the deployment completes, the load balance URL should be printed out by the SAM CLI. The following AWS endpoint routes should now be available:
+When the deployment completes, the API Gateway URL will be printed to the console by the SAM CLI. The following AWS endpoint routes should now be available:
 
-1. http://< LB URL >/ - A health check use by the load balancer.
-1. http://< LB URL >/getInfo - A simple GET method.
-1. http://< LB URL >/upload - A POST method to which files can be posted and copied to S3.   
+1. http://< URL >/ - A health check use by the load balancer.
+1. http://< URL >/getInfo - A simple GET method.
+1. http://< URL >/upload - A POST method to which files can be posted and copied to S3.   
 
-The GET methods can be access through a browser. The notebook in the `./client` folder can be used to post a sample image. 
+The GET methods can be access through a browser. The notebook in the `./client` folder can be used to POST a sample image. 
 
-## Container Access to AWS service
+# AWS Clean Up <a id='cleanup'></a>
 
-In the SAM `./sam-app-ecs1/template.yaml` file, the role `ECSTaskRole` is created and is assigned to the `TaskDefinition` resources's `TaskRoleArn` property. This configuration gives the container created by the service and task definitions access to S3 and CloudWatch logs. Any other AWS service needed by the endpoint can be added to the `ECSTaskRole` element `Policies`->`PolicyDocument`->`Statement`->`Affect`->`Action`.  
+To avoid unwanted AWS charges, the CloudFormation stack for this project must be deleted. 
 
-# AWS Clean Up
+Go to CloudFormation in the AWS console, find the stack with the name `sam-app-ecs1` and delete it.
 
-To avoid unwanted AWS charges, the CloudFormation stack for this project must be deleted. Go to CloudFormation in the AWS console, find the stack with the name `sam-app-ecs1` and delete it.
+**--OR--**
 
-Finally, in the AWS console go to the ECR screen screen and remove the Docker image used for this project.
+At the command line in the `./sam-app-ecs1` directory, run `sam delete`.
+
+After doing either of these, do a sanity check to make sure the ECS cluster, VPC, and application load balancer are deleted.
 
 # Conclusion
 
-Using CloudFormation and SAM greatly expedites the creation of AWS applications. This simple project demonstrated accessing AWS services from a Docker container run locally and in AWS ECS.   
+Using CloudFormation and SAM greatly expedites the creation of AWS applications.
 
-TODO 
-1. Add Api Gateway/Cloud Map
-1. Add Authentication/Authorization
-
+# TODO 
+1. Create a version that uses AWS Cloud Map instead of an ALB to avoid the costs.
+1. Add Authentication/Authorization.
