@@ -38,7 +38,7 @@ You'll need the following to run this project:
 
 I found these CloudFormation examples useful:
 
-- [API Gateway Integrations examples]([https://github.com/aws-samples/aws-apigw-http-api-private--integrations/blob/main/templates/APIGW-HTTP-private-integration-ALB-ecs.yml](https://github.com/aws-samples/aws-apigw-http-api-private--integrations) 
+- [API Gateway Integrations examples]([https://github.com/aws-samples/aws-apigw-http-api-private--integrations/blob/main/templates/APIGW-HTTP-private-integration-ALB-ecs.yml](https://github.com/aws-samples/aws-apigw-http-api-private--integrations)) 
 - [Fargate Example](https://containersonaws.com/pattern/sam-fargate)
 
 # The App
