@@ -243,7 +243,7 @@ Resources:
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 0
-      Port: 9090
+      Port: 80
       TargetType: ip
       IpAddressType: ipv4
 
@@ -266,12 +266,12 @@ Resources:
           Description: Allow all outbound traffic by default
           IpProtocol: "-1"
       SecurityGroupIngress:
-        # Allow traffic from services on port 9090
+        # Allow traffic from services on port 80
         - CidrIp: 0.0.0.0/0
-          Description: Allow traffic from services on port 9090
-          FromPort: 9090
+          Description: Allow traffic from services on port 80
+          FromPort: 80
           IpProtocol: tcp
-          ToPort: 9090
+          ToPort: 80
       VpcId: !Ref VPC
 
   ApplicationLBSecurityGroupIngress:

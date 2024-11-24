@@ -27,7 +27,7 @@ Resources:
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /ecs/ecs1-server
+      LogGroupName: !Sub /ecs/${ECSClusterName}-server
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -86,7 +86,7 @@ Resources:
           Base: 0
           Weight: 1
       TaskDefinition: !Ref "TaskDefinition"
-      ServiceName: ecs1-service
+      ServiceName: !Sub ${ECSClusterName}-service
       SchedulingStrategy: REPLICA
       DesiredCount: 2
       NetworkConfiguration:
@@ -109,20 +109,20 @@ Resources:
       EnableECSManagedTags: true
       LoadBalancers:
         - ContainerName: "server"
-          ContainerPort: 9090
+          ContainerPort: 80
           TargetGroupArn: !GetAtt VPC.Outputs.LB
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties: 
-      Family: ecs1-server
+      Family: !Sub ${ECSClusterName}-server
       ContainerDefinitions:
         - Name: server
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:server"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/${ECSClusterName}:upload"
           Cpu: '1024'
           PortMappings:
-            - Name: '9090'
-              ContainerPort: 9090
-              HostPort: 9090
+            - Name: 'upload'
+              ContainerPort: 80
+              HostPort: 80
               Protocol: tcp
               AppProtocol: http
           Essential: true
@@ -243,27 +243,6 @@ Resources:
 # Information about the stack.
 # -------------------------------------------------------------------------
 Outputs:
-  VpcId:
-    Description: VPC ID
-    Value: !GetAtt VPC.Outputs.VPCID
-  ClusterName:
-    Description: The cluster used to create the service.
-    Value: !Ref ECSClusterName
-  ECSService:
-    Description: The created service.
-    Value: !Ref ECSService
-  PublicLBListener:
-    Description: LB Listener ID
-    Value: !GetAtt VPC.Outputs.PublicLBListener
-  FQDN:
-    Description: URL for your application
-    Value: !GetAtt VPC.Outputs.PublicLBFQDN
-  PrivateSubnet1:
-    Description: Private Subnet 1
-    Value: !GetAtt "VPC.Outputs.PrivateSubnet1"
-  PrivateSubnet2:
-    Description: Private Subnet 2
-    Value: !GetAtt "VPC.Outputs.PrivateSubnet2"
   APIURL:
     Description: API Gateway URL
     Value: !Sub https://${HttpApiALB}.execute-api.${AWS::Region}.amazonaws.com/ 
