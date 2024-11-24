@@ -90,7 +90,7 @@ docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
 
 # Provision A CloudFormation Stack in AWS
 
-I used AWS CloudFormation and SAM to provision the stack defined in `./sam-app-ecs1/template.yaml` and `./sam-app-ecs1/vpc.yml`. 
+I used AWS CloudFormation and SAM to provision the stack defined in `./ecs-alb/template.yaml` and `./ecs-alb/vpc.yml`. 
 
 To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in this distribution's `sam-app-ec1` directory as thats where the SAM template files are.
 
@@ -117,7 +117,7 @@ Go to CloudFormation in the AWS console, find the stack with the name `sam-app-e
 
 **--OR--**
 
-At the command line in the `./sam-app-ecs1` directory, run `sam delete`.
+At the command line in the `./ecs-alb` directory, run `sam delete`.
 
 After doing either of these, do a sanity check to make sure the ECS cluster, VPC, and application load balancer are deleted.
 
