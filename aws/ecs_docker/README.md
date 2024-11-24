@@ -1,63 +1,54 @@
 # Project: Building An ECS Stack
 
-This project demonstrates using Docker, ECS, and CloudFormation to deploy a very simple microservice.
+This project demonstrates using Docker, ECS, and CloudFormation to deploy a simple microservice.
 
-Below is a summary of the AWS resources provisioned for this this stack:
+What's interesting:
 
-- A VPC with two public and private subnets and supporting gateways.
-- Fargate Task Definition, Cluster, and Service deployed to the private subnets. 
-- An internal facing Application Load Balancer.
-- An API Gateway along with a VPC link to the private Application Load Balancer.
+* All resources are deployed to a new VPC created using CloudFormation.
+* Two variants are given to link an AWS API Gateway to ECS: 1) Using an application load balancer, 2) Using  Cloud Map.
 
-**NOTE**: The charges for this stack can accumulate quickly. In particular, the ELB and NAT Gateways. Be sure to delete the stack when done. See [section 'AWS Cleanup'](#cleanup) for options to delete the stack.  
-
-Below are a couple options for reducing the cost of this stack:
-
-1. Remove the VPC created and the references to it and use the AWS account default VPC.
-1. Reduce the number of public/private subnets and the NAT Gateway that connects them.
-1. Git rid of the public subnets and the Internet/NAT Gateways and use AWS Private Links to the services needed by the container app (S3) and ECS (EDR and Secrets Manager).
-1. Reduce the number of tasks created by the ECS.
-1. Use AWS Cloud Map instead of an application load balancer to integrate the API Gateway and ECS.  
+**NOTE**: The charges for this stack can accumulate quickly. Be sure to delete the stack when done. See [section 'AWS Cleanup'](#cleanup) for options to delete the stack.  
 
 Below are the steps to:
 
 - Build and test the Docker image and deploy it to AWS ECR.
 - Create the ECS stack using CloudFormation.  
 
-The Docker container exposes a FastAPI endpoint that copies posted files to S3.
-
-This project demonstrates two use cases of providing AWS credentials to the Docker container to access AWS services (e.g. AWS S3):
-
-- When testing the Docker container locally. 
-- When running the Docker container in AWS ECS.
+The Docker image exposes a FastAPI endpoint that copies posted files to S3.
 
 You'll need the following to run this project:
 
 - Configured AWS and SAM command line clients.
-- Docker
+- A local Docker instance.
 
 I found these CloudFormation examples useful:
 
 - [API Gateway Integrations examples](https://github.com/aws-samples/aws-apigw-http-api-private--integrations) 
 - [Fargate Example](https://containersonaws.com/pattern/sam-fargate)
+- [Serverless API Gateway Ingress for AWS Fargate, in CloudFormation](https://containersonaws.com/pattern/api-gateway-fargate-cloudformation)
 
 # The App
 
-In the `./server` directory are the files to build the Docker image. The `main.py` script contains an endpoint that supports GET and POST requests. The POST copies files to AWS S3. The web framework FastAPI is used to implement the endpoint.  
+In the `./docker` directory are the files to build the Docker image. The `main.py` script contains an endpoint that supports GET and POST requests. The POST copies files to AWS S3. The web framework FastAPI is used to implement the endpoint.  
 
 NOTE: The `.env` file included with this distribution needs to be updated to reference a valid AWS S3 bucket in the AWS account used for this project.
 
 # Docker Build
 
-Using the Docker file in the `./server` folder, run the commands below. 
+Using the Docker file in the `./docker` folder, run the commands below. 
 
 ```bash
-docker build -t ecs1/server .
-docker container run -d -p 9090:9090 ecs1/server
+docker build -t ecs1/upload .
+docker container run -d -p 80:80 ecs1/upload
+```
+
+Check if the container is running.
+
+```bash
 docker ps
 ```
 
-In your local docker instance, there should now be a container listed in the output of the `docker ps` command above. Try to access the container endpoint at `http://localhost:9090` in a web browser or using the client Jupyter notebook in this distribution's `client` directory. 
+In your local docker instance, there should now be a container listed in the output of the `docker ps` command above. Try to access the container endpoint at `http://localhost` in a web browser or using the client Jupyter notebook in this distribution's `client` directory. 
 
 Now shutdown the container.
 
@@ -90,9 +81,12 @@ docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
 
 # Provision A CloudFormation Stack in AWS
 
-I used AWS CloudFormation and SAM to provision the stack defined in `./ecs-alb/template.yaml` and `./ecs-alb/vpc.yml`. 
+Two variants are provided for connecting an AWS API Gateway to ECS:
 
-To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in this distribution's `sam-app-ec1` directory as thats where the SAM template files are.
+1. The `.\ecs-alb` directory contains a CloudFormation template to link API Gateway to ECS using a application load balancer.
+2. The `.\ecs-sc` directory contains a CloudFormation template to link API Gateway to ECS using AWS Cloud Map.
+
+To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in the variant directory you are interested in.
 
 ```bash
 sam build
@@ -117,14 +111,10 @@ Go to CloudFormation in the AWS console, find the stack with the name `sam-app-e
 
 **--OR--**
 
-At the command line in the `./ecs-alb` directory, run `sam delete`.
+At the command line in the directory the build and deploy commands where run, run `sam delete`.
 
 After doing either of these, do a sanity check to make sure the ECS cluster, VPC, and application load balancer are deleted.
 
 # Conclusion
 
-Using CloudFormation and SAM greatly expedites the creation of AWS applications.
-
-# TODO 
-1. Create a version that uses AWS Cloud Map instead of an ALB to avoid the costs.
-1. Add Authentication/Authorization.
+Using CloudFormation and SAM greatly expedites the creation of AWS applications. Using Cloud Map to provide round-robin load balancing to the ECS cluster is a cheaper alternative to using ALBs.
