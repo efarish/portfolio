@@ -4,8 +4,8 @@ This project demonstrates using Docker, ECS, and CloudFormation to deploy a simp
 
 What's interesting:
 
-* All resources are deployed to a new VPC created using CloudFormation.
-* Two variants are given to link an AWS API Gateway to ECS: 1) Using an application load balancer, 2) Using  Cloud Map.
+* All resources for this project are created using CloudFormation.
+* This project provides two examples of linking an AWS API Gateway to ECS: 1) Using an application load balancer, 2) Using  Cloud Map.
 
 **NOTE**: The charges for this stack can accumulate quickly. Be sure to delete the stack when done. See [section 'AWS Cleanup'](#cleanup) for options to delete the stack.  
 
@@ -107,7 +107,7 @@ The GET methods can be access through a browser. The notebook in the `./client` 
 
 To avoid unwanted AWS charges, the CloudFormation stack for this project must be deleted. 
 
-Go to CloudFormation in the AWS console, find the stack with the name `sam-app-ecs1` and delete it.
+Go to CloudFormation in the AWS console, find the stack with the name `sam-app-ecs*` and delete it.
 
 **--OR--**
 
