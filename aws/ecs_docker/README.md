@@ -7,8 +7,9 @@ What's interesting:
 * All resources for this project are created using CloudFormation.
 * A VPC with two public and private subnets is created along with the supporting Internet and NAT gateways. 
 * Two apporaches for linking an AWS API Gateway to ECS are explored: 1) Using an application load balancer (ALB), and 2) Using Cloud Map.
-* For the ALB approach, the ALB and an ECS service are deplyed to the private subnets.
-* For the Cloud Map approach, a Cloud Map service is used to integrat the API Gateway with ECS.
+* In both approaches, an ECS service containing two tasks is deployed the private subnets.
+* For the ALB approach, an ALB is used to integrate API Gateway with ECS.
+* For the Cloud Map approach, a Cloud Map service discovery is used to integrat the API Gateway with ECS.
 * Both approaches use a VPC Link to give API Gateway access to the private subnets.   
 
 **NOTE**: The charges for this stack can accumulate quickly. Be sure to delete the stack when done. See [section 'AWS Cleanup'](#cleanup) for options to delete the stack.  
