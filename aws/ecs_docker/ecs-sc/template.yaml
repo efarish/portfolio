@@ -36,9 +36,9 @@ Resources:
       Name: !Sub ${ECSClusterName}-api-discovery-service
       DnsConfig:
         NamespaceId: !Ref PrivateNamespace
-        DnsRecords:
-          - TTL: 0
-            Type: SRV
+        DnsRecords:   # Note that this type of DNS record is important. The SRV type  
+          - TTL: 0    #  stores the port and the IP address of the ECS tasks in 
+            Type: SRV #  the private DNS namespace which API Gateway accesses to proxy requests to ECS,
 
   #---------------------------------------------------------------------
   # Deploys ECS
