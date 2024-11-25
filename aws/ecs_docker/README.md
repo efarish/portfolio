@@ -5,7 +5,11 @@ This project demonstrates using Docker, ECS, and CloudFormation to deploy a simp
 What's interesting:
 
 * All resources for this project are created using CloudFormation.
-* This project provides two examples of linking an AWS API Gateway to ECS: 1) Using an application load balancer, 2) Using  Cloud Map.
+* A VPC with two public and private subnets is created along with the supporting Internet and NAT gateways. 
+* Two apporaches for linking an AWS API Gateway to ECS are explored: 1) Using an application load balancer (ALB), and 2) Using Cloud Map.
+* For the ALB approach, the ALB and an ECS service are deplyed to the private subnets.
+* For the Cloud Map approach, a Cloud Map service is used to integrat the API Gateway with ECS.
+* Both approaches use a VPC Link to give API Gateway access to the private subnets.   
 
 **NOTE**: The charges for this stack can accumulate quickly. Be sure to delete the stack when done. See [section 'AWS Cleanup'](#cleanup) for options to delete the stack.  
 
@@ -59,7 +63,7 @@ docker stop <container id>
 Tag the Docker image as below. I've removed the AWS account ID used for this project, but your AWS ECR URL should look similar to whats below
 
 ```bash
-docker tag ecs1/server <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
+docker tag ecs1/upload <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:upload
 ```
 
 # Test Locally
@@ -67,7 +71,7 @@ docker tag ecs1/server <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:s
 Since the endpoint will use the AWS S3 service, credentials will need to be provided. An easy way to do this is by providing the credentials through environment variables when the container is started. Below is an example.
 
 ```bash
-docker container run -p 9090:9090 -e AWS_ACCESS_KEY_ID='YOUR AWS ACCT ID' -e AWS_SECRET_ACCESS_KEY='YOUR AWS ACCT KEY' ecs1/server  
+docker container run -p 80:80 -e AWS_ACCESS_KEY_ID='YOUR AWS ACCT ID' -e AWS_SECRET_ACCESS_KEY='YOUR AWS ACCT KEY' ecs1/upload  
 ```
 
 # Push Docker Image to ECR
@@ -76,7 +80,7 @@ Below, the AWS CLI is used to push the Docker image to AWS ECR. The command belo
 
 ```bash
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <YOUR ACCT ID>.dkr.ecr.us-east-1.amazonaws.com
-docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:server
+docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:upload
 ```
 
 # Provision A CloudFormation Stack in AWS
@@ -85,6 +89,8 @@ Two variants are provided for connecting an AWS API Gateway to ECS:
 
 1. The `.\ecs-alb` directory contains a CloudFormation template to link API Gateway to ECS using a application load balancer.
 2. The `.\ecs-sc` directory contains a CloudFormation template to link API Gateway to ECS using AWS Cloud Map.
+
+Each directory contains a complete CloudFormation stack to deploy the Docker image to ECS. Option 2 is the cheaper of the two as it uses Cloud Map to provide load balancing instead of an application load balancer. Option 2 uses a private DNS namespace and service discovery to integrate API Gateway with ECS over a VPC Link to the private subnets the ECS tasks are deployed to. When this type of integration is used, API Gateway will discover the tasks available in ECS and round-robin requests across the tasks as documented [here](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-integration.html#cfn-apigatewayv2-integration-integrationuri) and [here](https://docs.aws.amazon.com/cloud-map/latest/api/API_DiscoverInstances.html).
 
 To build and deploy the cluster to AWS, use the SAM CLI commands below. Be sure to run this commands in the variant directory you are interested in.
 
