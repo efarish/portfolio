@@ -1,0 +1,25 @@
+services:
+  rekog:
+    depends_on:
+      - upload
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./rekog
+    ports:
+      - '9090:9090'
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+  upload:
+    build: 
+      context: ./upload
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - REKOG_SVC=http://rekog:9090/get_image_labels
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+
