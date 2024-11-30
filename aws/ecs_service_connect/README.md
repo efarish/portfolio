@@ -66,7 +66,7 @@ NOTE: Be sure to delete the CloudFormation stacks when done, otherwise costs wil
 
 ## Testing the Services
 
-The `./client` directory contains a Jupyter notebook with code to make GET and POST requests to the API Gateway created for this project. This directory has an image of a daisy to test the service.
+The `./client` directory contains a Jupyter notebook with code to make GET and POST requests to the API Gateway created for this project. That directory also has an image of a daisy to test the service.
 
 ## AWS Clean Up
 
