@@ -22,4 +22,3 @@ services:
       - REKOG_SVC=http://rekog:9090/get_image_labels
       - AWS_ACCESS_KEY_ID=
       - AWS_SECRET_ACCESS_KEY=
-

@@ -1,4 +1,3 @@
-import json
 import os
 import time
 
@@ -35,7 +34,8 @@ async def upload_file(file: UploadFile = File(...)):
     print(f"File {file.filename} saved at {IMAGEDIR} and {S3_BUCKET}")
     s3.put_object(Bucket=S3_BUCKET, Key=file.filename, Body=contents)
     s3_file = {'s3_bucket': S3_BUCKET, 's3_imageFile': file.filename}
-    response = requests.post(REKOG_SVC, json=s3_file)
+    print(f"Making request to {REKOG_SVC}...")
+    response = requests.post(REKOG_SVC, json=s3_file, timeout=5)
     print(f"response: {response.text}")
 
     return Response(content=response.text, media_type="application/json")

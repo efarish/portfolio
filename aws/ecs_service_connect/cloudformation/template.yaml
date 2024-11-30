@@ -6,10 +6,10 @@ Parameters:
   ECSClusterName:
     Type: String
     Description: Specifies the ECS Cluster Name with which the resources would be associated.
-    Default: ecs1
+    Default: ecs-sc
   ECSServiceName:
     Type: String
-    Default: ecs1-service-sc
+    Default: ecs-sc-service
 
 Resources:
 
@@ -21,32 +21,23 @@ Resources:
     Properties:
       Location: ./vpc.yml
 
-#---------------------------------------------------------------------
-# Deploy Discovery Service
-#---------------------------------------------------------------------
-  PrivateNamespace:
-    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+  # Security group that limits network access to the task
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      Name: !Sub ${ECSClusterName}-api-namespace
-      Vpc: !GetAtt VPC.Outputs.VpcId
+      GroupDescription: Security group for service
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
 
-  DiscoveryService:
-    Type: AWS::ServiceDiscovery::Service
-    Properties:
-      Name: !Sub ${ECSClusterName}-api-discovery-service
-      DnsConfig:
-        NamespaceId: !Ref PrivateNamespace
-        DnsRecords:   # Note that this type of DNS record is important. The SRV type  
-          - TTL: 0    #  stores the port and the IP address of the ECS tasks in 
-            Type: SRV #  the private DNS namespace which API Gateway accesses to proxy requests to ECS,
-
-  #---------------------------------------------------------------------
-  # Deploys ECS
-  #---------------------------------------------------------------------
-  LogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /ecs/${ECSClusterName}-upload
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -64,6 +55,7 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
   ECSTaskRole:
     Type: AWS::IAM::Role
     Properties:
@@ -88,203 +80,92 @@ Resources:
                   - logs:PutLogEvents
                   - s3:GetObject
                   - s3:PutObject
+                  - rekognition:DetectLabels
                 Resource:
                   - '*'
                 Sid: ''
 
+  #---------------------------------------------------------------------
+  # Deploy Discovery Service: used to integrate API Gateway and ECS.
+  #---------------------------------------------------------------------
+  PrivateNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: !Sub ${ECSClusterName}-api-namespace
+      Vpc: !GetAtt VPC.Outputs.VpcId
+
+  DiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: !Sub ${ECSClusterName}-api-discovery-service
+      DnsConfig:
+        NamespaceId: !Ref PrivateNamespace
+        DnsRecords:   # Note that this type of DNS record is important. The SRV type  
+          - TTL: 0    #  stores the port and the IP address of the ECS tasks in 
+            Type: SRV #  the private DNS namespace which API Gateway accesses to proxy requests to ECS.
+                
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties: 
+      ClusterName: !Sub ${ECSClusterName}-cluster 
+      ServiceConnectDefaults:
+        Namespace: "internal.com"
       CapacityProviders: 
         - FARGATE
 
-  # Security group that limits network access to the task
-  ServiceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+  # Rekognition container deployment
+  ServiceStackRekog:
+    Type: AWS::Serverless::Application
     Properties:
-      GroupDescription: Security group for service
-      VpcId: !GetAtt VPC.Outputs.VpcId
+      Location: ./service-rekog.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        ECSCluster: !Ref ECSCluster
+        ECSClusterName: !Ref ECSClusterName
+        ECSTaskRole: !Ref ECSTaskRole
+        ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
+        ECSServiceName: !Sub ${ECSClusterName}-svc-rekog
+        TaskName: 'rekog'
+        TaskPort: '9090'
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:rekog
+        ServiceSecurityGroup: !Ref ServiceSecurityGroup
 
-  ECSService:
-    Type: AWS::ECS::Service
+  # Upload container deployment
+  ServiceStackUpload:
+    Type: AWS::Serverless::Application
     Properties:
-      Cluster: !Ref ECSCluster
-      ServiceName: !Ref ECSServiceName
-      CapacityProviderStrategy:
-        - CapacityProvider: FARGATE
-          Base: 0
-          Weight: 1
-      TaskDefinition: !Ref "TaskDefinition"
-      SchedulingStrategy: REPLICA
-      DesiredCount: 2
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
-          SecurityGroups: [!Ref ServiceSecurityGroup]
-          Subnets:  [!GetAtt "VPC.Outputs.PrivateSubnet1", !GetAtt VPC.Outputs.PrivateSubnet2]
-      PlatformVersion: LATEST
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 100
-        DeploymentCircuitBreaker:
-          Enable: true
-          Rollback: true
-      DeploymentController:
-        Type: ECS
-      ServiceRegistries:
-        - RegistryArn: !GetAtt DiscoveryService.Arn   
-          Port: 80
-      Tags: []
-      EnableECSManagedTags: true
+      Location: ./service-upload.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        ECSCluster: !Ref ECSCluster
+        ECSClusterName: !Ref ECSClusterName
+        ECSTaskRole: !Ref ECSTaskRole
+        ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
+        ECSServiceName: !Sub ${ECSClusterName}-svc-upload
+        TaskName: 'upload'
+        TaskPort: '80'
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:upload
+        ServiceSecurityGroup: !Ref ServiceSecurityGroup
+        DiscoveryService: !GetAtt DiscoveryService.Arn 
 
-  TaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties: 
-      Family: !Sub ${ECSClusterName}-server
-      ContainerDefinitions:
-        - Name: server
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/${ECSClusterName}:upload"
-          Cpu: '1024'
-          PortMappings:
-            - Name: 'upload'
-              ContainerPort: 80
-              HostPort: 80
-              Protocol: tcp
-              AppProtocol: http
-          Essential: true
-          Environment: []
-          EnvironmentFiles: []
-          MountPoints: []
-          VolumesFrom: []
-          Ulimits: []
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: !Ref LogGroup
-              mode: non-blocking
-              max-buffer-size: 25m
-              awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: ecs
-            SecretOptions: []
-          SystemControls: []
-      TaskRoleArn: !Ref ECSTaskRole
-      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
-      NetworkMode: awsvpc
-      Volumes: []
-      PlacementConstraints: []
-      RequiresCompatibilities:
-        - FARGATE
-      Cpu: '1024'
-      Memory: '3072'
-      RuntimePlatform:
-        CpuArchitecture: X86_64
-        OperatingSystemFamily: LINUX
-
-  # -------------------------------------------------------------------------
-  # Deploy API GW HTTP API route and integration to Cloud Map
-  # -------------------------------------------------------------------------
-  HttpApiSvcConnect:
-    Type: AWS::ApiGatewayV2::Api
+  # API Gateway
+  APIGatewayStack:
+    Type: AWS::Serverless::Application
     Properties:
-      Name: sc-HTTP-api
-      Description: HTTP API Linking to Service Connect
-      ProtocolType: HTTP
-
-  APIRoute1:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref HttpApiSvcConnect
-      RouteKey: 'GET /'
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref APIIntegration
-
-  APIRoute2:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref HttpApiSvcConnect
-      RouteKey: 'GET /getInfo'
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref APIIntegration
-
-  APIRoute3:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref HttpApiSvcConnect
-      RouteKey: 'POST /upload'
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref APIIntegration
-
-  # This security group is used by the VPC link, so that
-  # you can control which resources in the VPC the VPC link is
-  # allowed to communicate with.
-  ApiGatewaySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for API gateway
-      VpcId: !GetAtt VPC.Outputs.VpcId
-
-  PrivateAPIGWvpcLink:  
-    Type: AWS::ApiGatewayV2::VpcLink
-    Properties: 
-      Name: private-apigw-vpclink
-      SecurityGroupIds: 
-        - !Ref ApiGatewaySecurityGroup
-      SubnetIds: 
-        - !GetAtt "VPC.Outputs.PrivateSubnet1"
-        - !GetAtt "VPC.Outputs.PrivateSubnet2"
-
-  APIIntegration:
-    Type: AWS::ApiGatewayV2::Integration
-    Properties:
-      ApiId: !Ref HttpApiSvcConnect
-      Description: A Cloud Map Integration
-      IntegrationType: HTTP_PROXY
-      IntegrationMethod: ANY
-      ConnectionType: VPC_LINK
-      ConnectionId: !Ref PrivateAPIGWvpcLink
-      IntegrationUri: !GetAtt DiscoveryService.Arn
-      PayloadFormatVersion: '1.0'
-
-  # Configure the security group of the service to accept
-  # inbound traffic originating from the security group of
-  # the API gateway's VPC link
-  ServiceIngressFromApiGateway:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow API Gateway to communicate to the service
-      GroupId: !Ref ServiceSecurityGroup
-      IpProtocol: -1
-      SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
-
-  APILogGroup:
-      Type: AWS::Logs::LogGroup
-      Properties:
-        LogGroupName: !Sub /aws/apigateway/${ECSClusterName}
-        RetentionInDays: 1
-
-  APIStage:
-    Type: AWS::ApiGatewayV2::Stage
-    Properties:
-      StageName: $default
-      AutoDeploy: true
-      ApiId: !Ref HttpApiSvcConnect
-      AccessLogSettings:
-        DestinationArn: !GetAtt APILogGroup.Arn 
-        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
-
+      Location: ./api-gw.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        ECSClusterName: !Ref ECSClusterName
+        ServiceSecurityGroup: !Ref ServiceSecurityGroup
+        DiscoveryService: !GetAtt DiscoveryService.Arn
+        
 # -------------------------------------------------------------------------
 # Information about the stack.
 # -------------------------------------------------------------------------
 Outputs:
-  APIURL:
+  ApiUrl:
     Description: API Gateway URL
-    Value: !Sub https://${HttpApiSvcConnect}.execute-api.${AWS::Region}.amazonaws.com/ 
-
-
-    
+    Value: !GetAtt APIGatewayStack.Outputs.ApiUrl 
