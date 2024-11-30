@@ -1,6 +1,6 @@
 # Project: Integrating AWS API Gateway with ECS
 
-This project demonstrates using Docker, ECS, and CloudFormation to deploy a simple microservice.
+This project demonstrates using Docker, ECS, and CloudFormation to deploy a Docker microservice and integrating it with API Gateway.
 
 What's interesting:
 
