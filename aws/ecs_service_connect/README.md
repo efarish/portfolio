@@ -30,7 +30,7 @@ The steps below assume you have a running instance of Docker and configured AWS 
 
 ## Docker Build
 
-To build the Label Service Docker image, execute the following steps.
+To build the Labeling Service Docker image, execute the following steps.
 
 First login to AWS using your configured AWS CLI:
 
