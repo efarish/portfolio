@@ -26,7 +26,7 @@ The `./docker` folder has two container definitions:
 
 ## Build and Deploy
 
-The steps below assume you have a running instance of Docker and a configured AWS CLI. 
+The steps below assume you have a running instance of Docker and configured AWS and SAM CLIs. 
 
 ## Docker Build
 
