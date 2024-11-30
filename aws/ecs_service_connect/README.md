@@ -22,7 +22,7 @@ The `./docker` folder has two container definitions:
 
 ## AWS Service Connect
 
-[Service Connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html) is used to manage service-to-service communications. It provides an easy way to create hostnames by which services can connect to each other. For this project, the CloudFormation file `./cloudforamtion/service-rekog.ymal` configures the hostname `rekog` by which its FastAPI endpoint can be referenced. The Upload Service's Cloudformation configuration sets an environment variable with the value `http://rekog.internal.com:9090/get_image_labels` for request to the Label Service. Another benefit of Service Connect is that the proxies created for configured services provide round-robin load balancing.  
+[Service Connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html) is used to manage service-to-service communications. It provides an easy way to create hostnames by which services can connect to each other. For this project, the CloudFormation file `./cloudforamtion/service-rekog.ymal` configures the hostname `rekog` by which its FastAPI endpoint can be referenced. The Upload Service's Cloudformation configuration sets an environment variable with the value `http://rekog.internal.com:9090/get_image_labels` for request to the Labeling Service. Another benefit of Service Connect is that the proxies created for configured services provide round-robin load balancing.  
 
 ## Build and Deploy
 
@@ -38,7 +38,7 @@ First login to AWS using your configured AWS CLI:
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <YOUR ACCT ID>.dkr.ecr.us-east-1.amazonaws.com
 ```
 
-Then build and push the Docker images to AWS ECR. To build and push the Label ServiceL
+Then build and push the Docker images to AWS ECR. To build and push the Labeling Service:
 
 ```bash
 cd ./docker/rekog
