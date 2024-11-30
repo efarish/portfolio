@@ -1,4 +1,4 @@
-# Project: Integrate ECS Services using Cloud Map
+# Project: Integrate ECS Services using Service Connect
 
 ## Introduction
 
