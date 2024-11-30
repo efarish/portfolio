@@ -17,7 +17,7 @@ Below is a network diagram.
 
 The `./docker` folder has two container definitions:
 
-1. Labeling Service: The `./docker/rekog` folder defines a microservice for returning the labels in an image located in AWS S3. AWS Rekognition is used for labeling the images. This service is configured to use AWS Service Connect to expose a DNS Service Connect URL for the FastAPI started in the container. The the only way to access this service is through the Service connect URL.
+1. Labeling Service: The `./docker/rekog` folder defines a microservice for returning the labels in an image located in AWS S3. AWS Rekognition is used for labeling the images. This service is configured to use AWS Service Connect to expose a DNS Service Connect URL for the FastAPI started in the container. The the only way to access this service is through the Service Connect URL.
 1. Upload Service: The `./docker/upload` folder defines a microservice for uploading image files to S3 and calling the Labeling Service for the image labels. This service is also configured to utilize Service Connect to find the Labeling Service's Service Connect URL. The only access to the FastAPI microservice in this container is through the API Gateway.
 
 ## AWS Service Connect
