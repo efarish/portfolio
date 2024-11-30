@@ -46,7 +46,7 @@ docker build -t ecs1/rekog .
 docker tag ecs1/rekog <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:rekog
 docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:rekog
 ```
-To build the Upload Service image:
+Do the same for the Upload Service:
 
 ```bash
 cd ./docker/upload
