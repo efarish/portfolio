@@ -1,4 +1,4 @@
-# Project: Building An ECS Stack
+# Project: Integrating AWS API Gateway with ECS
 
 This project demonstrates using Docker, ECS, and CloudFormation to deploy a simple microservice.
 
