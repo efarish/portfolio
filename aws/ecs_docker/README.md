@@ -118,7 +118,7 @@ Go to CloudFormation in the AWS console, find the stack with the name `sam-app-e
 
 **--OR--**
 
-At the command line in the directory the build and deploy commands where run, run `sam delete`.
+At the command line in the directory the build and deploy commands were run, run `sam delete`.
 
 After doing either of these, do a sanity check to make sure the ECS cluster, VPC, and application load balancer are deleted.
 
