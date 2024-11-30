@@ -58,6 +58,7 @@ docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:upload
 Finally, provision the project resources. 
 
 ```bash
+cd ./cloudformation
 sam build
 sam deploy
 ```
