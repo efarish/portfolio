@@ -6,4 +6,5 @@ These projects demonstrate developing applications using various AWS services.
 - [AutoGluon Example](https://github.com/efarish/portfolio/tree/main/aws/AutoGluon): Example of using SageMaker's SKLearn container to run a AutoGluon prototyping Python script.
 - [Optuna](https://github.com/efarish/portfolio/tree/main/aws/Optuna): Example of using the hyperparameter tuning framework Optuna for a LightGBM model.
 - [AWS SAM Lambda Example](https://github.com/efarish/portfolio/tree/main/aws/sam_lambda_s3): Use AWS Serverless Application Model (SAM) to deploy a Lambda endpoint that can post a file to S3.
-- [AWS CloudFormation And ECS](https://github.com/efarish/portfolio/tree/main/aws/ecs_docker): Examples of integrating API Gatweay and ECS using an applocation load balancer and Service Connect.
+- [AWS CloudFormation And ECS](https://github.com/efarish/portfolio/tree/main/aws/ecs_docker): Examples of integrating API Gatweay and ECS using an applocation load balancer and Cloud Map.
+- [AWS ECS Interateion using Service Connect](https://github.com/efarish/portfolio/tree/main/aws/ecs_service_connect): Project demonstrating integrating ECS services using Service Connect.
