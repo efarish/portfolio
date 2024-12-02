@@ -1,0 +1,171 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The template used to create a ECS cluster and task using ECR image.
+
+Parameters:
+  ECSClusterName:
+    Type: String
+    Description: Specifies the ECS Cluster Name with which the resources would be associated.
+    Default: ecs-sc
+  ECSServiceName:
+    Type: String
+    Default: ecs-sc-service
+
+Resources:
+
+  #---------------------------------------------------------------------
+  # Deploys VPC
+  #---------------------------------------------------------------------
+  VPC:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./vpc.yml
+
+  # Security group that limits network access to the task
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for service
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:        
+        - Effect: Allow
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+          Action: ['sts:AssumeRole']
+          Condition:
+            ArnLike:
+              aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+            StringEquals:
+              aws:SourceAccount: !Ref AWS::AccountId
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ecr-iam-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - s3:GetObject
+                  - s3:PutObject
+                  - rekognition:DetectLabels
+                Resource:
+                  - '*'
+                Sid: ''
+
+  #---------------------------------------------------------------------
+  # Deploy Discovery Service: used to integrate API Gateway and ECS.
+  #---------------------------------------------------------------------
+  PrivateNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: !Sub ${ECSClusterName}-api-namespace
+      Vpc: !GetAtt VPC.Outputs.VpcId
+
+  DiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: !Sub ${ECSClusterName}-api-discovery-service
+      DnsConfig:
+        NamespaceId: !Ref PrivateNamespace
+        DnsRecords:   # Note that this type of DNS record is important. The SRV type  
+          - TTL: 0    #  stores the port and the IP address of the ECS tasks in 
+            Type: SRV #  the private DNS namespace which API Gateway accesses to proxy requests to ECS.
+                
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties: 
+      ClusterName: !Sub ${ECSClusterName}-cluster 
+      ServiceConnectDefaults:
+        Namespace: "internal.com"
+      CapacityProviders: 
+        - FARGATE
+
+  # Rekognition container deployment
+  ServiceStackRekog:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./service-rekog.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        ECSCluster: !Ref ECSCluster
+        ECSClusterName: !Ref ECSClusterName
+        ECSTaskRole: !Ref ECSTaskRole
+        ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
+        ECSServiceName: !Sub ${ECSClusterName}-svc-rekog
+        TaskName: 'rekog'
+        TaskPort: '9090'
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:rekog
+        ServiceSecurityGroup: !Ref ServiceSecurityGroup
+
+  # Upload container deployment
+  ServiceStackUpload:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./service-upload.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        ECSCluster: !Ref ECSCluster
+        ECSClusterName: !Ref ECSClusterName
+        ECSTaskRole: !Ref ECSTaskRole
+        ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
+        ECSServiceName: !Sub ${ECSClusterName}-svc-upload
+        TaskName: 'upload'
+        TaskPort: '80'
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:upload
+        ServiceSecurityGroup: !Ref ServiceSecurityGroup
+        DiscoveryService: !GetAtt DiscoveryService.Arn 
+
+  # API Gateway
+  APIGatewayStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./api-gw.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        ECSClusterName: !Ref ECSClusterName
+        ServiceSecurityGroup: !Ref ServiceSecurityGroup
+        DiscoveryService: !GetAtt DiscoveryService.Arn
+        
+# -------------------------------------------------------------------------
+# Information about the stack.
+# -------------------------------------------------------------------------
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !GetAtt APIGatewayStack.Outputs.ApiUrl 

@@ -1,0 +1,16 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - export AWS_REGION=${AWS_REGION}
+      - export AWS_ACCT=${AWS_ACCT}
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+  build:
+    commands:
+      - docker build -t codepipe1:latest ./docker
+  post_build:
+    commands:
+      - docker tag codepipe1:latest ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecs1:codepipe1
+      - docker push ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecs1:codepipe1
