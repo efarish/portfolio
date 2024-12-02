@@ -1,4 +1,4 @@
-# Project: Integrate ECS Services using Cloud Map
+# Project: Integrate ECS Services using Service Connect
 
 ## Introduction
 
@@ -17,12 +17,12 @@ Below is a network diagram.
 
 The `./docker` folder has two container definitions:
 
-1. Labeling Service: The `./docker/rekog` folder defines a microservice for returning the labels in an image located in AWS S3. AWS Rekognition is used for labeling the images. This service is configured to use AWS Service Connect to expose a DNS Service Connect URL for the FastAPI started in the container. The the only way to access this service is through the Service connect URL.
+1. Labeling Service: The `./docker/rekog` folder defines a microservice for returning the labels in an image located in AWS S3. AWS Rekognition is used for labeling the images. This service is configured to use AWS Service Connect to expose a DNS Service Connect URL for the FastAPI started in the container. The the only way to access this service is through the Service Connect URL.
 1. Upload Service: The `./docker/upload` folder defines a microservice for uploading image files to S3 and calling the Labeling Service for the image labels. This service is also configured to utilize Service Connect to find the Labeling Service's Service Connect URL. The only access to the FastAPI microservice in this container is through the API Gateway.
 
 ## AWS Service Connect
 
-[Service Connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html) is used to manage service-to-service communications. It provides an easy way to create hostnames by which services can connect to each other. For this project, the CloudFormation file `./cloudforamtion/service-rekog.ymal` configures the hostname `rekog` by which its FastAPI endpoint can be referenced. The Upload Service's Cloudformation configuration sets an environment variable with the value `http://rekog.internal.com:9090/get_image_labels` for request to the Label Service. Another benefit of Service Connect is that the proxies created for configured services provide round-robin load balancing.  
+[Service Connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html) is used to manage service-to-service communications. It provides an easy way to create hostnames by which services can connect to each other. For this project, the CloudFormation file `./cloudforamtion/service-rekog.ymal` configures the hostname `rekog` by which its FastAPI endpoint can be referenced. The Upload Service's Cloudformation configuration sets an environment variable with the value `http://rekog.internal.com:9090/get_image_labels` for request to the Labeling Service. Another benefit of Service Connect is that the proxies created for configured services provide round-robin load balancing. Service Connect uses Cloud Map for service discovery. Cloud Map makes round-robin requests across the tasks in a service as documented [here](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-integration.html#cfn-apigatewayv2-integration-integrationuri) and [here](https://docs.aws.amazon.com/cloud-map/latest/api/API_DiscoverInstances.html).  
 
 ## Build and Deploy
 
@@ -30,7 +30,7 @@ The steps below assume you have a running instance of Docker and configured AWS 
 
 ## Docker Build
 
-To build the Label Service Docker image, execute the following steps.
+To build the Labeling Service Docker image, execute the following steps.
 
 First login to AWS using your configured AWS CLI:
 
@@ -38,7 +38,7 @@ First login to AWS using your configured AWS CLI:
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <YOUR ACCT ID>.dkr.ecr.us-east-1.amazonaws.com
 ```
 
-Then build and push the Docker images to AWS ECR. To build and push the Label ServiceL
+Then build and push the Docker images to AWS ECR. To build and push the Labeling Service:
 
 ```bash
 cd ./docker/rekog
@@ -46,7 +46,7 @@ docker build -t ecs1/rekog .
 docker tag ecs1/rekog <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:rekog
 docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:rekog
 ```
-To build the Upload Service image:
+Do the same for the Upload Service:
 
 ```bash
 cd ./docker/upload
@@ -58,6 +58,7 @@ docker push <YOUR AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:upload
 Finally, provision the project resources. 
 
 ```bash
+cd ./cloudformation
 sam build
 sam deploy
 ```
@@ -66,7 +67,7 @@ NOTE: Be sure to delete the CloudFormation stacks when done, otherwise costs wil
 
 ## Testing the Services
 
-The `./client` directory contains a Jupyter notebook with code to make GET and POST requests to the API Gateway created for this project. This directory has an image of a daisy to test the service.
+The `./client` directory contains a Jupyter notebook with code to make GET and POST requests to the API Gateway created for this project. That directory also has an image of a daisy to test the service.
 
 ## AWS Clean Up
 
