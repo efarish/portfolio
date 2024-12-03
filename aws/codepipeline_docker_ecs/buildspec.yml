@@ -6,7 +6,7 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
   build:
     commands:
-      - cd ./portfolio/aws/codepipeline_docker_ecs/
+      - cd ./aws/codepipeline_docker_ecs/
       - docker build -t codepipe1:latest ./docker
   post_build:
     commands:
