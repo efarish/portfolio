@@ -2,13 +2,22 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - export AWS_ACCT=${AWS_ACCT}
-      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+      - AWS_ACCT=${AWS_ACCT}
+      = ECS_CONTAINER_NAME=ecs-sc-upload-container
+      - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
+      - ECR_IMG_NAME=ecs1:codepipe1
+      - ECR_IMAGE_URI="${ECR_MAIN_URI}/${ECR_IMG_NAME}"
   build:
     commands:
       - cd ./aws/codepipeline_docker_ecs/
-      - docker build -t codepipe1:latest ./docker
+      - docker build -t ${ECR_IMG_NAME} ./docker
   post_build:
     commands:
-      - docker tag codepipe1:latest ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecs1:codepipe1
-      - docker push ${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com/ecs1:codepipe1
+      - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
+      - docker push ${ECR_IMAGE_URI}
+      - printf '[{"name":"${ECS_CONTAINER_NAME}","imageUri":"%s"}]' ${ECR_IMAGE_URI} > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json

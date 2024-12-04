@@ -25,10 +25,10 @@ async def upload_file(file: UploadFile = File(...)):
     s3 = boto3.client('s3')
     timestr = time.strftime("%Y%m%d_%H%M%S")
     file.filename = f'IMG_{timestr}.png'
-    print(f"File {file.filename} saved at {IMAGEDIR} and {S3_BUCKET}")
+    contents = await file.read()
+    print(f"File {file.filename} saved at S3 bucket: {S3_BUCKET}")
     s3.put_object(Bucket=S3_BUCKET, Key=file.filename, Body=contents)
-    s3_file = {'s3_bucket': S3_BUCKET, 's3_imageFile': file.filename}
-
-    return Response(content=f"{'filename':'{file.filename}'}", media_type="application/json")
+    
+    return Response(content=f"{'filename':'{file.filename}', 'bucket':'{S3_BUCKET}' }", media_type="application/json")
 
 

@@ -113,24 +113,6 @@ Resources:
       CapacityProviders: 
         - FARGATE
 
-  # Rekognition container deployment
-  ServiceStackRekog:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./service-rekog.yaml
-      Parameters:
-        VpcId: !GetAtt VPC.Outputs.VpcId
-        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
-        ECSCluster: !Ref ECSCluster
-        ECSClusterName: !Ref ECSClusterName
-        ECSTaskRole: !Ref ECSTaskRole
-        ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
-        ECSServiceName: !Sub ${ECSClusterName}-svc-rekog
-        TaskName: 'rekog'
-        TaskPort: '9090'
-        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:rekog
-        ServiceSecurityGroup: !Ref ServiceSecurityGroup
-
   # Upload container deployment
   ServiceStackUpload:
     Type: AWS::Serverless::Application
