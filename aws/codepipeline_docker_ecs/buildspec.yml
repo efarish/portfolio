@@ -10,8 +10,7 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
-      - cd ./aws/codepipeline_docker_ecs/
-      - docker build -t ${ECR_IMG_NAME} ./docker
+      - docker build -t ${ECR_IMG_NAME} ./aws/codepipeline_docker_ecs/docker
   post_build:
     commands:
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
@@ -20,4 +19,4 @@ phases:
 
 artifacts:
   files:
-    - ./aws/codepipeline_docker_ecs/imagedefinitions.json
+    - imagedefinitions.json
