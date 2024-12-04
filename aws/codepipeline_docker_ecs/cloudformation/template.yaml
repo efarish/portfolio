@@ -6,10 +6,10 @@ Parameters:
   ECSClusterName:
     Type: String
     Description: Specifies the ECS Cluster Name with which the resources would be associated.
-    Default: ecs-sc
+    Default: ecs-cp-1
   ECSServiceName:
     Type: String
-    Default: ecs-sc-service
+    Default: ecs-cp-1-service
 
 Resources:
 
@@ -128,7 +128,7 @@ Resources:
         ECSServiceName: !Sub ${ECSClusterName}-svc-upload
         TaskName: 'upload'
         TaskPort: '80'
-        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:upload
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:codepipe1
         ServiceSecurityGroup: !Ref ServiceSecurityGroup
         DiscoveryService: !GetAtt DiscoveryService.Arn 
 

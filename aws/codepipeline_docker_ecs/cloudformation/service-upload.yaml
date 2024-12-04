@@ -95,9 +95,6 @@ Resources:
               HostPort: !Ref TaskPort
               Protocol: tcp
               AppProtocol: http
-          Environment:
-            - Name: "REKOG_SVC"
-              Value: http://rekog.internal.com:9090/get_image_labels
           Essential: true
           EnvironmentFiles: []
           MountPoints: []
