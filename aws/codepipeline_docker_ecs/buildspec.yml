@@ -3,11 +3,11 @@ phases:
   pre_build:
     commands:
       - AWS_ACCT=${AWS_ACCT}
-      = ECS_CONTAINER_NAME=ecs-sc-upload-container
+      - ECS_CONTAINER_NAME=ecs-sc-upload-container
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
       - ECR_IMG_NAME=ecs1:codepipe1
       - ECR_IMAGE_URI="${ECR_MAIN_URI}/${ECR_IMG_NAME}"
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
       - cd ./aws/codepipeline_docker_ecs/
