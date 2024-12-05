@@ -7,7 +7,7 @@ phases:
       - AWS_ACCT=${AWS_ACCT}
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - ECR_IMG_NAME=${ECR_REPO}:codepipe1
-      - ECR_IMAGE_URI="${ECR_MAIN_URI}/${ECR_REPO}:${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}"
+      - ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_REPO}:${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
