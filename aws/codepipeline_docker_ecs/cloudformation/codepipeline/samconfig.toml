@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "CodePipeLine-ECS-v1"
+stack_name = "CodePipeLine-For-ECS-v1"
 
 [default.build.parameters]
 parallel = true
