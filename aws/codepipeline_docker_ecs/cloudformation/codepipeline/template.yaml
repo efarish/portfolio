@@ -23,6 +23,10 @@ Parameters:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
     Default: arn:aws:codeconnections:us-east-1:598185244415:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
+  S3BucketName:
+    Type: String
+    Description: Specifies the S3 Bucket that will used by CodePipeLine.
+    Default: !Sub ${PipeLineName}-${AWS::Region}-${AWS::AccountId}
 
 Resources:
 
@@ -65,12 +69,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
 
-  S3Bucket:
-    Type: 'AWS::S3::Bucket'
-    DeletionPolicy: Delete
-    Properties:
-      BucketName: !Sub ${PipeLineName}-${AWS::Region}-${AWS::AccountId}
-
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -107,7 +105,7 @@ Resources:
       RoleArn: !GetAtt CodePipeLineECSRole.Arn
       ArtifactStore:
         Type: S3
-        Location: !Sub ${PipeLineName}-${AWS::Region}-${AWS::AccountId}
+        Location: !Ref S3BucketName
       Stages:
         - Name: Source
           Actions:
