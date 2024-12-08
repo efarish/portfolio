@@ -8,6 +8,6 @@ Resources:
     Type: 'AWS::S3::Bucket'
     DeletionPolicy: Delete
     Properties:
-      BucketName: !Sub TestBucket-${AWS::Region}-${AWS::AccountId}
+      BucketName: !Sub testbucket-${AWS::Region}-${AWS::AccountId}
 
       
