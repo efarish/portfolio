@@ -5,7 +5,7 @@ phases:
   pre_build:
     commands:
       - ECR_REPO=ecs1
-      - ECS_CONTAINER_NAME=ecs-cp-1-upload-container
+      - ECS_CONTAINER_NAME=ecs-create-pipeline-v1-cluster-upload-container
       - AWS_ACCT=${AWS_ACCT}
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - ECR_IMG_NAME=${ECR_REPO}:codepipe1
