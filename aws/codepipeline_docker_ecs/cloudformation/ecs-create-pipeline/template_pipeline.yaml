@@ -165,7 +165,7 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_IAM
                 RoleArn: !GetAtt CodePipeLineECSRole.Arn
-                StackName: !Sub ${PipeLineName}-Stack
+                StackName: !Sub ${PipeLineName}-app-stack
                 TemplatePath: BuildArtifact::packaged-template.yaml
               InputArtifacts:
                 - Name: BuildArtifact
