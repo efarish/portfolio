@@ -10,7 +10,7 @@ Parameters:
   ECSServiceName:
     Type: String
     Default: ecs-cp-1-service
-
+  
 Resources:
 
   #---------------------------------------------------------------------
@@ -19,7 +19,7 @@ Resources:
   VPC:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./vpc.yml
+      Location: ./aws/codepipeline_docker_ecs/cloudformation/ecs/vpc.yml
 
   # Security group that limits network access to the task
   ServiceSecurityGroup:
@@ -80,7 +80,6 @@ Resources:
                   - logs:PutLogEvents
                   - s3:GetObject
                   - s3:PutObject
-                  - rekognition:DetectLabels
                 Resource:
                   - '*'
                 Sid: ''
@@ -117,7 +116,7 @@ Resources:
   ServiceStackUpload:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./service-upload.yaml
+      Location: ./aws/codepipeline_docker_ecs/cloudformation/ecs/service-upload.yaml
       Parameters:
         VpcId: !GetAtt VPC.Outputs.VpcId
         PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
