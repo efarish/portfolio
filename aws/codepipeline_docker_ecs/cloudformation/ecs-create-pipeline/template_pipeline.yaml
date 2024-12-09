@@ -40,9 +40,6 @@ Resources:
           Principal:
             Service: [codepipeline.amazonaws.com, codebuild.amazonaws.com, codedeploy.amazonaws.com, ecs-tasks.amazonaws.com, ecs.amazonaws.com, ec2.amazonaws.com, cloudformation.amazonaws.com]
           Action: ['sts:AssumeRole']
-          Condition:
-            StringEquals:
-              aws:SourceAccount: !Ref AWS::AccountId
       Policies:
         - PolicyName: !Sub ${PipeLineName}-policy
           PolicyDocument:
@@ -75,8 +72,6 @@ Resources:
                 Resource:
                   - '*'
       Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
 
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
