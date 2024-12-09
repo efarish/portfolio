@@ -26,7 +26,7 @@ Parameters:
   S3BucketName:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
-    Default: !Sub ${PipeLineName}-${AWS::Region}-${AWS::AccountId}
+    Default: codepipeline-for-ecs-v1-us-east-1-598185244415
 
 Resources:
 
