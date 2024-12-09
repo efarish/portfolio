@@ -26,7 +26,7 @@ Parameters:
   S3BucketName:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
-    Default: !Sub ${PipeLineName}-${AWS::Region}-${AWS::AccountId}
+    Default: ecs-create-pipeline-v1-us-east-1-598185244415
 
 Resources:
 
@@ -50,27 +50,27 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - codestar-connections:UseConnection,
-                  - codebuild:BatchGetBuilds,
-                  - codebuild:StartBuild,
-                  - codebuild:BatchGetBuildBatches,
-                  - codebuild:StartBuildBatch,
-                  - apigateway:*,
-                  - cloudformation:*,
-                  - cloudwatch:*,
-                  - ec2:*,
-                  - ecs:*,
-                  - ecr:*,
-                  - logs:*,
-                  - route53:*,
-                  - s3:*,
-                  - servicediscovery:*,
-                  - iam:DeleteRolePolicy,
-                  - iam:DetachRolePolicy,
-                  - iam:DeleteRole,
-                  - iam:CreateRole,
-                  - iam:PutRolePolicy,
-                  - iam:AttachRolePolicy,
+                  - codestar-connections:UseConnection
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuildBatches
+                  - codebuild:StartBuildBatch
+                  - apigateway:*
+                  - cloudformation:*
+                  - cloudwatch:*
+                  - ec2:*
+                  - ecs:*
+                  - ecr:*
+                  - logs:*
+                  - route53:*
+                  - s3:*
+                  - servicediscovery:*
+                  - iam:DeleteRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:DeleteRole
+                  - iam:CreateRole
+                  - iam:PutRolePolicy
+                  - iam:AttachRolePolicy
                   - iam:PassRole
                 Resource:
                   - '*'
@@ -95,7 +95,6 @@ Resources:
         EnvironmentVariables:
           - Name: AWS_ACCT
             Value: !Sub ${AWS::AccountId}
-            type: PLAINTEXT
         PrivilegedMode: true
         ImagePullCredentialsType: CODEBUILD
       TimeoutInMinutes: 5
@@ -170,6 +169,7 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_IAM
+                RoleArn: !GetAtt CodePipeLineECSRole.Arn
                 StackName: !Sub ${PipeLineName}-Stack
                 TemplatePath: BuildArtifact::packaged-template.yaml
               InputArtifacts:
