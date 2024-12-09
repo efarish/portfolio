@@ -96,7 +96,7 @@ Resources:
       Visibility: PRIVATE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: "./aws/codepipeline_docker_ecs/buildspec.yml"
+        BuildSpec: "./aws/codepipeline_docker_ecs/cloudformation/ecs-update-pipeline/buildspec.yml"
         InsecureSsl: false
 
   CodePipeline1:
