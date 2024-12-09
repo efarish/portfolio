@@ -19,7 +19,7 @@ Resources:
   VPC:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./aws/codepipeline_docker_ecs/cloudformation/ecs/vpc.yml
+      Location: aws/codepipeline_docker_ecs/cloudformation/ecs/vpc.yml
 
   # Security group that limits network access to the task
   ServiceSecurityGroup:
@@ -116,7 +116,7 @@ Resources:
   ServiceStackUpload:
     Type: AWS::Serverless::Application
     Properties:
-      Location: ./aws/codepipeline_docker_ecs/cloudformation/ecs/service-upload.yaml
+      Location: aws/codepipeline_docker_ecs/cloudformation/ecs/service-upload.yaml
       Parameters:
         VpcId: !GetAtt VPC.Outputs.VpcId
         PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
