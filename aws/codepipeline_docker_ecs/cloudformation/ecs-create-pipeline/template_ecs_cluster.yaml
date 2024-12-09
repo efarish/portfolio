@@ -6,10 +6,10 @@ Parameters:
   ECSClusterName:
     Type: String
     Description: Specifies the ECS Cluster Name with which the resources would be associated.
-    Default: ecs-cp-1
+    Default: ecs-create-pipeline-v1-cluster
   ECSServiceName:
     Type: String
-    Default: ecs-cp-1-service
+    Default: ecs-create-pipeline-v1-service
   
 Resources:
 
@@ -106,7 +106,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties: 
-      ClusterName: !Sub ${ECSClusterName}-cluster 
+      ClusterName: !Ref ECSClusterName 
       ServiceConnectDefaults:
         Namespace: "internal.com"
       CapacityProviders: 
@@ -124,7 +124,7 @@ Resources:
         ECSClusterName: !Ref ECSClusterName
         ECSTaskRole: !Ref ECSTaskRole
         ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
-        ECSServiceName: !Sub ${ECSClusterName}-svc-upload
+        ECSServiceName: !Ref ECSServiceName
         TaskName: 'upload'
         TaskPort: '80'
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:codepipe1

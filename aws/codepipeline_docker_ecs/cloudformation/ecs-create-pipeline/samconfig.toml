@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "ECS-create-pipeline-v1"
+stack_name = "ecs-create-pipeline-v1"
 
 [default.build.parameters]
 parallel = true
