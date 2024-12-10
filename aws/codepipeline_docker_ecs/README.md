@@ -4,7 +4,7 @@
 
 This project demonstrates using Amazon's CI/CD CodePipeline service to deploy and update an AWS ECS cluster. Two pipelines are used:
 
-1. A pipeline to create a AWS ECS using a CloudFormation stack.
+1. A pipeline to create a AWS ECS using a CloudFormation template.
 1. A pipeline to update the containers in the ECS stack.
 
 The SAM CLI and CloudFormation templates are used to create the pipelines.
