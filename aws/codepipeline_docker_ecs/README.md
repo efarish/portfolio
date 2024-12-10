@@ -28,7 +28,7 @@ The `docker` directory contains a simple FastAPI implementation of GET and POST 
 
 ## Creating the Pipeline Stacks
 
-Create the pipelines in the order below. Let the execution of each stack completes before proceeding.
+Create the pipelines in the order below. Let the execution of each pipeline complete before proceeding.
 
 ### The ECS Stack Pipeline
 
