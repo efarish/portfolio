@@ -16,7 +16,7 @@ A couple of **WARNINGS**:
 
 ## The Endpoint Deployed
 
-The directory `docker` directory contains a simple FastAPI endpoint implementation GET and POST FastAPI endpoints. The resources are deployed into a VPC created by the template.   
+The `docker` directory contains a simple FastAPI endpoint implementation GET and POST FastAPI endpoints. This Docker image will be deployed as the lone task in the ECS cluster.   
 
 ## Prerequisites
 
