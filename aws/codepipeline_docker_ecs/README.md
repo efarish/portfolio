@@ -2,7 +2,7 @@
 
 # Project: AWS CodePipeline, Docker, ECS, and CloudFormation
 
-This project demonstrates using Amazon's CI/CD service CodePipeline to deploy and update an AWS ECS cluster. Two pipelines are used:
+This project demonstrates using Amazon's CI/CD CodePipeline service to deploy and update an AWS ECS cluster. Two pipelines are used:
 
 1. A pipeline to create a AWS ECS using a CloudFormation stack.
 1. A pipeline to update the containers in the ECS stack.
