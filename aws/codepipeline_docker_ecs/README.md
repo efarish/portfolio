@@ -50,7 +50,7 @@ Once the pipeline completes, use the Jupyter notebook in the `client` directory 
 
 ### The ECS Update Pipeline
 
-This pipeline can be used to update the containers in the ECS cluster. It re-builds the Docker image in the `docker` directory and updates the containers in the created cluster. 
+This pipeline can be used to update the containers in the ECS cluster. It re-builds the Docker image in the `docker` directory and updates the container in the created cluster. 
 
 In the `cloudformation/ecs-update-pipeline` directory, run the following commands:
 
