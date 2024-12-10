@@ -8,4 +8,4 @@ The types of projects in this portfolio are:
 - [LLM Projects](https://github.com/efarish/portfolio/tree/main/llm): Projects demonstrating the use of large language models.
 - [Research Projects](https://github.com/efarish/portfolio/tree/main/research): My application of data science techniques for research.
 - [Fundamentals](https://github.com/efarish/portfolio/tree/main/fundamentals): Examples of using commmon ML algorithms for various tasks.
-- [Mobile Application](https://github.com/efarish/portfolio/tree/main/mobile/kivy_img_post): A demonstration project in which a Python mobile app is sued to integrated with AWW cloud services.
+- [Mobile Application](https://github.com/efarish/portfolio/tree/main/mobile/kivy_img_post): A demonstration project in which a Python mobile app integrates with AWW cloud services.
