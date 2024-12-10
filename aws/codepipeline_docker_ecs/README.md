@@ -11,7 +11,7 @@ The SAM CLI and CloudFormation templates are used to create the pipelines.
 
 A couple of **WARNINGS**:
 
-1. This projects creates AWS resources that cost money. Be sure to execute the [Clean Up](#Clean-Up) section.
+1. This projects creates AWS resources that cost money. Be sure to execute the [Clean Up](#Clean-Up) section when done.
 1. As soon as a pipeline is created using the SAM CLI, it executes. 
 
 ## The Endpoint Deployed
