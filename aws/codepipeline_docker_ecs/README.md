@@ -23,7 +23,7 @@ The `docker` directory contains a simple FastAPI implementation of GET and POST 
 1. This project assumes the AWS and SAM CLIs are are installed and configured. 
 2. The following resources need to be created manually:
     1. A S3 bucket used to by the pipelines. Set your bucket at the `S3ArtifactBucket` parameter in the `cloudformation/ecs-create-pipeline/templage_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/templage.yaml` CloudFormation templates.
-    2. An ARN for a AWS Developer Tools Code Connections. Set the Github connection in the `GitHubConnectionArn` parameter in the `cloudformation/ecs-create-pipeline/template_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/template.yaml` CloudFormation templates. 
+    2. An ARN for a AWS Developer Tools Code Connections. Set the Github connection at the `GitHubConnectionArn` parameter in the `cloudformation/ecs-create-pipeline/template_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/template.yaml` CloudFormation templates. 
     3. A ECR repository called `ecs1` needs to be created. The `buildspec.yml` and pipeline templates assume this repository exists.
 
 ## Creating the Pipeline Stacks
