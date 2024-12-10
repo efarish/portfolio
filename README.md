@@ -4,8 +4,8 @@ The purpose of this portfolio is to demonstrate my expertise in Python, machine 
 
 The types of projects in this portfolio are:
 
-- [AWS Projects](https://github.com/efarish/portfolio/tree/main/aws): Projects using AWS services like CloudFormation, ECS, SageMaker, S3, Lambda, and API Gateway.
+- [AWS Projects](https://github.com/efarish/portfolio/tree/main/aws): Projects that use AWS services like CloudFormation, ECS, SageMaker, Lambda, API Gateway, and CodePipeline.
 - [LLM Projects](https://github.com/efarish/portfolio/tree/main/llm): Projects demonstrating the use of large language models.
 - [Research Projects](https://github.com/efarish/portfolio/tree/main/research): My application of data science techniques for research.
 - [Fundamentals](https://github.com/efarish/portfolio/tree/main/fundamentals): Examples of using commmon ML algorithms for various tasks.
-- [Mobile Application](https://github.com/efarish/portfolio/tree/main/mobile/kivy_img_post): A demonstration project showing how Python can be used to created mobile device applications that are integrated with cloud services like AWS.
+- [Mobile Application](https://github.com/efarish/portfolio/tree/main/mobile/kivy_img_post): A demonstration project in which a Python mobile app integrates with AWW cloud services.

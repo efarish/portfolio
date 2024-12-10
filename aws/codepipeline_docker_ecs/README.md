@@ -10,11 +10,11 @@ The SAM CLI and CloudFormation templates are used to create the pipelines.
 A couple of **WARNINGS**:
 
 1. This projects creates AWS resources that cost money. Specifically, API Gateway and ECS resources are deployed into a VPC created for the project. The VPC consists of a one public subnet, one private subnet, an Internet gateway, and a NAT gateway. Be sure to execute the [Clean Up](#Clean-Up) section when done.
-1. As soon as a pipeline is created in CodePipeline using the SAM CLI, it executes. So for example, when the ECS pipeline is created in the steps below, it will immediately execute. 
+1. As soon as a pipeline is created in CodePipeline using the SAM CLI, it executes. For example, when the ECS pipeline is created in the steps below, it will immediately execute. 
 
 ## The Endpoint Deployed
 
-The `docker` directory contains a simple FastAPI implementation of GET and POST FastAPI endpoints. This Docker image will be deployed as part of the the lone task in the ECS cluster.   
+The `docker` directory contains a simple FastAPI implementation of GET and POST endpoints. This Docker image will be deployed as part of the the lone task in the ECS cluster.   
 
 ## Prerequisites
 
