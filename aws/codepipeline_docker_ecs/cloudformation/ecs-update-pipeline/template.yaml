@@ -23,10 +23,10 @@ Parameters:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
     Default: arn:aws:codeconnections:us-east-1:598185244415:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
-  S3BucketName:
+  S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
-    Default: codepipeline-for-ecs-v1-us-east-1-598185244415
+    Default: a-unique-artifact-bucket-name
 
 Resources:
 
@@ -105,7 +105,7 @@ Resources:
       RoleArn: !GetAtt CodePipeLineECSRole.Arn
       ArtifactStore:
         Type: S3
-        Location: !Ref S3BucketName
+        Location: !Ref S3ArtifactBucket
       Stages:
         - Name: Source
           Actions:
