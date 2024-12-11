@@ -141,7 +141,7 @@ In this distribution's `client` folder is a Jupyter notebook that can be used to
 
 ## AWS Cleanup 
 
-To delete all the resources created for this project, in the AWS console go back to the CloudFormation service and find you application in the `Stacks` screen. Select the stack and hit the `Delete` button. This will delete all the resources created for the project.
+To delete all the resources created for this project, in the AWS console go back to the CloudFormation service and find your application in the `Stacks` screen. Select the stack and hit the `Delete` button. This will delete all the resources created for the project.
 
 
 
