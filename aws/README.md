@@ -2,7 +2,7 @@
 
 These projects demonstrate developing applications using various AWS services. 
 
-- [AWS SAM Lambda Example](https://github.com/efarish/portfolio/tree/main/aws/sam_lambda_s3): Use AWS Serverless Application Model (SAM) to deploy a Lambda endpoint that can post a file to S3.
+- [AWS SAM Lambda Example](https://github.com/efarish/portfolio/tree/main/aws/sam_lambda_s3): Use AWS Serverless Application Model (SAM) to deploy a Lambda endpoint.
 - [API Gateway-ECS Integration](https://github.com/efarish/portfolio/tree/main/aws/ecs_docker): Integrating API Gatweay and ECS using an ALB and Cloud Map.
 - [ESC Service Integration](https://github.com/efarish/portfolio/tree/main/aws/ecs_service_connect): Integrating ECS services using Service Connect.
 - [CodePipeline ECS CI/CD](https://github.com/efarish/portfolio/tree/main/aws/codepipeline_docker_ecs) - Project demonstrating CI/CD CodePipelines that create and udpate ECS clusters.
