@@ -21,8 +21,64 @@ The `docker` directory contains a simple FastAPI implementation of GET and POST 
 1. This project assumes the AWS and SAM CLIs are are installed and configured. 
 2. The following resources need to be created manually:
     1. A S3 bucket used to by the pipelines. Set your bucket at the `S3ArtifactBucket` parameter in the `cloudformation/ecs-create-pipeline/templage_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/templage.yaml` CloudFormation templates.
-    2. An ARN for a AWS Developer Tools Code Connections to Github. Set the Github connection at the `GitHubConnectionArn` parameter in the `cloudformation/ecs-create-pipeline/template_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/template.yaml` CloudFormation templates. 
-    3. A ECR repository called `ecs1` needs to be created. The `buildspec.yml` files and pipeline templates assume this repository exists.
+    2. A ECR repository called `ecs1` needs to be created. The `buildspec.yml` files and pipeline templates assume this repository exists.
+    3. An ARN for a AWS Developer Tools Code Connections to Github. Set the Github connection at the `GitHubConnectionArn` parameter in the `cloudformation/ecs-create-pipeline/template_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/template.yaml` CloudFormation templates with the ARN of the Github Code Connection you create. When creating the Code Connection, you'll be prompted to referenced a IAM role. Below are the IAM Trust relationships and permissions policy needed for this project. The permissions are overly broad and would need to be refined for production use.
+        1. Trust Relationships:
+        ```
+        {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "",
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": [
+                        "ecs-tasks.amazonaws.com",
+                        "cloudformation.amazonaws.com",
+                        "codebuild.amazonaws.com",
+                        "codedeploy.amazonaws.com",
+                        "codepipeline.amazonaws.com"
+                    ]
+                },
+                "Action": "sts:AssumeRole"
+            }
+        ```
+        2. Permissions Policy:
+        ```
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "codestar-connections:UseConnection",
+                        "codebuild:BatchGetBuilds",
+                        "codebuild:StartBuild",
+                        "codebuild:BatchGetBuildBatches",
+                        "codebuild:StartBuildBatch",
+                        "apigateway:*",
+                        "cloudformation:*",
+                        "cloudwatch:*",
+                        "ec2:*",
+                        "ecs:*",
+                        "ecr:*",
+                        "logs:*",
+                        "route53:*",
+                        "s3:*",
+                        "servicediscovery:*",
+                        "iam:DeleteRolePolicy",
+                        "iam:DetachRolePolicy",
+                        "iam:DeleteRole",
+                        "iam:CreateRole",
+                        "iam:PutRolePolicy",
+                        "iam:AttachRolePolicy",
+                        "iam:PassRole"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        }
+        ```
 
 ## Creating the Pipeline Stacks
 
