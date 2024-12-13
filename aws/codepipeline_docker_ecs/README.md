@@ -20,7 +20,9 @@ The `docker` directory contains a simple FastAPI implementation of GET and POST 
 
 1. This project assumes the AWS and SAM CLIs are are installed and configured. 
 2. The following resources need to be created manually:
-    1. A S3 bucket used to by the pipelines. Set your bucket at the `S3ArtifactBucket` parameter in the `cloudformation/ecs-create-pipeline/templage_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/templage.yaml` CloudFormation templates.
+    1. A S3 buckets:  
+        1. Used by the code pipelines, set the `S3ArtifactBucket` parameter in the `cloudformation/ecs-create-pipeline/templage_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/templage.yaml` CloudFormation templates.
+        2. Set the `docket/.env` properties file's `S3_BUCKET`. This the S3 bucket the app's `/upload` endpoint uses. This can be the same bucket used for the the pipelines.
     2. A ECR repository called `ecs1` needs to be created. The `buildspec.yml` files and pipeline templates assume this repository exists.
     3. An ARN for a AWS Developer Tools Code Connections to Github. Set the Github connection at the `GitHubConnectionArn` parameter in the `cloudformation/ecs-create-pipeline/template_pipeline.yaml` and the `cloudformation/ecs-update-pipeline/template.yaml` CloudFormation templates with the ARN of the Github Code Connection you create. When creating the Code Connection, you'll be prompted to referenced a IAM role. Below are the IAM Trust relationships and permissions policy needed for this project. The permissions are overly broad and would need to be refined for production use.
         1. Trust Relationships:
