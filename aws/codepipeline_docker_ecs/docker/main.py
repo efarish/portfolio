@@ -31,6 +31,6 @@ async def upload_file(file: UploadFile = File(...)):
     s3.put_object(Bucket=S3_BUCKET, Key=file.filename, Body=contents)
     response_json = f'{{"filename":"{file.filename}", "bucket":"{S3_BUCKET}" }}'
     
-    return Response(content=response_json, media_type="application/json")
+    #return Response(content=response_json, media_type="application/json")
 
 
