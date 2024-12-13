@@ -10,7 +10,7 @@ The SAM CLI and CloudFormation templates are used to create the pipelines.
 A couple of **WARNINGS**:
 
 1. This projects creates AWS resources that cost money. Specifically, API Gateway and ECS resources are deployed into a VPC created for the project. The VPC consists of a one public subnet, one private subnet, an Internet gateway, and a NAT gateway. Be sure to execute the [Clean Up](#Clean-Up) section when done.
-1. As soon as a pipeline is created in CodePipeline using the SAM CLI, it executes. For example, when the ECS pipeline is created in the steps below, it will immediately execute. 
+1. As soon as a pipeline is created in CodePipeline using the SAM CLI, it executes. For example, the "Create ECS Stack Pipeline" described below will begin creating an AWS ECS cluster as soon as the pipeline is created in AWS.
 
 ## The Endpoint Deployed
 
@@ -79,6 +79,11 @@ The `docker` directory contains a simple FastAPI implementation of GET and POST 
             ]
         }
         ```
+        Below is a snapshot of the AWS console where Developer Tools Code Connections are created.
+
+        <p align="center">
+            <img src="./assets/img/code_connection.jpg" style="width:90%; height:auto;" />
+        </p>
 
 ## Creating the Pipeline Stacks
 
