@@ -18,7 +18,7 @@ def health_check():
 
 @app.get('/getInfo', status_code=status.HTTP_200_OK)
 def read_me():
-    return {'message': 'Hi from the Upload container v1.'}
+    return {'message': 'Hi from the Upload container v2.'}
 
 @app.post("/upload", status_code=status.HTTP_201_CREATED)
 async def upload_file(file: UploadFile = File(...)):
