@@ -18,7 +18,7 @@ def health_check():
 
 @app.get('/getInfo', status_code=status.HTTP_200_OK)
 def read_me():
-    return {'message': 'Hi from the Upload container v2.'}
+    return {'message': 'Hi from the Upload container v1.'}
 
 @app.post("/upload", status_code=status.HTTP_201_CREATED)
 async def upload_file(file: UploadFile = File(...)):
@@ -29,8 +29,6 @@ async def upload_file(file: UploadFile = File(...)):
     contents = await file.read()
     print(f"File {file.filename} saved at S3 bucket: {S3_BUCKET}")
     s3.put_object(Bucket=S3_BUCKET, Key=file.filename, Body=contents)
-    response_json = f'{{"filename":"{file.filename}", "bucket":"{S3_BUCKET}" }}'
-    
-    #return Response(content=response_json, media_type="application/json")
+
 
 
