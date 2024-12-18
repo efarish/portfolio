@@ -7,4 +7,3 @@ boto3
 requests
 starlette
 sqlalchemy
-databases
