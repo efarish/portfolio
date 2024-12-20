@@ -42,12 +42,12 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
         
 @router.get("/read_all", status_code=status.HTTP_200_OK, response_model=list[UserGetAll])
 async def read_all(user: user_dependency, db: db_dependency):
-    if user is None or user.get('user_role') != 'admin':
+    if user is None or user.get('role') != 'admin':
         raise HTTPException(status_code=401, detail='Authentication Failed')
     statement = select(Users.user_name, Users.role)
     result = db.execute(statement)
     users = result.all()
-    return users #db.query(Users).all()
+    return users
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency,
