@@ -17,7 +17,7 @@ def health_check():
     return {'message': 'The GPS Tracker container is up.'}
 
 
-#app.include_router(auth.router)
+app.include_router(auth.router)
 app.include_router(users.router)
 
 if __name__ == '__main__':
