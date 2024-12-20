@@ -1,4 +1,4 @@
 # Mobile GPS Tracker
 
-WORKING-IN-PROGRESS
+WORK-IN-PROGRESS
 
