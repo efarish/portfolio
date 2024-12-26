@@ -1,15 +1,16 @@
 import os
 from typing import Annotated
 
-from .auth import check_user_name, get_current_user
 import bcrypt
-from db import SessionLocal
+from db import get_db
 from fastapi import APIRouter, Depends, HTTPException
 from model import Users
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette import status
+
+from .auth import check_user_name, get_current_user
 
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') #salt = bcrypt.gensalt(rounds=10, prefix=b'2a')
 
@@ -29,13 +30,6 @@ class UserGetAll(BaseModel):
 
     class Config:
         orm_mode = True
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]

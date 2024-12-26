@@ -9,3 +9,9 @@ class Users(Base):
     user_name = Column(String, unique=True)
     password = Column(String)
     role = Column(String)
+
+
+class User_Location(Base):
+    __tablename__ = 'user_location'
+
+    id = Column(Integer, primary_key=True, index=True)
