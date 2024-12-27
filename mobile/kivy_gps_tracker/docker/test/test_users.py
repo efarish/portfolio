@@ -20,5 +20,5 @@ def test_admin_read_all(insert_user):
 def test_user_read_all():
     app.dependency_overrides[get_current_user] = get_mock_user
     response = client.get('/users/read_all')
-    #assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

@@ -21,7 +21,7 @@ def get_mock_user():
     return {'user_name': 'test_user',
             'role': 'user'}
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def insert_user(request):
     user = Users()
     mock_user = request.param
