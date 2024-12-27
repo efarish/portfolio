@@ -2,7 +2,6 @@ from fastapi import status
 
 from .util import *
 
-client = TestClient(main.app)
 
 def test_read_main():
     response = client.get("/")
