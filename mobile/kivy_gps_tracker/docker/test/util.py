@@ -2,14 +2,13 @@ import os
 
 import bcrypt
 import pytest
+from db import Base
 from fastapi.testclient import TestClient
+from main import app
+from model import Users
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-
-from db import Base
-from main import app
-from model import Users
 
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
 
@@ -19,6 +18,10 @@ def get_mock_admin_user():
 
 def get_mock_user():
     return {'user_name': 'test_user',
+            'role': 'user'}
+
+def get_mock_user_2():
+    return {'user_name': 'test_user_2',
             'role': 'user'}
 
 @pytest.fixture(scope="function")

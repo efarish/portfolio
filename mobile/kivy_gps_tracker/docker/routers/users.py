@@ -24,6 +24,9 @@ class CreateUserRequest(BaseModel):
     password: str
     role: str
 
+class UpdateUserRequest(BaseModel):
+    role: str
+
 class UserGetAll(BaseModel):
     user_name: str
     role: str
@@ -61,3 +64,14 @@ async def create_user(db: db_dependency,
     db.commit()
 
 
+@router.put("/update", status_code=status.HTTP_204_NO_CONTENT)
+async def update_user(user: user_dependency, db: db_dependency,
+                      update_user_request: UpdateUserRequest):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+    
+    user_model = db.query(Users).filter(Users.user_name == user.get('user_name')).first()
+
+    user_model.role = update_user_request.role
+    db.add(user_model)
+    db.commit()
