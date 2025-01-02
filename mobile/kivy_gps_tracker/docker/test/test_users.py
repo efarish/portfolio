@@ -50,3 +50,17 @@ def test_user_update_success(insert_user):
     response = client.put('/users/update', json=request_data)
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
+@pytest.mark.parametrize(
+    'insert_user',
+    ([get_mock_user()]),
+    indirect=True
+)
+def test_user_delete_success(insert_user):
+    app.dependency_overrides[get_current_user] = get_mock_admin_user
+    mock_user_name = get_mock_user().get('user_name')
+    response = client.delete(f'/users/delete/{ mock_user_name }')
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    with TestSessionLocal() as db:
+        cnt_result = db.query(Users).filter(Users.user_name == mock_user_name).count()
+        assert  cnt_result == 0
+
