@@ -3,7 +3,7 @@ from db import engine
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from model import Base
-from routers import auth, users
+from routers import auth, user_location, users
 from starlette import status
 
 load_dotenv()
@@ -19,6 +19,7 @@ def health_check():
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(user_location.router)
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=80)

@@ -12,7 +12,7 @@ from starlette import status
 
 from .auth import check_user_name, get_current_user
 
-BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') #salt = bcrypt.gensalt(rounds=10, prefix=b'2a')
+BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
 
 router = APIRouter(
     prefix='/users',
@@ -28,11 +28,12 @@ class UpdateUserRequest(BaseModel):
     role: str
 
 class UserGetAll(BaseModel):
+    id: int
     user_name: str
     role: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
@@ -41,7 +42,7 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 async def read_all(user: user_dependency, db: db_dependency):
     if user is None or user.get('role') != 'admin':
         raise HTTPException(status_code=401, detail='Authentication Failed')
-    statement = select(Users.user_name, Users.role)
+    statement = select(Users.id, Users.user_name, Users.role)
     result = db.execute(statement)
     users = result.all()
     return users
@@ -67,13 +68,13 @@ async def update_user(user: user_dependency, db: db_dependency,
                       update_user_request: UpdateUserRequest):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
-    user_model = db.query(Users).filter(Users.user_name == user.get('user_name')).first()
+    user_model = db.query(Users).filter(Users.id == user.get('id')).first()
     user_model.role = update_user_request.role
     db.add(user_model)
     db.commit()
 
 @router.delete("/delete/{user_name}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(user: user_dependency, db: db_dependency, user_name: str = Path(..., min_length=1)):
+async def delete_user(user: user_dependency, db: db_dependency, user_name: str = Path(..., min_length=1)):
     if user is None or user.get('role') != 'admin':
         raise HTTPException(status_code=401, detail='Authentication Failed')
     user_model = db.query(Users).filter(Users.user_name == user_name).first()

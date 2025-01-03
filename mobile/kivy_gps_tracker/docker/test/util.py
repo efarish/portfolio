@@ -5,29 +5,34 @@ import pytest
 from db import Base
 from fastapi.testclient import TestClient
 from main import app
-from model import Users
+from model import User_Location, Users
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
 
-def get_mock_admin_user():
-    return {'user_name': 'test_user',
+def get_mock_admin_user(id: int = 1):
+    return {'id': id, 'user_name': 'test_user',
             'role': 'admin'}
 
-def get_mock_user():
-    return {'user_name': 'test_user',
+def get_mock_user(id: int = 2):
+    return {'id': id, 'user_name': 'test_user',
             'role': 'user'}
 
-def get_mock_user_2():
-    return {'user_name': 'test_user_2',
+def get_mock_user_location(id: int = 1, user_id = 2):
+    return {'id': id, 'user_id': user_id,
+            'lat': 1.0, 'lng': 1.0}
+
+def get_mock_user_2(id: int = 3):
+    return {'id': id, 'user_name': 'test_user_2',
             'role': 'user'}
 
 @pytest.fixture(scope="function")
 def insert_user(request):
     user = Users()
     mock_user = request.param
+    user.id = mock_user['id']
     user.user_name = mock_user['user_name']
     user.role = mock_user['role']
     user.password = bcrypt.hashpw(password='XXXX_password'.encode('UTF-8'), salt=BCRYPT_SALT)
@@ -36,6 +41,30 @@ def insert_user(request):
     db.commit()
     yield user
     with engine.connect() as connection:
+        connection.execute(text('DELETE FROM users'))
+        connection.commit()
+
+@pytest.fixture(scope="function")
+def insert_location(request):
+    user = Users()
+    mock_user = request.param['user']
+    user.id = mock_user['id']
+    user.user_name = mock_user['user_name']
+    user.role = mock_user['role']
+    db = TestSessionLocal()
+    db.add(user)
+
+    loc = User_Location()
+    mock_location = request.param['loc']
+    loc.user_id = mock_location['user_id']
+    loc.lat = mock_location['lat']
+    loc.lng = mock_location['lng']
+    db.add(loc)
+    db.commit()
+    
+    yield user, loc
+    with engine.connect() as connection:
+        connection.execute(text('DELETE FROM user_location'))
         connection.execute(text('DELETE FROM users'))
         connection.commit()
 

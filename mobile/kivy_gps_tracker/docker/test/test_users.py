@@ -1,3 +1,5 @@
+import functools
+
 from fastapi import status
 from model import Users
 from routers.users import get_current_user, get_db
@@ -15,7 +17,10 @@ def test_admin_read_all(insert_user):
     app.dependency_overrides[get_current_user] = get_mock_admin_user
     response = client.get('/users/read_all')
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [get_mock_admin_user()]
+    mock_admin = get_mock_admin_user()
+    response = response.json()[0]
+    assert  response['user_name'] == mock_admin['user_name']
+    assert  response['role'] == mock_admin['role']
 
 def test_user_read_all():
     app.dependency_overrides[get_current_user] = get_mock_user
@@ -38,7 +43,6 @@ def test_user_create():
             connection.execute(text('DELETE FROM users'))
             connection.commit()
 
-
 @pytest.mark.parametrize(
     'insert_user',
     ([get_mock_user()]),
@@ -46,9 +50,14 @@ def test_user_create():
 )
 def test_user_update_success(insert_user):
     request_data={'role': 'admin'}
-    app.dependency_overrides[get_current_user] = get_mock_user
+    mock_user = get_mock_user()
+    wrap_get_mock_user = functools.partial(get_mock_user, id=mock_user.get('id'))
+    app.dependency_overrides[get_current_user] = wrap_get_mock_user
     response = client.put('/users/update', json=request_data)
     assert response.status_code == status.HTTP_204_NO_CONTENT
+    with TestSessionLocal() as db:
+        user_model = db.query(Users).filter(Users.id == mock_user.get('id')).first()
+        assert  user_model.role == request_data.get('role')
 
 @pytest.mark.parametrize(
     'insert_user',

@@ -1,5 +1,5 @@
 from db import Base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String
 
 
 class Users(Base):
@@ -15,3 +15,6 @@ class User_Location(Base):
     __tablename__ = 'user_location'
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    lat = Column(DECIMAL(9,6))
+    lng = Column(DECIMAL(9,6))
