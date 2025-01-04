@@ -1,12 +1,32 @@
 from decimal import Decimal
 
 from fastapi import status
-from model import Users
 from routers.users import get_current_user, get_db
 
 from .util import *
 
 app.dependency_overrides[get_db] = mock_get_db
+
+
+@pytest.mark.parametrize(
+    'insert_user',
+    [get_mock_user()],
+    indirect=True
+)
+def test_update_location(insert_user):
+    app.dependency_overrides[get_current_user] = get_mock_user
+    mock_user = get_mock_user()
+    response = client.post('/location/update', 
+                           json={'user_name': mock_user['user_name'], 'lat': 1.0, 'lng': 1.0})
+    assert response.status_code == status.HTTP_201_CREATED
+    with TestSessionLocal() as db:
+        user_loc_model = db.query(User_Location).filter(User_Location.user_id == mock_user['id']).first()
+        assert user_loc_model.lat == 1.0
+        assert user_loc_model.lng == 1.0 
+
+    with engine.connect() as connection:
+        connection.execute(text('DELETE FROM user_location'))
+        connection.commit()
 
 
 @pytest.mark.parametrize(

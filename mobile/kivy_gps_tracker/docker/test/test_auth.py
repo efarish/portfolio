@@ -5,7 +5,7 @@ from routers.auth import get_current_user
 from .util import *
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="function")
 @pytest.mark.parametrize(
     'insert_user',
     [get_mock_admin_user()],

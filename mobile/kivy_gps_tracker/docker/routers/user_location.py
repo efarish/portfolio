@@ -55,9 +55,8 @@ async def update_user_location(user: user_dependency, db: db_dependency,
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
     
-    user_model = db.query(Users).filter(Users.id == user.get('id')).first()
     user_location_model = User_Location(
-        user_id=user_model.id,
+        user_id=user.get('id'), 
         lat=update_user_location.lat,
         lng=update_user_location.lng
     )

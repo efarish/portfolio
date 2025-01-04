@@ -1,5 +1,7 @@
+from datetime import datetime, timezone
+
 from db import Base
-from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String
+from sqlalchemy import DECIMAL, TIMESTAMP, Column, ForeignKey, Integer, String
 
 
 class Users(Base):
@@ -18,3 +20,4 @@ class User_Location(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     lat = Column(DECIMAL(9,6))
     lng = Column(DECIMAL(9,6))
+    created_at = Column(TIMESTAMP, default=datetime.now(timezone.utc))

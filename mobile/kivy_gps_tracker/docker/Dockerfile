@@ -2,11 +2,12 @@ FROM public.ecr.aws/docker/library/python:latest
 
 WORKDIR /app
 
-COPY . /app
+COPY .env /app
+COPY *.py /app
+COPY requirements.txt /app
+COPY routers /app
 
 RUN pip3 install -r requirements.txt
-
-RUN mkdir /app/uploads
 
 EXPOSE 80
 
