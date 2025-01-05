@@ -29,7 +29,7 @@ def test_user_read_all():
 
 def test_user_create():
     request_data={'user_name': 'test_user', 'password': 'password', 'role':'user' }
-    response = client.post('/users', json=request_data)
+    response = client.post('/users/create_user', json=request_data)
     assert response.status_code == status.HTTP_201_CREATED
     try:
         with TestSessionLocal() as db:

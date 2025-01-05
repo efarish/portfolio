@@ -47,7 +47,7 @@ async def read_all(user: user_dependency, db: db_dependency):
     users = result.all()
     return users
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/create_user", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency,
                       create_user_request: CreateUserRequest):
     

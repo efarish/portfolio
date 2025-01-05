@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: The template used to create an AWS API Gateway.
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  PrivateSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of private subnet ID's.
+  ECSClusterName:
+    Type: String
+    Description: The name of the ECS cluster into which to launch capacity.
+  ServiceSecurityGroup:
+    Type: String
+  DiscoveryService:
+    Type: String
+    Description: ARN of the discovery service.
+     
+Resources:
+
+  # -------------------------------------------------------------------------
+  # Deploy API GW HTTP API route and integration to Cloud Map
+  # -------------------------------------------------------------------------
+  HttpApiSvcConnect:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: SC-HTTP-api
+      Description: HTTP API Linking to Service Connect
+      ProtocolType: HTTP
+
+  APIRoute1:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiSvcConnect
+      RouteKey: 'GET /'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute2:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiSvcConnect
+      RouteKey: 'POST /users/create_user'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute3:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiSvcConnect
+      RouteKey: 'GET /users/read_all'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute4:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiSvcConnect
+      RouteKey: 'POST /auth/token'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+          
+  # This security group is used by the VPC link, so that
+  # you can control which resources in the VPC the VPC link is
+  # allowed to communicate with.
+  ApiGatewaySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for API gateway
+      VpcId: !Ref VpcId
+
+  PrivateAPIGWvpcLink:  
+    Type: AWS::ApiGatewayV2::VpcLink
+    Properties: 
+      Name: private-apigw-vpclink
+      SecurityGroupIds: 
+        - !Ref ApiGatewaySecurityGroup
+      SubnetIds: !Ref PrivateSubnetIds
+
+  APIIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApiSvcConnect
+      Description: A Cloud Map Integration
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      ConnectionType: VPC_LINK
+      ConnectionId: !Ref PrivateAPIGWvpcLink
+      IntegrationUri: !Ref DiscoveryService
+      PayloadFormatVersion: '1.0'
+
+  # Configure the security group of the service to accept
+  # inbound traffic originating from the security group of
+  # the API gateway's VPC link
+  ServiceIngressFromApiGateway:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow API Gateway to communicate to the service
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
+
+  APILogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/apigateway/${ECSClusterName}
+        RetentionInDays: 1
+
+  APIStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: $default
+      AutoDeploy: true
+      ApiId: !Ref HttpApiSvcConnect
+      AccessLogSettings:
+        DestinationArn: !GetAtt APILogGroup.Arn 
+        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
+
+# -------------------------------------------------------------------------
+# Information about the stack.
+# -------------------------------------------------------------------------
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub https://${HttpApiSvcConnect}.execute-api.${AWS::Region}.amazonaws.com/ 
+
+
