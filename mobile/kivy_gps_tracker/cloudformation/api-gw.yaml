@@ -5,9 +5,9 @@ Parameters:
   VpcId:
     Type: String
     Description: The VPC that the service is running inside of
-  PrivateSubnetIds:
+  DeploymentSubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
-    Description: List of private subnet ID's.
+    Description: List of deployment subnet ID's.
   ECSClusterName:
     Type: String
     Description: The name of the ECS cluster into which to launch capacity.
@@ -84,7 +84,7 @@ Resources:
       Name: private-apigw-vpclink
       SecurityGroupIds: 
         - !Ref ApiGatewaySecurityGroup
-      SubnetIds: !Ref PrivateSubnetIds
+      SubnetIds: !Ref DeploymentSubnetIds
 
   APIIntegration:
     Type: AWS::ApiGatewayV2::Integration

@@ -27,11 +27,6 @@ Resources:
     Properties:
       GroupDescription: Security group for service
       VpcId: !GetAtt VPC.Outputs.VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 0
@@ -117,7 +112,7 @@ Resources:
       Location: ./service-tracker.yaml
       Parameters:
         VpcId: !GetAtt VPC.Outputs.VpcId
-        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
         ECSCluster: !Ref ECSCluster
         ECSClusterName: !Ref ECSClusterName
         ECSTaskRole: !Ref ECSTaskRole
@@ -136,7 +131,7 @@ Resources:
       Location: ./api-gw.yaml
       Parameters:
         VpcId: !GetAtt VPC.Outputs.VpcId
-        PrivateSubnetIds: !GetAtt VPC.Outputs.PrivateSubnetIds
+        DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
         ECSClusterName: !Ref ECSClusterName
         ServiceSecurityGroup: !Ref ServiceSecurityGroup
         DiscoveryService: !GetAtt DiscoveryService.Arn

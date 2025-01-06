@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: The template used to create the Rekognition service.
+Description: The template used to create the service.
 
 Parameters:
   VpcId:
     Type: String
     Description: The VPC that the service is running inside of
-  PrivateSubnetIds:
+  DeploymentSubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
-    Description: List of private subnet ID's.
+    Description: List of deployment subnet ID's.
   ECSCluster:
     Type: String
     Description: ARN of the ECS cluster to run the service in.
@@ -60,9 +60,9 @@ Resources:
       DesiredCount: 1
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
+          AssignPublicIp: ENABLED
           SecurityGroups: [!Ref ServiceSecurityGroup]
-          Subnets:  !Ref PrivateSubnetIds
+          Subnets:  !Ref DeploymentSubnetIds
       ServiceConnectConfiguration:
         Enabled: true
         Namespace: "internal.com"
