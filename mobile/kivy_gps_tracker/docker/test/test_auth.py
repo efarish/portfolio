@@ -1,5 +1,4 @@
 import pytest
-from jose import JWTError, jwt
 from routers.auth import get_current_user, get_db
 
 from .util import *
