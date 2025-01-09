@@ -9,6 +9,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from model import Users
 from pydantic import BaseModel
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -41,12 +43,17 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Could not validate user.')
 
-def check_user_name(username: str, db):
-    user = db.query(Users).filter(Users.user_name == username).first()
-    return user if user else None
+async def check_user_name(username: str, db):
+    statement = select(Users).where(Users.user_name == username)
+    try:
+        result = await db.execute(statement)
+        user = result.one()[0]
+    except NoResultFound:
+        return None
+    return user 
 
-def authenticate_user(username: str, password: str, db):
-    user = check_user_name(username, db) 
+async def authenticate_user(username: str, password: str, db):
+    user = await check_user_name(username, db) 
     if not user:
         return False
     check = bcrypt.checkpw(password=password.encode('UTF-8'), hashed_password=user.password)
@@ -63,7 +70,7 @@ def create_access_token(id: int, username: str, role: str, expires_delta: timede
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
-    user = authenticate_user(form_data.username, form_data.password, db)
+    user = await authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Could not validate user.')

@@ -7,13 +7,13 @@ from .util import *
 
 app.dependency_overrides[get_db] = mock_get_db
 
-
+@pytest.mark.asyncio(loop_scope="function")
 @pytest.mark.parametrize(
     'insert_user',
     [get_mock_user()],
     indirect=True
 )
-def test_update_location(insert_user):
+async def test_update_location(insert_user):
     app.dependency_overrides[get_current_user] = get_mock_user
     mock_user = get_mock_user()
     response = client.post('/location/update', 
@@ -27,7 +27,6 @@ def test_update_location(insert_user):
     with engine.connect() as connection:
         connection.execute(text('DELETE FROM user_location'))
         connection.commit()
-
 
 @pytest.mark.parametrize(
     'insert_location',

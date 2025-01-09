@@ -43,12 +43,13 @@ def test_user_create():
             connection.execute(text('DELETE FROM users'))
             connection.commit()
 
+@pytest.mark.asyncio(loop_scope="function")
 @pytest.mark.parametrize(
     'insert_user',
     ([get_mock_user()]),
     indirect=True
 )
-def test_user_update_success(insert_user):
+async def test_user_update_success(insert_user):
     request_data={'role': 'admin'}
     mock_user = get_mock_user()
     wrap_get_mock_user = functools.partial(get_mock_user, id=mock_user.get('id'))
@@ -59,17 +60,18 @@ def test_user_update_success(insert_user):
         user_model = db.query(Users).filter(Users.id == mock_user.get('id')).first()
         assert  user_model.role == request_data.get('role')
 
+@pytest.mark.asyncio(loop_scope="function")
 @pytest.mark.parametrize(
     'insert_user',
     ([get_mock_user()]),
     indirect=True
 )
-def test_user_delete_success(insert_user):
+async def test_user_delete_success(insert_user):
     app.dependency_overrides[get_current_user] = get_mock_admin_user
     mock_user_name = get_mock_user().get('user_name')
     response = client.delete(f'/users/delete/{ mock_user_name }')
     assert response.status_code == status.HTTP_204_NO_CONTENT
     with TestSessionLocal() as db:
         cnt_result = db.query(Users).filter(Users.user_name == mock_user_name).count()
-        assert  cnt_result == 0
+        assert cnt_result == 0
 

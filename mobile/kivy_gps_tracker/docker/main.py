@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from db import engine
 from dotenv import load_dotenv
@@ -8,14 +10,25 @@ from starlette import status
 
 load_dotenv()
 
-app = FastAPI()
+async def create_db_and_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Before app starts
+    await create_db_and_tables()
+    try:
+        yield
+    finally:
+        # After the app stops
+        await engine.dispose()
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get('/', status_code=status.HTTP_200_OK)
 def health_check():
     return {'message': 'The GPS Tracker container is up.'}
-
 
 app.include_router(auth.router)
 app.include_router(users.router)

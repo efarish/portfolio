@@ -6,7 +6,9 @@ from db import get_db
 from fastapi import APIRouter, Depends, HTTPException, Path
 from model import Users
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import delete
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -43,7 +45,7 @@ async def read_all(user: user_dependency, db: db_dependency):
     if user is None or user.get('role') != 'admin':
         raise HTTPException(status_code=401, detail='Authentication Failed')
     statement = select(Users.id, Users.user_name, Users.role)
-    result = db.execute(statement)
+    result = await db.execute(statement)
     users = result.all()
     return users
 
@@ -51,7 +53,8 @@ async def read_all(user: user_dependency, db: db_dependency):
 async def create_user(db: db_dependency,
                       create_user_request: CreateUserRequest):
     
-    if check_user_name(create_user_request.user_name, db):
+    user = await check_user_name(create_user_request.user_name, db)
+    if user:
         raise HTTPException(status_code=401, detail='User name already exists.')    
     create_user_model = Users(
         user_name=create_user_request.user_name,
@@ -60,7 +63,7 @@ async def create_user(db: db_dependency,
                                salt=BCRYPT_SALT)
     )
     db.add(create_user_model)
-    db.commit()
+    await db.commit()
 
 
 @router.put("/update", status_code=status.HTTP_204_NO_CONTENT)
@@ -68,17 +71,22 @@ async def update_user(user: user_dependency, db: db_dependency,
                       update_user_request: UpdateUserRequest):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
-    user_model = db.query(Users).filter(Users.id == user.get('id')).first()
+    statement = select(Users).where(Users.id == user.get('id'))
+    try:
+        result = await db.execute(statement)
+        user_model = result.one()[0]
+    except NoResultFound:
+        raise HTTPException(status_code=404, detail='User not found.')
     user_model.role = update_user_request.role
     db.add(user_model)
-    db.commit()
+    await db.commit()
 
 @router.delete("/delete/{user_name}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user: user_dependency, db: db_dependency, user_name: str = Path(..., min_length=1)):
     if user is None or user.get('role') != 'admin':
         raise HTTPException(status_code=401, detail='Authentication Failed')
-    user_model = db.query(Users).filter(Users.user_name == user_name).first()
-    if user_model is None:
-        raise HTTPException(status_code=404, detail='User not found.')
-    db.query(Users).filter(Users.id == user_model.id).delete()
-    db.commit()
+    statement = delete(Users).where(Users.user_name == user_name)
+    result = await db.execute(statement)
+    if result.rowcount == 0:
+        raise HTTPException(status_code=404, detail='Delete failed.')
+    await db.commit()

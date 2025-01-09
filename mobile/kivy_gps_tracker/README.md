@@ -2,6 +2,8 @@
 
 WORK-IN-PROGRESS
 
+This project focuses on implementing a REST API using FastAPI and AWS ECS. To make it more interesting, a Kivy mobile application client is also implemented. Furthermore, to reduce the cost of the resources deployed on AWS, reliability and scalability considerations are ignored. Therefore, a single low capacity Fargate launch type is used.
+
 ## Notes
 
 salt = bcrypt.gensalt(rounds=10, prefix=b'2a')

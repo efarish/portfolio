@@ -1,9 +1,10 @@
 import pytest
 from jose import JWTError, jwt
-from routers.auth import get_current_user
+from routers.auth import get_current_user, get_db
 
 from .util import *
 
+app.dependency_overrides[get_db] = mock_get_db
 
 @pytest.mark.asyncio(loop_scope="function")
 @pytest.mark.parametrize(

@@ -5,6 +5,7 @@ from db import get_db
 from fastapi import APIRouter, Depends, HTTPException
 from model import User_Location, Users
 from pydantic import BaseModel, Field
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session, aliased
 from starlette import status
 
@@ -42,11 +43,12 @@ async def get_user_locations(user: user_dependency, db: db_dependency,
         raise HTTPException(status_code=401, detail='Authentication Failed')
     
     ul = aliased(User_Location)
-    
-    locs = db.query(Users.id, Users.user_name, ul.lat, ul.lng) \
+
+    statement = select(Users.id, Users.user_name, ul.lat, ul.lng) \
         .join(ul, ul.user_id == Users.id) \
-        .filter(Users.id.in_(get_user_location.ids)).all()
-    
+        .filter(Users.id.in_(get_user_location.ids))
+    result = await db.execute(statement)
+    locs = result.fetchall()
     return locs
 
 @router.post("/update", status_code=status.HTTP_201_CREATED)
@@ -61,4 +63,4 @@ async def update_user_location(user: user_dependency, db: db_dependency,
         lng=update_user_location.lng
     )
     db.add(user_location_model)
-    db.commit()
+    await db.commit()
