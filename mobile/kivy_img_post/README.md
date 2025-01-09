@@ -1,4 +1,4 @@
-# Project: Using Python To Create An Android Phone App
+# Project: Using Kivy and Python To Create An Android Phone App
 
 This project uses the open-source Kivy framework to build a simple Python app for an Android phone. The app uses the phone's camera to take a picture, copy the image to the phone's download directory, and post the picture to an HTTP endpoint.
 
