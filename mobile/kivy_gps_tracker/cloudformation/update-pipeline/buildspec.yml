@@ -4,10 +4,10 @@ env:
 phases:
   pre_build:
     commands:
-      - PROJECT_NAME=kivy_gps_tracker
-      - DOCKER_IMAGE_NAME=tracker
-      - ECR_REPO=ecs1
-      - ECS_CONTAINER_NAME=ecs-tracker-cluster-tracker-container
+      - PROJECT_NAME=kivy_gps_tracker # Used to help build the src code path to files.
+      - DOCKER_IMAGE_NAME=tracker     # Name given to docker build image.  
+      - ECR_REPO=ecs1                 # Name of ECR image repository.
+      - ECS_CONTAINER_NAME=ecs-tracker-cluster-tracker-container #This must match the ECS container name created for the service.
       - AWS_ACCT=${AWS_ACCT}
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - ECR_IMG_NAME=${ECR_REPO}:${DOCKER_IMAGE_NAME}
