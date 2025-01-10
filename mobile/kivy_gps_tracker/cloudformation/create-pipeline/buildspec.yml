@@ -13,8 +13,8 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
-      - docker build -t ${ECR_IMG_NAME} ./aws/${PROJECT_NAME}/docker
-      - aws cloudformation package --template ./aws/${PROJECT_NAME}/cloudformation/create-pipeline/template_app_stack.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
+      - docker build -t ${ECR_IMG_NAME} ./mobile/${PROJECT_NAME}/docker
+      - aws cloudformation package --template ./mobile/${PROJECT_NAME}/cloudformation/create-pipeline/template_app_stack.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
   post_build:
     commands:
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}

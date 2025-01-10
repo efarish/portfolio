@@ -31,6 +31,11 @@ sam delete
 
 ```
 
+```bash
+sam build --template .\template_pipeline_stack.yaml
+
+```
+
 
 <p align="center">
   <img src="./assets/img/nw1.png" />
