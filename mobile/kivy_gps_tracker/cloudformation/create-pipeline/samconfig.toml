@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "gps-tracker-pipeline"
+stack_name = "gps-tracker-create-pipeline"
 
 [default.build.parameters]
 parallel = true

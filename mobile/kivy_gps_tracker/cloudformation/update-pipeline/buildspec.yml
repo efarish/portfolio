@@ -7,7 +7,7 @@ phases:
       - PROJECT_NAME=kivy_gps_tracker
       - DOCKER_IMAGE_NAME=tracker
       - ECR_REPO=ecs1
-      - ECS_CONTAINER_NAME=${PROJECT_NAME}-container
+      - ECS_CONTAINER_NAME=ecs-tracker-cluster-tracker-container
       - AWS_ACCT=${AWS_ACCT}
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - ECR_IMG_NAME=${ECR_REPO}:${DOCKER_IMAGE_NAME}

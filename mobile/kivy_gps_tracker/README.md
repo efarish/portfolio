@@ -45,7 +45,7 @@ sam build --template template_app_stack.yaml --config-file samconfig.toml
 # Customizations
 
 1. template_pipeline_stack.yaml -> GitHubConnectionArn
-
+2. update-pipeline->buildspec.yml->ECS_CONTAINER_NAME must match create-app->service-tracker->TaskDefinition:ContainerDefinition:Name
 
 ## Clean Up 
 
