@@ -117,7 +117,7 @@ Resources:
         ECSClusterName: !Ref ECSClusterName
         ECSTaskRole: !Ref ECSTaskRole
         ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
-        ECSServiceName: !Sub ${ECSClusterName}-svc-upload
+        ECSServiceName: !Sub ${ECSClusterName}-svc
         TaskName: 'tracker'
         TaskPort: '80'
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: CodePipeline sample
+Description: CodePipeline for GPS Tracker
 
 Parameters:
   PipeLineName:
@@ -14,7 +14,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: <ARN OF DEVELOPER TOOLS GITHUB CONNECTION>
+    Default: arn:aws:codeconnections:us-east-1:598185244415:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
@@ -54,6 +54,7 @@ Resources:
                   - route53:*
                   - s3:*
                   - servicediscovery:*
+                  - iam:CreateServiceLinkedRole
                   - iam:DeleteRolePolicy
                   - iam:DetachRolePolicy
                   - iam:DeleteRole
