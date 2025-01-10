@@ -1,0 +1,27 @@
+version: 0.2
+env:
+  shell: bash
+phases:
+  pre_build:
+    commands:
+      - PROJECT_NAME=kivy_gps_tracker
+      - DOCKER_IMAGE_NAME=tracker
+      - ECR_REPO=ecs1
+      - ECS_CONTAINER_NAME=${PROJECT_NAME}-container
+      - AWS_ACCT=${AWS_ACCT}
+      - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+      - ECR_IMG_NAME=${ECR_REPO}:${DOCKER_IMAGE_NAME}
+      - ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_REPO}:${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
+  build:
+    commands:
+      - docker build -t ${ECR_IMG_NAME} ./mobile/${PROJECT_NAME}/docker
+  post_build:
+    commands:
+      - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
+      - docker push ${ECR_IMAGE_URI}
+      - printf '[{"name":"%s","imageUri":"%s"}]' ${ECS_CONTAINER_NAME} ${ECR_IMAGE_URI} > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json

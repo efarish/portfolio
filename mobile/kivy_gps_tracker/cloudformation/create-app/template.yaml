@@ -6,7 +6,7 @@ Parameters:
   ECSClusterName:
     Type: String
     Description: Specifies the ECS Cluster Name with which the resources would be associated.
-    Default: ecs-tracker
+    Default: ecs-tracker-cluster
   ECSServiceName:
     Type: String
     Default: ecs-tracker-service
@@ -99,7 +99,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties: 
-      ClusterName: !Sub ${ECSClusterName}-cluster 
+      ClusterName: !Sub ${ECSClusterName} 
       ServiceConnectDefaults:
         Namespace: "internal.com"
       CapacityProviders: 
@@ -117,7 +117,7 @@ Resources:
         ECSClusterName: !Ref ECSClusterName
         ECSTaskRole: !Ref ECSTaskRole
         ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
-        ECSServiceName: !Sub ${ECSClusterName}-svc
+        ECSServiceName: !Sub ${ECSServiceName}
         TaskName: 'tracker'
         TaskPort: '80'
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker

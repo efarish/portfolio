@@ -60,7 +60,7 @@ In the AWS CloudFormation console, delete the stacks created for this project in
 
 ### ECR Images
 
-The Docker images in the `ecs1` repository created for this project need to be deleted.
+The Docker images in the `ecs1` repository (or whatever repository you used) created for this project need to be deleted.
 
 ### S3 Bucket
 
