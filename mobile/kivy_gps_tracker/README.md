@@ -11,11 +11,11 @@ JWT_SECRET_KEY = openssl rand -hex 32
 
 docker build -t gps/tracker .
 
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 598185244415.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com
 
-docker tag gps/tracker 598185244415.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker
+docker tag gps/tracker <AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker
 
-docker push 598185244415.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker
+docker push <AWS ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker
 
 ```bash
 
@@ -36,7 +36,10 @@ sam build --template .\template_pipeline_stack.yaml
 
 ```
 
-
 <p align="center">
   <img src="./assets/img/nw1.png" />
 </p>
+
+# Customizations
+
+1. template_pipeline_stack.yaml -> GitHubConnectionArn
