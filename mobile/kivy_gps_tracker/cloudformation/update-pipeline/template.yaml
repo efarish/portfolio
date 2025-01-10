@@ -13,11 +13,11 @@ Parameters:
     Default: efarish/portfolio
   ECSClusterName:
     Type: String
-    Description: Specifies the ECS Cluster Name with which the resources would be associated.
+    Description: Specifies the name of the ECS cluster to update.
     Default: ecs-tracker-cluster
   ECSServiceName:
     Type: String
-    Description: Specifies the ECS Service Name with which the resources would be associated.
+    Description: Specifies the ECS Service to update.
     Default: ecs-tracker-service
   GitHubConnectionArn:
     Type: String
