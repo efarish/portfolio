@@ -1,0 +1,169 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CodePipeline sample
+
+Parameters:
+  PipeLineName:
+    Type: String
+    Description: Specifies the ECS Cluster Name with which the resources would be associated.
+    Default: tracker-create-pipeline
+  SourceRepository:
+    Type: String
+    Description: Specifies a GitHub repository to use as the source repository.
+    Default: efarish/portfolio
+  GitHubConnectionArn:
+    Type: String
+    Description: Specifies the ARN of the GitHub Connection.
+    Default: arn:aws:codeconnections:us-east-1:598185244415:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
+  S3ArtifactBucket:
+    Type: String
+    Description: Specifies the S3 Bucket that will used by CodePipeLine.
+    Default: a-unique-artifact-bucket-name
+
+Resources:
+
+  CodePipeLineECSRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: IAM role used by CodePipeline for the ECS deploys.
+      AssumeRolePolicyDocument:
+        Statement:        
+        - Effect: Allow
+          Principal:
+            Service: [codepipeline.amazonaws.com, codebuild.amazonaws.com, codedeploy.amazonaws.com, ecs-tasks.amazonaws.com, ecs.amazonaws.com, ec2.amazonaws.com, cloudformation.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Policies:
+        - PolicyName: !Sub ${PipeLineName}-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuildBatches
+                  - codebuild:StartBuildBatch
+                  - apigateway:*
+                  - cloudformation:*
+                  - cloudwatch:*
+                  - ec2:*
+                  - ecs:*
+                  - ecr:*
+                  - logs:*
+                  - route53:*
+                  - s3:*
+                  - servicediscovery:*
+                  - iam:DeleteRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:DeleteRole
+                  - iam:CreateRole
+                  - iam:PutRolePolicy
+                  - iam:AttachRolePolicy
+                  - iam:PassRole
+                Resource:
+                  - '*'
+      Path: /
+
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${PipeLineName}-build
+      ServiceRole: !GetAtt CodePipeLineECSRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+        Name: !Sub ${PipeLineName}-build
+        Packaging: NONE
+        EncryptionDisabled: false
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: AWS_ACCT
+            Value: !Sub ${AWS::AccountId}
+        PrivilegedMode: true
+        ImagePullCredentialsType: CODEBUILD
+      TimeoutInMinutes: 5
+      QueuedTimeoutInMinutes: 10
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+        S3Logs:
+          Status: DISABLED
+          EncryptionDisabled: false
+      Visibility: PRIVATE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: mobile/kivy_gps_tracker/cloudformation/create-pipeline/buildspec.yml
+        InsecureSsl: false
+
+  CodePipeline1:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      RoleArn: !GetAtt CodePipeLineECSRole.Arn
+      ExecutionMode: QUEUED
+      PipelineType: V2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3ArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              RunOrder: 1
+              Configuration:
+                BranchName: main
+                ConnectionArn: !Ref GitHubConnectionArn
+                DetectChanges: 'false'
+                FullRepositoryId: !Ref SourceRepository
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: !Ref AWS::Region
+              Namespace: SourceVariables
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              RunOrder: 1
+              Configuration:
+                ProjectName: !Sub ${PipeLineName}-build
+              OutputArtifacts:
+                - Name: BuildArtifact
+              InputArtifacts:
+                - Name: SourceArtifact
+              Region: !Ref AWS::Region
+              Namespace: BuildVariables
+        - Name: Deploy
+          Actions:
+            - Name: Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              RunOrder: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_IAM
+                RoleArn: !GetAtt CodePipeLineECSRole.Arn
+                StackName: !Sub ${PipeLineName}-app-stack
+                TemplatePath: BuildArtifact::packaged-template.yaml
+              InputArtifacts:
+                - Name: BuildArtifact
+              Region: !Ref AWS::Region
+              Namespace: DeployVariables
+
+           
+
+

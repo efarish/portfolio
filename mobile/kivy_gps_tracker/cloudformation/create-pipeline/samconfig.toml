@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "gps-tracker-1"
+stack_name = "gps-tracker-app"
 
 [default.build.parameters]
 parallel = true

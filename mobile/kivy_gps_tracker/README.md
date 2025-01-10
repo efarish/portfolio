@@ -9,11 +9,13 @@ This project focuses on implementing a REST API using FastAPI and AWS ECS. To ma
 salt = bcrypt.gensalt(rounds=10, prefix=b'2a')
 JWT_SECRET_KEY = openssl rand -hex 32
 
-docker build -t gps/tracker
+docker build -t gps/tracker .
 
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <YOUR ACCT ID>.dkr.ecr.us-east-1.amazonaws.com
-docker tag gps/tracker <YOUR ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/<AN ECR REPOSITORY>:tracker
-docker push <YOUR ACCT ID>.dkr.ecr.us-east-1.amazonaws.com/<AN ECR REPOSITORY>:tracker
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 598185244415.dkr.ecr.us-east-1.amazonaws.com
+
+docker tag gps/tracker 598185244415.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker
+
+docker push 598185244415.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker
 
 ```bash
 
