@@ -2,7 +2,8 @@ import functools
 
 from fastapi import status
 from model import Users
-from routers.users import get_current_user, get_db
+from routers.auth import get_current_user
+from routers.users import get_db
 
 from .util import *
 

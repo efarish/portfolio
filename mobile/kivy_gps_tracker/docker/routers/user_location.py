@@ -9,7 +9,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import Session, aliased
 from starlette import status
 
-from .auth import get_current_user
+from .auth import user_dependency
 
 router = APIRouter(
     prefix='/location',
@@ -34,7 +34,6 @@ class UserLocations(BaseModel):
         from_attributes = True
 
 db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(get_current_user)]
 
 @router.post("/get_locations", status_code=status.HTTP_200_OK, response_model=List[UserLocations])
 async def get_user_locations(user: user_dependency, db: db_dependency,

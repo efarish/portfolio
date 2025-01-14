@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 from starlette import status
 
-from .auth import check_user_name, get_current_user
+from .auth import check_user_name, user_dependency
 
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
 
@@ -38,7 +38,6 @@ class UserGetAll(BaseModel):
         from_attributes = True
 
 db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(get_current_user)]
         
 @router.get("/read_all", status_code=status.HTTP_200_OK, response_model=list[UserGetAll])
 async def read_all(user: user_dependency, db: db_dependency):

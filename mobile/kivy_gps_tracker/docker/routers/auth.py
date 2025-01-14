@@ -42,6 +42,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Could not validate user.')
+    
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
 async def check_user_name(username: str, db):
     statement = select(Users).where(Users.user_name == username)
@@ -66,6 +68,13 @@ def create_access_token(id: int, username: str, role: str, expires_delta: timede
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({'exp': expires})
     return jwt.encode(encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
+
+
+@router.get("/check_token", status_code=status.HTTP_200_OK)
+async def check_token(user: user_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+    return user
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
