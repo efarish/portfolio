@@ -6,7 +6,6 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 COPY requirements.txt ${LAMBDA_TASK_ROOT}
 
 # Install the specified packages
-RUN python -m pip install --upgrade pip
 RUN pip3 install -r requirements.txt
 
 # Copy function code
