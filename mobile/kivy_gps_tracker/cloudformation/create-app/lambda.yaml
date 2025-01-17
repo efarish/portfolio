@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The template used for Lambda functions.
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  DeploymentSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of deployment subnet ID's.
+  ImageUrl:
+    Type: String
+    Description: The url of a docker image that contains the task application.
+  LambdaSecurityGroup:
+    Type: String
+
+Resources:
+
+  LambdaAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Description: 'A Lambda Authorizer for API GateWay.'
+      MemorySize: 128
+      Timeout: 3
+      Architectures:
+        - arm64
+      EphemeralStorage:
+        Size: 512
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      ImageUri: !Ref ImageUrl
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - servicediscovery:*
+                - ec2:*
+                - cloudmap:*
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - ec2:CreateNetworkInterface
+                - ec2:DescribeNetworkInterfaces
+                - ec2:DescribeSubnets
+                - ec2:DeleteNetworkInterface
+                - ec2:AssignPrivateIpAddresses
+                - ec2:UnassignPrivateIpAddresses
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+      SnapStart:
+        ApplyOn: None
+      VpcConfig:
+        SecurityGroupIds: [!Ref LambdaSecurityGroup]
+        SubnetIds: !Ref DeploymentSubnetIds
+        Ipv6AllowedForDualStack: false
+
+# -------------------------------------------------------------------------
+# Information about the stack.
+# -------------------------------------------------------------------------
+Outputs:
+  LambdaAuthArn:
+    Description: Arn of Lambda function.
+    Value: !GetAtt LambdaAuth.Arn
+  
+
