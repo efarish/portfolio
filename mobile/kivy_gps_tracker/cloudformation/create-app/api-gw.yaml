@@ -11,11 +11,14 @@ Parameters:
   ECSClusterName:
     Type: String
     Description: The name of the ECS cluster into which to launch capacity.
-  ServiceSecurityGroup:
-    Type: String
+  ApiGatewaySecurityGroup:
+    Type: String 
   DiscoveryService:
     Type: String
     Description: ARN of the discovery service.
+  LambdaAuthorizerArn: 
+    Type: String
+    Description: ARN of the lambda authorizer.
      
 Resources:
 
@@ -25,9 +28,53 @@ Resources:
   HttpApiSvcConnect:
     Type: AWS::ApiGatewayV2::Api
     Properties:
-      Name: SC-HTTP-api
-      Description: HTTP API Linking to Service Connect
+      Name: Tracker-HTTP-api
+      Description: HTTP API Linking to Tracker Service.
       ProtocolType: HTTP
+
+  LambdaAuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-auth-iam-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - '*'
+                Sid: ''
+
+  Authorizer:
+      Type: 'AWS::ApiGatewayV2::Authorizer'
+      Properties:
+        Name: LambdaAuthorizer
+        ApiId: !GetAtt HttpApiSvcConnect.ApiId
+        AuthorizerType: REQUEST
+        AuthorizerCredentialsArn: !GetAtt LambdaAuthRole.Arn
+        AuthorizerPayloadFormatVersion: "2.0"
+        EnableSimpleResponses: true
+        AuthorizerUri: !Join 
+          - ''
+          - - 'arn:aws:apigateway:'
+            - !Ref 'AWS::Region'
+            - ':lambda:path/2015-03-31/functions/'
+            - !Ref LambdaAuthorizerArn 
+            - '/invocations'
+        AuthorizerResultTtlInSeconds: 30
+        IdentitySource:
+          - '$request.header.Authorization'
 
   APIRoute1:
     Type: AWS::ApiGatewayV2::Route
@@ -54,6 +101,8 @@ Resources:
     Properties:
       ApiId: !Ref HttpApiSvcConnect
       RouteKey: 'GET /users/read_all'
+      AuthorizationType: CUSTOM
+      AuthorizerId: !GetAtt Authorizer.AuthorizerId
       Target: !Join
         - /
         - - integrations
@@ -69,15 +118,6 @@ Resources:
         - - integrations
           - !Ref APIIntegration
           
-  # This security group is used by the VPC link, so that
-  # you can control which resources in the VPC the VPC link is
-  # allowed to communicate with.
-  ApiGatewaySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for API gateway
-      VpcId: !Ref VpcId
-
   PrivateAPIGWvpcLink:  
     Type: AWS::ApiGatewayV2::VpcLink
     Properties: 
@@ -97,17 +137,6 @@ Resources:
       ConnectionId: !Ref PrivateAPIGWvpcLink
       IntegrationUri: !Ref DiscoveryService
       PayloadFormatVersion: '1.0'
-
-  # Configure the security group of the service to accept
-  # inbound traffic originating from the security group of
-  # the API gateway's VPC link
-  ServiceIngressFromApiGateway:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Allow API Gateway to communicate to the service
-      GroupId: !Ref ServiceSecurityGroup
-      IpProtocol: -1
-      SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
 
   APILogGroup:
       Type: AWS::Logs::LogGroup

@@ -38,6 +38,10 @@ sam build --template template_app_stack.yaml --config-file samconfig.toml
 
 ```
 
+```bash
+sam deploy --capabilities CAPABILITY_IAM, CAPABILITY_AUTO_EXPAND
+```
+
 <p align="center">
   <img src="./assets/img/nw1.png" />
 </p>

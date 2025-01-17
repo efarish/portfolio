@@ -25,13 +25,93 @@ Resources:
   ServiceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for service
+      GroupDescription: Security group for service.
       VpcId: !GetAtt VPC.Outputs.VpcId
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 0
           ToPort: 65535
           CidrIp: 0.0.0.0/0
+
+  ApiGatewaySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for API gateway.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+
+  ServiceIngressFromApiGateway:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Securty group for ECS service.
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
+
+  VpcEndPointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for VPC Interface Endpoint.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda function.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      SecurityGroupIngress:
+        - Description: Allow API Gateway to access this function.
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
+      SecurityGroupEgress:
+        - Description: Allow the Lambda to access the ECS service.
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          DestinationSecurityGroupId: !Ref ServiceSecurityGroup
+        - Description: Allow the Lambda to communicate to the VPC endpoint.
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          DestinationSecurityGroupId: !Ref VpcEndPointSecurityGroup
+
+  VPCEndpointIngressFromLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow the Lambda to communicate to the VPC endpoint.
+      GroupId: !Ref VpcEndPointSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref LambdaSecurityGroup
+
+  ECSServiceIngressFromLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow the Lambda to communicate to the VPC endpoint.
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref LambdaSecurityGroup
+ 
+  ServiceDiscoveryVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      IpAddressType: ipv4
+      DnsOptions:
+        PrivateDnsOnlyForInboundResolverEndpoint: NotSpecified
+        DnsRecordIpType: ipv4
+      SecurityGroupIds: [!Ref VpcEndPointSecurityGroup]
+      SubnetIds: !Split [",", !GetAtt VPC.Outputs.PublicSubnetIds]
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      RouteTableIds: []
+      ServiceName: com.amazonaws.us-east-1.data-servicediscovery
+      PolicyDocument:
+        Statement:
+          - Resource: '*'
+            Action: '*'
+            Effect: Allow
+            Principal: '*'
 
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
@@ -124,8 +204,22 @@ Resources:
         ServiceSecurityGroup: !Ref ServiceSecurityGroup
         DiscoveryService: !GetAtt DiscoveryService.Arn 
 
+  # Lambda Authorizer
+  LambdaAuthorizerStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./lambda.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:lambda
+        LambdaSecurityGroup: !Ref LambdaSecurityGroup
+
   # API Gateway
   APIGatewayStack:
+    DependsOn:
+      - ServiceDiscoveryVPCEndpoint
+      - LambdaAuthorizerStack
     Type: AWS::Serverless::Application
     Properties:
       Location: ./api-gw.yaml
@@ -133,9 +227,10 @@ Resources:
         VpcId: !GetAtt VPC.Outputs.VpcId
         DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
         ECSClusterName: !Ref ECSClusterName
-        ServiceSecurityGroup: !Ref ServiceSecurityGroup
+        ApiGatewaySecurityGroup: !Ref ApiGatewaySecurityGroup
         DiscoveryService: !GetAtt DiscoveryService.Arn
-        
+        LambdaAuthorizerArn: !GetAtt LambdaAuthorizerStack.Outputs.LambdaAuthArn
+
 # -------------------------------------------------------------------------
 # Information about the stack.
 # -------------------------------------------------------------------------
@@ -143,3 +238,6 @@ Outputs:
   ApiUrl:
     Description: API Gateway URL
     Value: !GetAtt APIGatewayStack.Outputs.ApiUrl 
+  LambdaAuthArn:
+    Description: Lambda Authorizer ARN
+    Value: !GetAtt LambdaAuthorizerStack.Outputs.LambdaAuthArn

@@ -73,7 +73,7 @@ def create_access_token(id: int, username: str, role: str, expires_delta: timede
 @router.get("/check_token", status_code=status.HTTP_200_OK)
 async def check_token(user: user_dependency):
     if user is None:
-        raise HTTPException(status_code=401, detail='Authentication Failed')
+        raise HTTPException(status_code=401, detail='Token Authentication Failed')
     return user
 
 @router.post("/token", response_model=Token)

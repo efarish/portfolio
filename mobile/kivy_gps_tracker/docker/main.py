@@ -24,7 +24,10 @@ async def lifespan(app: FastAPI):
         # After the app stops
         await engine.dispose()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title='TBD Web API',
+    description='Lets just wait and see what this becomes.',    
+    lifespan=lifespan)
 
 @app.get('/', status_code=status.HTTP_200_OK)
 def health_check():
