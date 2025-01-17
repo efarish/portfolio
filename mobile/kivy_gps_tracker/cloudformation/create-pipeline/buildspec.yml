@@ -14,11 +14,12 @@ phases:
       - ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_REPO}:${DOCKER_IMAGE_NAME}
       - ECR_LAMBDA_IMAGE_URI=${ECR_MAIN_URI}/${ECR_REPO}:${DOCKER_LAMBDA_IMAGE_NAME}
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
+      - sudo apt-get install -y qemu qemu-user-static
   build:
     commands:
       - docker build -t ${ECR_IMG_NAME} ./mobile/${PROJECT_NAME}/docker
       - aws cloudformation package --template ./mobile/${PROJECT_NAME}/cloudformation/create-app/template.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
-      - docker buildx build --platform linux/arm64 -t ${ECR_LAMBDA_IMG_NAME} ./mobile/${PROJECT_NAME}/docker/lambda  
+      - docker build --platform linux/arm64 -t ${ECR_LAMBDA_IMG_NAME} ./mobile/${PROJECT_NAME}/docker/lambda  
   post_build:
     commands:
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
