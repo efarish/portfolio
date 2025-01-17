@@ -46,7 +46,6 @@ Resources:
                 - logs:CreateLogGroup
                 - logs:CreateLogStream
                 - logs:PutLogEvents
-                - iam:TagRole
               Resource: '*'
             - Effect: Allow
               Action:
