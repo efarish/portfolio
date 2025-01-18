@@ -20,6 +20,3 @@ phases:
     commands:
       - aws lambda update-function-code --function-name ${LAMBDA_FUNC_NAME} --image-uri ${ECR_IMAGE_URI}
 
-artifacts:
-  files:
-    - packaged-template.yaml

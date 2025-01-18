@@ -137,8 +137,6 @@ Resources:
               RunOrder: 1
               Configuration:
                 ProjectName: !Sub ${PipeLineName}-build
-              OutputArtifacts:
-                - Name: BuildArtifact
               InputArtifacts:
                 - Name: SourceArtifact
               Region: !Ref AWS::Region
