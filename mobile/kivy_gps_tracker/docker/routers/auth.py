@@ -30,6 +30,7 @@ class Token(BaseModel):
 db_dependency = Annotated[Session, Depends(get_db)]
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         id: int = payload.get('id')
@@ -72,6 +73,7 @@ def create_access_token(id: int, username: str, role: str, expires_delta: timede
 
 @router.get("/check_token", status_code=status.HTTP_200_OK)
 async def check_token(user: user_dependency):
+
     if user is None:
         raise HTTPException(status_code=401, detail='Token Authentication Failed')
     return user

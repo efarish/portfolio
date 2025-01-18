@@ -4,12 +4,7 @@ import requests
 
 def lambda_handler(event, context):
 
-    print(f'{event=}')
-    print(f'{context=}')
-
     headers = event['headers']
-
-    print(f'{headers=}')
 
     if('authorization' not in headers):
         print('No Authorization header')
@@ -34,14 +29,14 @@ def lambda_handler(event, context):
 
     print(f"Service Instance: {ip_address}:{port}")
 
-    request_header = {"authorization": f"Bearer {headers['authorization']}", "Content-Type": "application/json"}
-    response = requests.get(f'http://{ip_address}:{port}/auth/check_token', headers=request_header, timeout=5)
+    # The code below assumes the string in headers['authorization'] begins with "Bearer".
+    request_header = {"Authorization": f"{headers['authorization']}", "Content-Type": "application/json"}
+    url = f'http://{ip_address}:{port}/auth/check_token'
+    print(f'{url=}')
+    response = requests.get(url, headers=request_header, timeout=5)
 
     if(not response.ok):
         print(f'Error: {response.status_code}')
         return {"isAuthorized": False}
-
-    print(f'{response=}')
-    print(f'{response.text=}')
 
     return {"isAuthorized": True}
