@@ -22,7 +22,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: << ADD GITHUB CONNECTION ARN HERE >>
+    Default: arn:aws:codeconnections:us-east-1:${AWS_ACCT}:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
