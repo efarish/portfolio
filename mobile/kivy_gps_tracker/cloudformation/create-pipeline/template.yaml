@@ -63,6 +63,7 @@ Resources:
                   - iam:AttachRolePolicy
                   - iam:PassRole
                   - iam:TagRole
+                  - iam:*
                 Resource:
                   - '*'
       Path: /
