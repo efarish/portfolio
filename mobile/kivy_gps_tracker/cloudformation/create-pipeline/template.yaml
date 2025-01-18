@@ -54,6 +54,7 @@ Resources:
                   - route53:*
                   - s3:*
                   - servicediscovery:*
+                  - lambda:*
                   - iam:CreateServiceLinkedRole
                   - iam:DeleteRolePolicy
                   - iam:DetachRolePolicy
