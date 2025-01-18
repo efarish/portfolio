@@ -67,7 +67,7 @@ Resources:
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: !Sub ${PipeLineName}--build
+      Name: !Sub ${PipeLineName}-build
       ServiceRole: !GetAtt CodePipeLineECSRole.Arn
       Artifacts:
         Type: CODEPIPELINE
