@@ -55,15 +55,6 @@ Resources:
                   - s3:*
                   - servicediscovery:*
                   - lambda:*
-                  - iam:CreateServiceLinkedRole
-                  - iam:DeleteRolePolicy
-                  - iam:DetachRolePolicy
-                  - iam:DeleteRole
-                  - iam:CreateRole
-                  - iam:PutRolePolicy
-                  - iam:AttachRolePolicy
-                  - iam:PassRole
-                  - iam:TagRole
                   - iam:*
                 Resource:
                   - '*'
