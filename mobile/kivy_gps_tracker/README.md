@@ -2,7 +2,7 @@
 
 WORK-IN-PROGRESS
 
-This project demonstrates using Python and AWS services to implement a RESTful API. Highlights include the use of CloudFormation, CodePipeline, API Gateway, Lambda Authorizer, ECS, FastAPI, and SQLAlchemy. I made some architecture decisions manage the costs: 
+This project demonstrates using Python and AWS services to implement a RESTful API. Highlights include the use of CloudFormation, CodePipeline, API Gateway, Lambda Authorizer, ECS, FastAPI, and SQLAlchemy. I made some architecture decisions to reduce the cost of deploying this app to AWS: 
 
 * Cloud Map instead of an ALB is used integrate API Gateway and ECS.
 * Since only a single ECS task is provisioned, SQLite is used for data storage. 
@@ -10,16 +10,16 @@ This project demonstrates using Python and AWS services to implement a RESTful A
 
 For reliability and scalability, the architecture supports increasing the size of the ECS cluster and adding addition subnets with minimal changes:
 
-* To service the cluster, one of AWS's relational database services would be needed. However, since SQLAlchemy is used for ORM, the effort in swapping out SQLite is minimal.
+* To service the cluster, one of AWS's relational database services would be needed. However, since SQLAlchemy is used for ORM, the effort of swapping out SQLite is minimal.
 * The Cloud Map configuration used for the ECS service will automatically pickup the additional tasks instances and use round-robin for request distribution.
 
 A couple of additional notes:
 
-* Lambdas deployed to a public subnet have no internet access. Therefore, a VPC Interface Endpoint is used to access AWS services.
+* Lambdas deployed to a public subnet have no internet access so a VPC Interface Endpoint is used to access AWS services.
 * The ECS service is secured by using its security group to restrict inbound access to API Gateway, Cloud Map, and Lambda.   
-* Some of the AWS resources provisioned were included for personal didactic teaching. For example, the Lambda Authorizer was included to experiment with securing an API Gateway. ECS is used to implement the endpoints instead of Lambda. Also, using the AWS account default VPC would also have been cheaper, but less interesting.
+* Some of the AWS resources provisioned were included for personal didactic teaching. For example, the Lambda Authorizer was included to experiment with securing an API Gateway. ECS is used to implement the endpoints instead of Lambda. Also, using an AWS account's default VPC would also have been cheaper, but less interesting.
  
-A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, the costs for an application load balancers are much more than Cloud Map. For larger clusters, this is probably not true.
+A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, an application load balancer is more expensive than Cloud Map. For larger clusters, this is probably not true.
 
 The architecture diagram is below.
 
@@ -60,7 +60,7 @@ In the AWS CloudFormation console, delete the root stacks created for this proje
 
 Let the deletion of each stack finish before deleting the next.
 
-**NOTE: The order of stack deletion is very important.** Deleting the pipeline stacks before the app-stack will cause you many problems. IAM roles created by the pipeline stacks are needed to delete the application stack. Delete the application stack first, then delete the pipeline stacks.
+**NOTE: The order of stack deletion is very important.** Deleting the pipeline stacks before the app stack will cause many problems. The IAM role created by the Create Pipeline stack is needed to delete the application stack. Delete the application stack first, then delete the pipeline stacks. If the pipeline stacks are mistakenly deleted first, deleting the application stack will fail with an error stating a certain role cannot be assumed. To fix, manually create an IAM role with the same name using the policy defined in the `create-pipeline` template.  
 
 ### ECR Images
 
