@@ -1,4 +1,4 @@
-# Application
+# Project: RESTful API Application
 
 WORK-IN-PROGRESS
 
@@ -17,7 +17,7 @@ A couple of additional notes:
 
 * Lambdas deployed to a public subnet have no internet access. Therefore, a VPC Interface Endpoint is used to access AWS services.
 * The ECS service is secured by using its security group to restrict inbound access to API Gateway, Cloud Map, and Lambda.   
-* Some of the AWS resources provisioned were included for personal didactic teaching. For example, the Lambda Authorizer was included to experiment with securing an API Gateway. Also, using the AWS account default VPC would also have been cheaper, but less interesting.
+* Some of the AWS resources provisioned were included for personal didactic teaching. For example, the Lambda Authorizer was included to experiment with securing an API Gateway. ECS is used to implement the endpoints instead of Lambda. Also, using the AWS account default VPC would also have been cheaper, but less interesting.
  
 A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, the costs for an application load balancers are much more than Cloud Map. For larger clusters, this is probably not true.
 
@@ -44,10 +44,11 @@ sam deploy
 
 ```
 
-Two AWS resources are not provisioned by `create-pipeline` and need to be manually created before running any of the pipelines:
+Three AWS resources are not provisioned by `create-pipeline` and need to be manually created before running any of the pipelines:
 
 1. The AWS Developer Tools GitHub Connection referenced by the `GitHubConnectionArn` property in the pipeline templates will need to be manually created in any AWS account trying to run these pipelines. The connection needs to point to where this code is stored and its ARN used to update the pipeline templates property. For this project, the code was stored in the Git Hub repository `https://github.com/efarish/portfolio`. 
 2. An AWS ECR repository with the name `ecs1` is assumed to exist. This repository is referenced by the CloudFormation templates and the pipeline `buildspec.yml` files.
+3. CodePipeline requires an S3 bucket. To run these pipelines, replace the `S3ArtifactBucket` values in the template files with a bucket from the AWS account the pipelines are run in.
 
 # Clean Up 
 
@@ -78,3 +79,11 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 * The costs of demonstration projects can be significantly reduced with a few architecture decisions,
 * The up-front effort of implementing CI/CD pipelines and IaC templates reduces development time.
 
+# Enhancements
+
+1. Replace ECS endpoints with Lambda.
+
+# TODO
+
+1. Develop Kivy model frontend app.
+1. Add CloudFormation template for the ECR repository.
