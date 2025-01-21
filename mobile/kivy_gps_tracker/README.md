@@ -17,7 +17,7 @@ A couple of additional notes:
 
 * Lambdas deployed to a public subnet have no internet access so a VPC Interface Endpoint is used to access AWS services.
 * The ECS service is secured by using its security group to restrict inbound access to API Gateway, Cloud Map, and Lambda.   
-* Some of the AWS resources provisioned were included for personal didactic teaching. For example, the Lambda Authorizer was included to experiment with securing an API Gateway. ECS is used to implement the endpoints instead of Lambda. Also, using an AWS account's default VPC would also have been cheaper, but less interesting.
+* Some of the AWS resources provisioned were included for personal didactic teaching. For example, the Lambda Authorizer was included to experiment with securing an API Gateway. ECS and FastAPI are used to implement the endpoints instead of Lambda. Also, using an AWS account's default VPC would also have been cheaper, but less interesting.
  
 A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, an application load balancer is more expensive than Cloud Map. For larger clusters, this is probably not true.
 
@@ -27,13 +27,17 @@ The architecture diagram is below.
   <img src="./assets/img/nw1.png" />
 </p>
 
+# Test Suite
+
+A PyTest suite can be run using the `./docker/test/TestSuite.py` script.
+
 # Deployment
 
 Three AWS CodePipelines are created to deploy and maintain this application.
 
 - Create Pipeline: Runs the CloudFormation templates found in the directory `./create-app` to create the application.
 - Update Lambda Pipeline: Update the Lambda with the latest code. 
-- Update Pipeline: Update the AWS ECS tasks with the latest code. 
+- Update Pipeline: Update the AWS ECS task with the latest code. 
 
 As soon as any of these pipeline are deployed to AWS, it executes. Therefore, be sure to run the `Create Pipeline` first, and the other two after that. The following SAM CLI commands were used to build and deploy the pipelines.
 
@@ -60,7 +64,7 @@ In the AWS CloudFormation console, delete the root stacks created for this proje
 
 Let the deletion of each stack finish before deleting the next.
 
-**NOTE: The order of stack deletion is very important.** Deleting the pipeline stacks before the app stack will cause many problems. The IAM role created by the Create Pipeline stack is needed to delete the application stack. Delete the application stack first, then delete the pipeline stacks. If the pipeline stacks are mistakenly deleted first, deleting the application stack will fail with an error stating a certain role cannot be assumed. To fix, manually create an IAM role with the same name using the policy defined in the `create-pipeline` template.  
+**NOTE: The order of stack deletion is very important.** Deleting the pipeline stacks before the app stack will cause many problems. The IAM role created by the Create Pipeline stack is needed to delete the application stack. Delete the application root stack first, then delete the pipeline stacks. If the pipeline stacks are mistakenly deleted first, deleting the application stack will fail with an error stating a certain role cannot be assumed. To fix, manually create an IAM role with the same name using the policy defined in the `create-pipeline` template.  
 
 ### ECR Images
 
@@ -86,4 +90,4 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 # TODO
 
 1. Develop Kivy model frontend app.
-1. Add CloudFormation template for the ECR repository.
+1. Add a CloudFormation template for the ECR repository.
