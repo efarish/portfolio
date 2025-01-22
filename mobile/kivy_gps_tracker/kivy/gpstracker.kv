@@ -1,0 +1,27 @@
+#: import BgStackLayout layouts.BgStackLayout
+#: import BgStackLayout layouts.BgBoxLayout
+
+Interface:
+    orientation: "vertical"
+    hex_code:"#1E45F3"
+    alpha: 0.2
+    padding:[dp(20),dp(20),dp(20),dp(20)]
+    spacing: dp(20)
+    ScrollView:
+        id: scrollView
+        size_hint: 1,0.9
+        #bar_margin: 20
+        bar_width: 10
+        BgBoxLayout:
+            id: boxLayout
+            orientation: "vertical"
+            size_hint_y: None
+            height:self.minimum_height
+            hex_code:"#1E45F3"
+            alpha: 0.2
+    Button:
+        id: locationBtn
+        text: "Start Tracking..."
+        size_hint: 1,0.1
+        on_release: root.location_click()
+
