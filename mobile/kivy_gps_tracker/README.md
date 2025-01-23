@@ -60,7 +60,10 @@ Three AWS resources are not provisioned by `create-pipeline` and need to be manu
 
 In the AWS CloudFormation console, delete the root stacks created for this project in the following order. 
 
-<< TODO >> 
+1. tracker-create-pipeline-app-stack
+2. gps-tracker-lambda-update
+3. gps-tracker-update-pipeline
+4. gps-tracker-create-pipeline
 
 Let the deletion of each stack finish before deleting the next.
 

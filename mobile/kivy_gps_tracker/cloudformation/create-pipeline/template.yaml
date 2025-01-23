@@ -14,7 +14,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: arn:aws:codeconnections:us-east-1:${AWS_ACCT}:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
+    Default: arn:aws:codeconnections:< ENTER A CODE CONNECTION ARN HERE >
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
@@ -30,7 +30,14 @@ Resources:
         Statement:        
         - Effect: Allow
           Principal:
-            Service: [codepipeline.amazonaws.com, codebuild.amazonaws.com, codedeploy.amazonaws.com, ecs-tasks.amazonaws.com, ecs.amazonaws.com, ec2.amazonaws.com, cloudformation.amazonaws.com]
+            Service: 
+              - codepipeline.amazonaws.com
+              - codebuild.amazonaws.com
+              - codedeploy.amazonaws.com
+              - ecs-tasks.amazonaws.com
+              - ecs.amazonaws.com
+              - ec2.amazonaws.com
+              - cloudformation.amazonaws.com
           Action: ['sts:AssumeRole']
       Policies:
         - PolicyName: !Sub ${PipeLineName}-policy
@@ -39,7 +46,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - codestar-connections:UseConnection
+                  - codestar-connections:*
                   - codebuild:BatchGetBuilds
                   - codebuild:StartBuild
                   - codebuild:BatchGetBuildBatches

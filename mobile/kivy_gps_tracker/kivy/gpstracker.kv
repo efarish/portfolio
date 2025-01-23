@@ -1,27 +1,179 @@
 #: import BgStackLayout layouts.BgStackLayout
-#: import BgStackLayout layouts.BgBoxLayout
+#: import BgBoxLayout layouts.BgBoxLayout
 
 Interface:
-    orientation: "vertical"
-    hex_code:"#1E45F3"
-    alpha: 0.2
-    padding:[dp(20),dp(20),dp(20),dp(20)]
-    spacing: dp(20)
-    ScrollView:
-        id: scrollView
-        size_hint: 1,0.9
-        #bar_margin: 20
-        bar_width: 10
+    Screen:
+        name: "SignIn"
         BgBoxLayout:
-            id: boxLayout
-            orientation: "vertical"
-            size_hint_y: None
-            height:self.minimum_height
-            hex_code:"#1E45F3"
-            alpha: 0.2
-    Button:
-        id: locationBtn
-        text: "Start Tracking..."
-        size_hint: 1,0.1
-        on_release: root.location_click()
+            orientation: 'vertical'
+            spacing: dp(20)
+            padding:[dp(20),dp(20),dp(20),dp(20)]
+            BoxLayout:
+                orientation:'vertical'               
+                size_hint: 1,0.2
+                Image:       
+                    source:"bkr.png"
+                    size_hint_y: None
+                    height:"2.465cm"
+                Label:
+                    text:'Sign In'
+                    font_size: '1.05833cm'
+            TextInput:
+                id: userIdTxt
+                multiline:False
+                hint_text:"User Id"
+                size_hint: None,None
+                size_hint_x: 0.5
+                height:'1.50cm'
+                font_size:'0.635cm'
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                padding : self.height/2 - self.font_size/2
+            TextInput:
+                id: passwordTxt
+                multiline:False
+                size_hint: None,None
+                size_hint_x: 0.5
+                height:'1.549cm'
+                hint_text:"Password"
+                font_size:'0.635cm'
+                password:True
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                padding : self.height/2 - self.font_size/2
+            BoxLayout:
+                orientation:'horizontal'
+                padding:[dp(40),dp(40),dp(40),dp(40)]             
+                size_hint: 1,0.2
+                spacing: dp(20)
+                Button:
+                    size_hint: None,None
+                    size_hint_x: 0.5
+                    height:'1.549cm'
+                    text:'Log In'
+                    font_size:'0.635cm'
+                    on_release: root.sign_in()
+                Button:
+                    size_hint: None,None
+                    size_hint_x: 0.5
+                    height:'1.549cm'
+                    text:'Or Register!'
+                    font_size:'0.635cm'
+                    on_release: root.switch_screen("Register")    
+    Screen:
+        name: "Register"
+        BgBoxLayout:
+            orientation: 'vertical'
+            spacing: dp(20)
+            padding:[dp(20),dp(20),dp(20),dp(20)]
+            BoxLayout:
+                orientation:'vertical'               
+                size_hint: 1,0.2
+                Image:       
+                    source:"bkr.png"
+                    size_hint_y: None
+                    height:"2.465cm"
+                Label:
+                    text:'Sign In'
+                    font_size: '1.05833cm'
+            TextInput:
+                id: userIdRegisterTxt
+                multiline:False
+                hint_text:"Enter a User Id"
+                size_hint: None,None
+                size_hint_x: 0.5
+                height:'1.50cm'
+                font_size:'0.635cm'
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                padding : self.height/2 - self.font_size/2
+            TextInput:
+                id: passwordRegisterTxt
+                multiline:False
+                size_hint: None,None
+                size_hint_x: 0.5
+                height:'1.549cm'
+                hint_text:"Enter A Password"
+                font_size:'0.635cm'
+                password:True
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                padding : self.height/2 - self.font_size/2
+            BoxLayout:
+                orientation:'horizontal'
+                padding:[dp(40),dp(40),dp(40),dp(40)]             
+                size_hint: 1,0.2
+                spacing: dp(20)
+                Button:
+                    size_hint: None,None
+                    size_hint_x: 0.5
+                    height:'1.549cm'
+                    text:'Register'
+                    font_size:'0.635cm'
+                    on_release: root.register()
+                Button:
+                    size_hint: None,None
+                    size_hint_x: 0.5
+                    height:'1.549cm'
+                    text:'Cancel'
+                    font_size:'0.635cm'
+                    on_release: root.switch_screen("SignIn")
 
+    Screen:
+        name: "Map"
+        BgBoxLayout:
+            orientation: "vertical"
+            hex_code: "#000000" #"#1E45F3"
+            alpha: 0.2
+            padding:[dp(20),dp(20),dp(20),dp(20)]
+            spacing: dp(20)
+            ScrollView:
+                id: scrollView
+                size_hint: 1,0.9
+                bar_width: 10
+                BgBoxLayout:
+                    id: boxLayout
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height:self.minimum_height
+                    hex_code:"#1E45F3"
+                    alpha: 0.2
+            Button:
+                id: locationBtn
+                text: "Start Tracking..."
+                size_hint: 1,0.1
+                on_release: root.location_click()
+
+<ErrorPopup@Popup>:
+    message: message
+    auto_dismiss: False
+    title: "Response"
+    size_hint: None, None
+    width: grid.width + dp(25)
+    height: grid.height + root.title_size + dp(48)
+    GridLayout:
+        id: grid
+        size_hint: None, None
+        size: self.minimum_size
+        padding: [10, 5]
+        cols: 1
+        AnchorLayout:
+            anchor_x: "center"
+            anchor_y: "bottom"
+            size_hint: None, None
+            height: message.height
+            width: max(message.width, butt.width)
+            Label: 
+                id: message
+                size_hint: None, None
+                size: self.texture_size
+                padding: [10, 5]
+        AnchorLayout:
+            anchor_x: "center"
+            anchor_y: "bottom"
+            size_hint: None, None
+            height: butt.height
+            width: max(message.width, butt.width)
+            Button:
+                id: butt
+                text: 'Close'
+                size_hint: None, None
+                size: self.texture_size
+                padding: [10, 5]
+                on_release: root.dismiss()

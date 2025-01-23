@@ -1,29 +1,67 @@
+import httpx
 from layouts.BgBoxLayout import BgBoxLayout
 from plyer import gps
 
 from kivy.app import App
 from kivy.clock import Clock, mainthread
+from kivy.factory import Factory
 from kivy.metrics import dp
 from kivy.uix.label import Label
+from kivy.uix.screenmanager import FadeTransition, ScreenManager
 from kivy.utils import platform
 
+API = 'https://rbe5k9wbj0.execute-api.us-east-1.amazonaws.com' #TODO ENTER YOU API URL HERE!
 
-class Interface(BgBoxLayout):
+class Interface(ScreenManager):
 
     btn_send = "Start Tracking..."
     btn_stop = "Stop Tracking"
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        
-    def clear(self):
-        self.ids.stackLayout.clear_widgets()
+        self.transition=FadeTransition()
+
+    def switch_screen(self, screen_name: str):
+        self.current = screen_name
+
+    def sign_in(self):
+        user = self.ids.userIdTxt.text
+        pwd = self.ids.passwordTxt.text
+        response = httpx.post(API + '/auth/token', 
+                              data={"username": user, "password": pwd, "grant_type": "password"},
+                              headers={"content-type": "application/x-www-form-urlencoded"})
+        print(f'{response.status_code}')
+        token = response.json()
+        if response.status_code == 200:
+            self.token = token['access_token']
+            print(f'{self.token=}')
+            self.switch_screen('Map')
+        else:
+            popup = Factory.ErrorPopup()
+            popup.message.text = 'Login failed.'
+            popup.open()
+
+    def register(self):
+        user = self.ids.userIdRegisterTxt.text
+        pwd = self.ids.passwordRegisterTxt.text
+        if len(user.strip()) < 5 or len(pwd.strip()) <= 5:
+            popup = Factory.ErrorPopup()
+            popup.message.text = 'User name and passwords need to longer than 5 characters.'
+            popup.open()
+            return
+        response = httpx.post(API + '/users/create_user', 
+                              json={"user_name": user, "password": pwd, "role": "user"})
+        if response.status_code == 201:
+            self.switch_screen('SignIn')
+        else: 
+            popup = Factory.ErrorPopup()
+            popup.message.text = response.json()['detail']
+            popup.open()
 
     def location_click(self):
         if self.ids.locationBtn.text == self.btn_send:
             self.ids.locationBtn.text = self.btn_stop
             gps.start(1000, 0)
-
         else:
             self.ids.locationBtn.text = self.btn_send
             gps.stop()
@@ -40,8 +78,7 @@ class GpsTracker(App):
         The request will produce a popup if permissions have not already been
         been granted, otherwise it will do nothing.
         """
-        from android.permissions import Permission, request_permissions
-
+        
         def callback(permissions, results):
             """
             Defines the callback to be fired when runtime permission
@@ -53,6 +90,7 @@ class GpsTracker(App):
             else:
                 print("callback. Some permissions refused.")
 
+        from android.permissions import Permission, request_permissions
         request_permissions([Permission.ACCESS_COARSE_LOCATION,
                              Permission.ACCESS_FINE_LOCATION], callback)
 
@@ -68,7 +106,7 @@ class GpsTracker(App):
         if platform == "android":
             print("Android detected. Requesting permissions")
             self.request_android_permissions()
-        else: print(f'Unexpected platform: {platform}')
+        else: print(f'Not a supported platform: {platform}')
 
     def on_start(self):
         print("App started.")
