@@ -61,7 +61,7 @@ class Interface(ScreenManager):
     def location_click(self):
         if self.ids.locationBtn.text == self.btn_send:
             self.ids.locationBtn.text = self.btn_stop
-            gps.start(1000, 0)
+            gps.start(5000, 10)
         else:
             self.ids.locationBtn.text = self.btn_send
             gps.stop()
