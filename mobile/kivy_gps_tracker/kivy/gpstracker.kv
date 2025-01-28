@@ -8,111 +8,122 @@ Interface:
             orientation: 'vertical'
             spacing: dp(20)
             padding:[dp(20),dp(20),dp(20),dp(20)]
+
             BoxLayout:
                 orientation:'vertical'               
-                size_hint: 1,0.2
+                size_hint: 1,0.25
                 Image:       
                     source:"bkr.png"
-                    size_hint_y: None
-                    height:"2.465cm"
+                    size_hint_y: 0.7
                 Label:
                     text:'Sign In'
-                    font_size: '1.05833cm'
+                    size_hint_y: 0.3
+                    font_size: '50dp'
+ 
             TextInput:
                 id: userIdTxt
                 multiline:False
                 hint_text:"User Id"
                 size_hint: None,None
-                size_hint_x: 0.5
-                height:'1.50cm'
-                font_size:'0.635cm'
+                size_hint_x: 0.75
+                height: '40dp'
+                font_size:'20dp'
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                 padding : self.height/2 - self.font_size/2
+            
             TextInput:
                 id: passwordTxt
                 multiline:False
                 size_hint: None,None
-                size_hint_x: 0.5
-                height:'1.549cm'
+                size_hint_x: 0.75
+                height: '40dp'
+                font_size:'20dp'
                 hint_text:"Password"
-                font_size:'0.635cm'
                 password:True
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                 padding : self.height/2 - self.font_size/2
+ 
             BoxLayout:
-                orientation:'horizontal'
-                padding:[dp(40),dp(40),dp(40),dp(40)]             
-                size_hint: 1,0.2
+                orientation:'horizontal'    
+                size_hint: 1,0.25
                 spacing: dp(20)
                 Button:
                     size_hint: None,None
                     size_hint_x: 0.5
-                    height:'1.549cm'
+                    height:'40dp'
+                    font_size:'20dp'
                     text:'Log In'
-                    font_size:'0.635cm'
-                    on_release: root.sign_in()
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    on_release: root.sign_in()                    
                 Button:
                     size_hint: None,None
                     size_hint_x: 0.5
-                    height:'1.549cm'
-                    text:'Or Register!'
-                    font_size:'0.635cm'
+                    height:'40dp'
+                    font_size:'20dp'
+                    text:'Sign Up'
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}               
                     on_release: root.switch_screen("Register")    
+
     Screen:
         name: "Register"
         BgBoxLayout:
             orientation: 'vertical'
             spacing: dp(20)
             padding:[dp(20),dp(20),dp(20),dp(20)]
+
             BoxLayout:
                 orientation:'vertical'               
-                size_hint: 1,0.2
+                size_hint: 1,0.25
                 Image:       
                     source:"bkr.png"
-                    size_hint_y: None
-                    height:"2.465cm"
+                    size_hint_y: 0.7
                 Label:
-                    text:'Sign In'
-                    font_size: '1.05833cm'
+                    text:'Sign Up'
+                    size_hint_y: 0.3
+                    font_size: '50dp'
+
             TextInput:
                 id: userIdRegisterTxt
                 multiline:False
-                hint_text:"Enter a User Id"
+                hint_text:"User Id"
                 size_hint: None,None
-                size_hint_x: 0.5
-                height:'1.50cm'
-                font_size:'0.635cm'
+                size_hint_x: 0.75
+                height: '40dp'
+                font_size:'20dp'
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                 padding : self.height/2 - self.font_size/2
+
             TextInput:
                 id: passwordRegisterTxt
                 multiline:False
+                hint_text:"Password"
                 size_hint: None,None
-                size_hint_x: 0.5
-                height:'1.549cm'
-                hint_text:"Enter A Password"
-                font_size:'0.635cm'
-                password:True
+                size_hint_x: 0.75
+                height: '40dp'
+                font_size:'20dp'
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                 padding : self.height/2 - self.font_size/2
+
             BoxLayout:
                 orientation:'horizontal'
-                padding:[dp(40),dp(40),dp(40),dp(40)]             
-                size_hint: 1,0.2
+                #padding:[dp(20),dp(20),dp(20),dp(20)]             
+                size_hint: 1,0.25
                 spacing: dp(20)
                 Button:
                     size_hint: None,None
                     size_hint_x: 0.5
-                    height:'1.549cm'
+                    height:'40dp'
+                    font_size:'20dp'
                     text:'Register'
-                    font_size:'0.635cm'
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                     on_release: root.register()
                 Button:
                     size_hint: None,None
                     size_hint_x: 0.5
-                    height:'1.549cm'
+                    height:'40dp'
+                    font_size:'20dp'
                     text:'Cancel'
-                    font_size:'0.635cm'
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                     on_release: root.switch_screen("SignIn")
 
     Screen:

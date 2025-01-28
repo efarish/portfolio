@@ -10,7 +10,7 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import FadeTransition, ScreenManager
 from kivy.utils import platform
 
-API = 'https://rbe5k9wbj0.execute-api.us-east-1.amazonaws.com' #TODO ENTER YOU API URL HERE!
+API = 'https://u67pk2go93.execute-api.us-east-1.amazonaws.com' #TODO ENTER YOU API URL HERE!
 
 class Interface(ScreenManager):
 
@@ -27,16 +27,24 @@ class Interface(ScreenManager):
     def sign_in(self):
         user = self.ids.userIdTxt.text
         pwd = self.ids.passwordTxt.text
-        response = httpx.post(API + '/auth/token', 
-                              data={"username": user, "password": pwd, "grant_type": "password"},
-                              headers={"content-type": "application/x-www-form-urlencoded"})
-        print(f'{response.status_code}')
-        token = response.json()
-        if response.status_code == 200:
-            self.token = token['access_token']
-            print(f'{self.token=}')
-            self.switch_screen('Map')
-        else:
+        try:
+            response = httpx.post(API + '/auth/token', 
+                                data={"username": user, "password": pwd, "grant_type": "password"},
+                                headers={"content-type": "application/x-www-form-urlencoded"})
+            print(f'{response.status_code}')
+            token = response.json()
+            if response.status_code == 200:
+                self.token = token['access_token']
+                print(f'{self.token=}')
+                self.ids.userIdRegisterTxt.text = ""
+                self.ids.passwordRegisterTxt.text = ""                
+                self.switch_screen('Map')
+            else:
+                popup = Factory.ErrorPopup()
+                popup.message.text = 'Login failed.'
+                popup.open()
+        except Exception as e:
+            print(f'{e=}')
             popup = Factory.ErrorPopup()
             popup.message.text = 'Login failed.'
             popup.open()
@@ -44,15 +52,26 @@ class Interface(ScreenManager):
     def register(self):
         user = self.ids.userIdRegisterTxt.text
         pwd = self.ids.passwordRegisterTxt.text
+        response = None
         if len(user.strip()) < 5 or len(pwd.strip()) <= 5:
             popup = Factory.ErrorPopup()
-            popup.message.text = 'User name and passwords need to longer than 5 characters.'
+            popup.message.text = 'User name and passwords\n need to longer than 5 characters.'
             popup.open()
             return
-        response = httpx.post(API + '/users/create_user', 
-                              json={"user_name": user, "password": pwd, "role": "user"})
-        if response.status_code == 201:
-            self.switch_screen('SignIn')
+        try:
+            response = httpx.post(API + '/users/create_user', 
+                                json={"user_name": user, "password": pwd, "role": "user"})
+        except Exception as e:
+            print(f'{e=}')
+            popup = Factory.ErrorPopup()
+            popup.message.text = 'Registration failed.'
+            popup.open()
+            return
+        
+        if response and response.status_code == 201:
+            self.ids.userIdRegisterTxt.text = ""
+            self.ids.passwordRegisterTxt.text = ""
+            self.switch_screen('SignIn') 
         else: 
             popup = Factory.ErrorPopup()
             popup.message.text = response.json()['detail']
@@ -60,8 +79,14 @@ class Interface(ScreenManager):
 
     def location_click(self):
         if self.ids.locationBtn.text == self.btn_send:
-            self.ids.locationBtn.text = self.btn_stop
-            gps.start(5000, 10)
+            try:
+                gps.start(5000, 10)
+                self.ids.locationBtn.text = self.btn_stop
+            except Exception as e:
+                print(f'{e=}')
+                popup = Factory.ErrorPopup()
+                popup.message.text = 'Location tracking failed.'
+                popup.open()
         else:
             self.ids.locationBtn.text = self.btn_send
             gps.stop()
