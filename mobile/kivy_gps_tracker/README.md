@@ -94,3 +94,4 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 
 1. Develop Kivy model frontend app.
 1. Add a CloudFormation template for the ECR repository.
+1. In buildozer.spec, needed to reference kivy plyer as: git+https://github.com/kivy/plyer.git@master
