@@ -37,7 +37,10 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,plyer,android,httpx,httpcore,anyio,certifi,idna,h11
+requirements = python3,kivy,kivy_garden.mapview,git+https://github.com/kivy/plyer.git@master,android,httpx,httpcore,anyio,certifi,idna,h11,openssl,urllib3,requests,futures
+
+# (list) Garden requirements
+#garden_requirements = mapview
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

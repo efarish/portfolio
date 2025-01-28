@@ -1,9 +1,9 @@
 import httpx
-from layouts.BgBoxLayout import BgBoxLayout
+from kivy_garden.mapview import MapMarker
 from plyer import gps
 
 from kivy.app import App
-from kivy.clock import Clock, mainthread
+from kivy.clock import mainthread
 from kivy.factory import Factory
 from kivy.metrics import dp
 from kivy.uix.label import Label
@@ -11,6 +11,7 @@ from kivy.uix.screenmanager import FadeTransition, ScreenManager
 from kivy.utils import platform
 
 API = 'https://u67pk2go93.execute-api.us-east-1.amazonaws.com' #TODO ENTER YOU API URL HERE!
+DEBUG = True
 
 class Interface(ScreenManager):
 
@@ -27,6 +28,12 @@ class Interface(ScreenManager):
     def sign_in(self):
         user = self.ids.userIdTxt.text
         pwd = self.ids.passwordTxt.text
+
+        if DEBUG:
+            self.token = '123'
+            self.switch_screen('Map')
+            return
+
         try:
             response = httpx.post(API + '/auth/token', 
                                 data={"username": user, "password": pwd, "grant_type": "password"},
@@ -94,6 +101,10 @@ class Interface(ScreenManager):
 
 class GpsTracker(App):
 
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.lastMarker = None
+
     def request_android_permissions(self):
         """
         Since API 23, Android requires permission to be requested at runtime.
@@ -144,8 +155,14 @@ class GpsTracker(App):
         gps_location = ' '.join([
             '{}={}'.format(k, v) for k, v in kwargs.items() if k in ['lat', 'lon', 'speed']])
         print(f'{gps_location=}')
-        lbl=Label(text=gps_location, size_hint=(None,None), size=(dp(300),dp(50)), halign='left')
-        self.root.ids.boxLayout.add_widget(lbl, len(self.root.ids.boxLayout.children))
+        #lbl=Label(text=gps_location, size_hint=(None,None), size=(dp(300),dp(50)), halign='left')
+        #self.root.ids.boxLayout.add_widget(lbl, len(self.root.ids.boxLayout.children))
+        lon = kwargs['lon']
+        lat = kwargs['lat']
+        if self.lastMarker:
+            self.root.ids.theMap.remove_marker(self.lastMarker)
+        self.lastMarker = MapMarker(lon=lon, lat=lat)
+        self.root.ids.theMap.add_marker(self.lastMarker)
 
     @mainthread
     def on_status(self, stype, status):
