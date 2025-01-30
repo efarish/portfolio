@@ -1,6 +1,7 @@
 #: import BgStackLayout layouts.BgStackLayout
 #: import BgBoxLayout layouts.BgBoxLayout
 #: import MapView kivy_garden.mapview.MapView
+#: include gpsblinker.kv
 
 Interface:
     Screen:
@@ -106,8 +107,7 @@ Interface:
                 padding : self.height/2 - self.font_size/2
 
             BoxLayout:
-                orientation:'horizontal'
-                #padding:[dp(20),dp(20),dp(20),dp(20)]             
+                orientation:'horizontal'           
                 size_hint: 1,0.25
                 spacing: dp(20)
                 Button:
@@ -137,6 +137,11 @@ Interface:
             zoom: 10
             on_zoom:
                 self.zoom = 10 if self.zoom < 10 else self.zoom
+            on_map_relocated: root.on_map_relocated() 
+
+            GpsBlinker:
+                id: blinker
+
         Button:
             id: locationBtn
             text: "Start Tracking..."

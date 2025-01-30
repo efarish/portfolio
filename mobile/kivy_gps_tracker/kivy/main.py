@@ -1,4 +1,5 @@
 import httpx
+from gpsblinker import GpsBlinker
 from kivy_garden.mapview import MapMarker
 from plyer import gps
 
@@ -21,6 +22,7 @@ class Interface(ScreenManager):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.transition=FadeTransition()
+        self.gps_blinker = None
 
     def switch_screen(self, screen_name: str):
         self.current = screen_name
@@ -84,11 +86,17 @@ class Interface(ScreenManager):
             popup.message.text = response.json()['detail']
             popup.open()
 
+    def on_map_relocated(self, **kwargs):
+        pass
+        
     def location_click(self):
         if self.ids.locationBtn.text == self.btn_send:
             try:
+                if not self.gps_blinker:
+                    self.gps_blinker = self.ids.blinker
+                    self.gps_blinker.blink()                
                 gps.start(5000, 10)
-                self.ids.locationBtn.text = self.btn_stop
+                self.ids.locationBtn.text = self.btn_stop                
             except Exception as e:
                 print(f'{e=}')
                 popup = Factory.ErrorPopup()
@@ -104,6 +112,7 @@ class GpsTracker(App):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.lastMarker = None
+        self.has_centered_map = False
 
     def request_android_permissions(self):
         """
@@ -155,14 +164,18 @@ class GpsTracker(App):
         gps_location = ' '.join([
             '{}={}'.format(k, v) for k, v in kwargs.items() if k in ['lat', 'lon', 'speed']])
         print(f'{gps_location=}')
-        #lbl=Label(text=gps_location, size_hint=(None,None), size=(dp(300),dp(50)), halign='left')
-        #self.root.ids.boxLayout.add_widget(lbl, len(self.root.ids.boxLayout.children))
         lon = kwargs['lon']
         lat = kwargs['lat']
-        if self.lastMarker:
-            self.root.ids.theMap.remove_marker(self.lastMarker)
-        self.lastMarker = MapMarker(lon=lon, lat=lat)
-        self.root.ids.theMap.add_marker(self.lastMarker)
+       
+        gps_blinker = self.root.ids.blinker
+        gps_blinker.lat = lat
+        gps_blinker.lon = lon
+        map = self.root.ids.theMap
+        map.trigger_update(True)
+
+        if not self.has_centered_map:
+            map.center_on(lat, lon)
+            self.has_centered_map = True
 
     @mainthread
     def on_status(self, stype, status):

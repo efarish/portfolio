@@ -1,0 +1,3 @@
+httpx
+kivy[full]
+kivy_garden.mapview
