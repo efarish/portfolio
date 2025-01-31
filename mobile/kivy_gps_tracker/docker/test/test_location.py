@@ -25,6 +25,11 @@ async def test_update_location(insert_user):
         assert user_loc_model.lat == 1.0
         assert user_loc_model.lng == 1.0 
 
+    response_json = response.json()[0]
+    assert response_json['id'] == mock_user['id']
+    assert Decimal(response_json['lat']) == 1.0
+    assert Decimal(response_json['lng']) == 1.0
+    
     with engine.connect() as connection:
         connection.execute(text('DELETE FROM user_location'))
         connection.commit()
