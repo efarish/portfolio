@@ -14,12 +14,17 @@ from starlette import status
 
 from .auth import check_user_name, user_dependency
 
+#from collections import namedtuple
+
+
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
 
 router = APIRouter(
     prefix='/users',
     tags=['users']
 )
+
+#AUser = namedtuple('AUser', ['x', 'y'])
 
 class CreateUserRequest(BaseModel):
     user_name: str
@@ -48,10 +53,7 @@ async def read_all(user: user_dependency, db: db_dependency):
     users = result.all()
     return users
 
-@router.post("/create_user", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency,
-                      create_user_request: CreateUserRequest):
-    
+async def create_user_util(db, create_user_request):
     user = await check_user_name(create_user_request.user_name, db)
     if user:
         raise HTTPException(status_code=401, detail='User name already exists.')    
@@ -64,6 +66,15 @@ async def create_user(db: db_dependency,
     db.add(create_user_model)
     await db.commit()
 
+@router.post("/create_user", status_code=status.HTTP_201_CREATED)
+async def create_user(db: db_dependency,
+                      create_user_request: CreateUserRequest,
+                      user: user_dependency):
+    
+    if user is None or user.get('role') != 'admin':
+        raise HTTPException(status_code=401, detail='Authentication Failed')   
+    
+    await create_user_util(db, create_user_request)
 
 @router.put("/update", status_code=status.HTTP_204_NO_CONTENT)
 async def update_user(user: user_dependency, db: db_dependency,

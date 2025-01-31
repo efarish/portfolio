@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from db import engine
+from db import SessionLocal, engine
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from model import Base
 from routers import auth, user_location, users
 from starlette import status
@@ -18,6 +18,15 @@ async def create_db_and_tables():
 async def lifespan(app: FastAPI):
     # Before app starts
     await create_db_and_tables()
+    try:
+        a_user = users.CreateUserRequest(user_name='admin', password='a_password_', role='admin')
+        async with SessionLocal() as db:
+            await users.create_user_util(db, a_user)
+    except HTTPException as e:
+        #If status is code is 401, admin user already exists. And thats okay.
+        #  Otherwise, re-throw exception.
+        if e.status_code != 401: 
+            raise e 
     try:
         yield
     finally:
