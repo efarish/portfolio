@@ -18,6 +18,6 @@ class User_Location(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    lat = Column(DECIMAL(9,6))
-    lng = Column(DECIMAL(9,6))
+    lat = Column(DECIMAL(12,8))
+    lng = Column(DECIMAL(12,8))
     created_at = Column(TIMESTAMP, default=datetime.now(timezone.utc))

@@ -19,8 +19,8 @@ router = APIRouter(
 
 class UpdateLocationRequest(BaseModel):
     user_name: str
-    lat: Decimal = Field(max_digits=9, decimal_places=6)
-    lng: Decimal = Field(max_digits=9, decimal_places=6)
+    lat: Decimal = Field(max_digits=12, decimal_places=8)
+    lng: Decimal = Field(max_digits=12, decimal_places=8)
 
 class GetUserLocationRequest(BaseModel):
     ids: List[int]
@@ -28,8 +28,8 @@ class GetUserLocationRequest(BaseModel):
 class UserLocations(BaseModel):
     id: int
     user_name: str
-    lat: Decimal = Field(max_digits=9, decimal_places=6)
-    lng: Decimal = Field(max_digits=9, decimal_places=6)
+    lat: Decimal = Field(max_digits=12, decimal_places=8)
+    lng: Decimal = Field(max_digits=12, decimal_places=8)
     
     class Config:
         from_attributes = True
