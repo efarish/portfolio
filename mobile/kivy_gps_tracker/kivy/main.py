@@ -1,3 +1,5 @@
+from threading import Thread
+
 import httpx
 from gpsblinker import GpsBlinker
 from kivy_garden.mapview import MapMarker
@@ -11,8 +13,12 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import FadeTransition, ScreenManager
 from kivy.utils import platform
 
-API = 'https://u67pk2go93.execute-api.us-east-1.amazonaws.com' #TODO ENTER YOU API URL HERE!
-DEBUG = True
+CONFIG_API = 'https://a-unique-public-bucket-name.s3.us-east-1.amazonaws.com/config.json'
+response = httpx.get(CONFIG_API)
+print(f'Config:{response.text}')
+API = response.json()['config']['api'] #TODO ENTER YOU API URL HERE!
+print(f'{API=}')
+DEBUG = False
 
 class Interface(ScreenManager):
 
@@ -23,6 +29,7 @@ class Interface(ScreenManager):
         super().__init__(**kwargs)
         self.transition=FadeTransition()
         self.gps_blinker = None
+        self.token = None
 
     def switch_screen(self, screen_name: str):
         self.current = screen_name
@@ -105,7 +112,22 @@ class Interface(ScreenManager):
         else:
             self.ids.locationBtn.text = self.btn_send
             gps.stop()
-            
+
+def worker(gpsTracker):
+    print('Worker started')
+    token = gpsTracker.root.token
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    response = httpx.post(API + '/location/update', 
+                             json={'user_name': 'user1', 'lat': gpsTracker.lat, 'lng': gpsTracker.lon},
+                             headers=headers)
+    positions = []
+    if response.status_code == 201:
+        positions = response.json()
+        gpsTracker.update_blinker_positions(positions)
+    elif response.status_code in [401, 403]: # Forbidden: probably a sign-in expiration.
+        gpsTracker.send_to_sign_in()
+    else:
+        print(f'Location update failed: {response.status_code=} {response.text=}')
 
 class GpsTracker(App):
 
@@ -159,22 +181,30 @@ class GpsTracker(App):
     def on_stop(self):
         print("App closed.")
 
-    @mainthread
     def on_location(self, **kwargs):
         gps_location = ' '.join([
             '{}={}'.format(k, v) for k, v in kwargs.items() if k in ['lat', 'lon', 'speed']])
         print(f'{gps_location=}')
-        lon = kwargs['lon']
-        lat = kwargs['lat']
-       
+        self.lon = kwargs['lon']
+        self.lat = kwargs['lat']
+        p = Thread(target=worker, args=(self,))
+        p.start()
+
+    @mainthread
+    def send_to_sign_in(self):
+        self.root.switch_screen('SignIn')
+
+    @mainthread
+    def update_blinker_positions(self, positions):
+        print('Blinker update positions..')
+        print(f'{positions=}')
         gps_blinker = self.root.ids.blinker
-        gps_blinker.lat = lat
-        gps_blinker.lon = lon
+        gps_blinker.lat = self.lat
+        gps_blinker.lon = self.lon
         map = self.root.ids.theMap
         map.trigger_update(True)
-
         if not self.has_centered_map:
-            map.center_on(lat, lon)
+            map.center_on(self.lat, self.lon)
             self.has_centered_map = True
 
     @mainthread
