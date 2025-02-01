@@ -117,7 +117,19 @@ Resources:
         - /
         - - integrations
           - !Ref APIIntegration
-          
+
+  APIRoute5:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiSvcConnect
+      RouteKey: 'POST /location/update'
+      AuthorizationType: CUSTOM
+      AuthorizerId: !GetAtt Authorizer.AuthorizerId
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
   PrivateAPIGWvpcLink:  
     Type: AWS::ApiGatewayV2::VpcLink
     Properties: 
