@@ -15,7 +15,7 @@ A couple of additional notes:
 
 * Lambdas deployed to a public subnet have no internet access so a VPC Interface Endpoint is used to access AWS services.
 * The ECS service is secured by using its security group to restrict inbound access to API Gateway, Cloud Map, and Lambda.   
-* Some of the AWS services used were for personal didactic teaching. For example, the Lambda Authorizer was included to experiment with securing an API Gateway. ECS and FastAPI are used to implement the endpoints instead of Lambda. Also, using an AWS account's default VPC would also have been cheaper, but less interesting.
+* Some of the AWS services used were for self-didactic teaching. For example, a Lambda Authorizer was included to experiment with securing an API Gateway. ECS and FastAPI are used to implement the endpoints instead of Lambda Fucntions. 
  
 A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, an application load balancer is more expensive than Cloud Map. For larger clusters, this is probably not true.
 
