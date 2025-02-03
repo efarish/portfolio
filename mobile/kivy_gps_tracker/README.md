@@ -1,4 +1,4 @@
-# Project: Mobile Device Tracking Application
+# Project: Mobile Device Tracker
 
 THIS IS A WORK-IN-PROGRESS
 
