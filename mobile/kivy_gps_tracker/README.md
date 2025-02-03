@@ -84,12 +84,7 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 * The costs of demonstration projects can be significantly reduced with a few architecture decisions,
 * The up-front effort of implementing CI/CD pipelines and IaC templates reduces development time.
 
-# Enhancements
-
-1. Replace ECS endpoints with Lambda.
-
 # TODO
 
-1. Develop Kivy model frontend app.
 1. Add a CloudFormation template for the ECR repository.
-1. In buildozer.spec, needed to reference kivy plyer as: git+https://github.com/kivy/plyer.git@master
+1. In the Kivy buildozer.spec, needed to reference kivy plyer as: git+https://github.com/kivy/plyer.git@master for the latest code. 
