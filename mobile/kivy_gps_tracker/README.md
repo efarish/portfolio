@@ -2,7 +2,7 @@
 
 THIS IS A WORK-IN-PROGRESS
 
-This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI framework for Python) to implement a mobile device tracker. The AWS highlights include a RESTFul API web service implemented using CloudFormation, CodePipeline, API Gateway, a Lambda Authorizer, ECS, FastAPI, and SQLAlchemy. A mobile client app is implemented using Kivy. Once installed, the app calls the web service to report its GSP location and to retrieve the locations of any other mobile device logged into the appliacation. These device locations are then displayed on an interactive map. 
+This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI framework for Python) to implement a mobile device tracker. The AWS highlights include a RESTFul API web service implemented using CloudFormation, CodePipeline, API Gateway, a Lambda Authorizer, ECS, FastAPI, and SQLAlchemy. A mobile client app is implemented using Kivy. Once installed, the app calls the web service to report its GSP location and to retrieve the locations of any other mobile device logged into the appliacation. The device locations are then displayed on an interactive map. 
 
 I made some architecture decisions to reduce the cost of deploying this app to AWS: 
 
