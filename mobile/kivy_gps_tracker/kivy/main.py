@@ -1,3 +1,4 @@
+from os.path import dirname, join
 from threading import Thread
 
 import httpx
@@ -8,6 +9,8 @@ from plyer import gps
 from kivy.app import App
 from kivy.clock import mainthread
 from kivy.factory import Factory
+from kivy.graphics import Color, Rectangle
+from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import FadeTransition, ScreenManager
@@ -21,6 +24,9 @@ print(f'{API=}')
 DEBUG = False
 
 class Interface(ScreenManager):
+    """
+    The Kivy user interface. 
+    """
 
     btn_send = "Start Tracking..."
     btn_stop = "Stop Tracking"
@@ -28,13 +34,22 @@ class Interface(ScreenManager):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.transition=FadeTransition()
-        self.gps_blinker = None
-        self.token = None
+        self.gps_blinker = None # Kivy Map Marker for application user. 
+        self.token = None # JWT token of logged in user.
+        self.user = None  # Application user name of logged in user. 
 
     def switch_screen(self, screen_name: str):
+        """
+        Method used to swtich between Kivy screens.
+        """
         self.current = screen_name
 
     def sign_in(self):
+        """
+        Method used to log into application. A successful login results in 
+        a JWT being returned to the user and will be used for all 
+        subsequent requests.
+        """
         user = self.ids.userIdTxt.text
         pwd = self.ids.passwordTxt.text
 
@@ -51,6 +66,7 @@ class Interface(ScreenManager):
             token = response.json()
             if response.status_code == 200:
                 self.token = token['access_token']
+                self.user = user
                 print(f'{self.token=}')
                 self.ids.userIdRegisterTxt.text = ""
                 self.ids.passwordRegisterTxt.text = ""                
@@ -114,6 +130,11 @@ class Interface(ScreenManager):
             gps.stop()
 
 def worker(gpsTracker):
+    """
+    Function to be called by worker Thread report application user's 
+      GPS position. The endpoint used to report the user GPS position
+      also returns the position of anyone else logged into the application.
+    """
     print('Worker started')
     token = gpsTracker.root.token
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
@@ -122,9 +143,14 @@ def worker(gpsTracker):
                              headers=headers)
     positions = []
     if response.status_code == 201:
+        # Reporting of user's GPS position was successful.
+        #  The response will contain the GPS position of all other 
+        #  users logged into the application. 
         positions = response.json()
         gpsTracker.update_blinker_positions(positions)
-    elif response.status_code in [401, 403]: # Forbidden: probably a sign-in expiration.
+    elif response.status_code in [401, 403]: 
+        # Forbidden: probably a sign-in expiration.
+        #  Return user to login screen.
         gpsTracker.send_to_sign_in()
     else:
         print(f'Location update failed: {response.status_code=} {response.text=}')
@@ -135,6 +161,7 @@ class GpsTracker(App):
         super().__init__(**kwargs)
         self.lastMarker = None
         self.has_centered_map = False
+        self.marker_list = []
 
     def request_android_permissions(self):
         """
@@ -196,12 +223,25 @@ class GpsTracker(App):
 
     @mainthread
     def update_blinker_positions(self, positions):
-        print('Blinker update positions..')
-        print(f'{positions=}')
+        # First update the application user's marker. 
         gps_blinker = self.root.ids.blinker
         gps_blinker.lat = self.lat
         gps_blinker.lon = self.lon
         map = self.root.ids.theMap
+        # Remove other users markers.
+        for marker in self.marker_list:
+            marker.stop()
+            map.remove_marker(marker)
+        self.marker_list.clear()
+        # Add markers for any users found by the endpoint.
+        for pos in positions: 
+            if pos['user_name'] != self.root.user:
+                m = GpsBlinker() 
+                m.lat = pos['lat']
+                m.lon = pos['lng']
+                self.marker_list.append(m)
+                map.add_marker(m)
+                m.blink()
         map.trigger_update(True)
         if not self.has_centered_map:
             map.center_on(self.lat, self.lon)
