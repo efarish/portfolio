@@ -142,11 +142,21 @@ Interface:
             GpsBlinker:
                 id: blinker
 
-        Button:
-            id: locationBtn
-            text: "Start Tracking..."
-            size_hint: 0.5,0.1
-            on_release: root.location_click()
+        BoxLayout:
+            orientation:'horizontal'           
+            size_hint: 1,0.1
+            spacing: dp(20)
+            Button:
+                id: locationBtn
+                text: "Start Tracking..."
+                size_hint: 0.5,1
+                on_release: root.location_click()
+            Button:
+                id: signOutBtn
+                text: "Sign Out"
+                size_hint: 0.5,1
+                on_release: root.signout_click()
+
 
 <ErrorPopup@Popup>:
     message: message

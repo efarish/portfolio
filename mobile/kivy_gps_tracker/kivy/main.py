@@ -16,12 +16,16 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import FadeTransition, ScreenManager
 from kivy.utils import platform
 
-CONFIG_API = 'https://a-unique-public-bucket-name.s3.us-east-1.amazonaws.com/config.json'
-response = httpx.get(CONFIG_API)
-print(f'Config:{response.text}')
-API = response.json()['config']['api'] #TODO ENTER YOU API URL HERE!
-print(f'{API=}')
 DEBUG = False
+
+CONFIG_API = 'https://a-unique-public-bucket-name.s3.us-east-1.amazonaws.com/config.json'
+
+def get_config() -> dict:
+    response = httpx.get(CONFIG_API)
+    print(f'Config:{response.text}')
+    props = response.json()['config'] 
+    print(f'{props=}')
+    return props
 
 class Interface(ScreenManager):
     """
@@ -36,7 +40,8 @@ class Interface(ScreenManager):
         self.transition=FadeTransition()
         self.gps_blinker = None # Kivy Map Marker for application user. 
         self.token = None # JWT token of logged in user.
-        self.user = None  # Application user name of logged in user. 
+        self.user = None  # Application user name of logged in user.
+        self.props = None # Application config retrieved from S3. 
 
     def switch_screen(self, screen_name: str):
         """
@@ -59,7 +64,8 @@ class Interface(ScreenManager):
             return
 
         try:
-            response = httpx.post(API + '/auth/token', 
+            self.props = get_config()
+            response = httpx.post(self.props['api'] + '/auth/token', 
                                 data={"username": user, "password": pwd, "grant_type": "password"},
                                 headers={"content-type": "application/x-www-form-urlencoded"})
             print(f'{response.status_code}')
@@ -91,7 +97,8 @@ class Interface(ScreenManager):
             popup.open()
             return
         try:
-            response = httpx.post(API + '/users/create_user', 
+            self.props = get_config()
+            response = httpx.post(self.props['api'] + '/users/create_user', 
                                 json={"user_name": user, "password": pwd, "role": "user"})
         except Exception as e:
             print(f'{e=}')
@@ -117,7 +124,7 @@ class Interface(ScreenManager):
             try:
                 if not self.gps_blinker:
                     self.gps_blinker = self.ids.blinker
-                    self.gps_blinker.blink()                
+                self.gps_blinker.blink()                
                 gps.start(5000, 10)
                 self.ids.locationBtn.text = self.btn_stop                
             except Exception as e:
@@ -127,7 +134,15 @@ class Interface(ScreenManager):
                 popup.open()
         else:
             self.ids.locationBtn.text = self.btn_send
+            self.gps_blinker.stop()
             gps.stop()
+
+    def signout_click(self):
+        if gps: gps.stop
+        if self.gps_blinker: self.gps_blinker.stop()
+        self.ids.locationBtn.text = self.btn_send
+        App.get_running_app().close_gps_app()
+
 
 def worker(gpsTracker):
     """
@@ -138,7 +153,8 @@ def worker(gpsTracker):
     print('Worker started')
     token = gpsTracker.root.token
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    response = httpx.post(API + '/location/update', 
+    api = gpsTracker.root.props['api']
+    response = httpx.post(api + '/location/update', 
                              json={'user_name': 'user1', 'lat': gpsTracker.lat, 'lng': gpsTracker.lon},
                              headers=headers)
     positions = []
@@ -151,7 +167,7 @@ def worker(gpsTracker):
     elif response.status_code in [401, 403]: 
         # Forbidden: probably a sign-in expiration.
         #  Return user to login screen.
-        gpsTracker.send_to_sign_in()
+        gpsTracker.close_gps_app()
     else:
         print(f'Location update failed: {response.status_code=} {response.text=}')
 
@@ -252,6 +268,16 @@ class GpsTracker(App):
         gps_status = 'stype={}, status={}'.format(stype, status)
         print(f'{gps_status=}')
 
+    def close_gps_app(self):
+        gps_blinker = self.root.ids.blinker
+        if gps_blinker: gps_blinker.stop() 
+        map = self.root.ids.theMap
+        for marker in self.marker_list:
+            marker.stop()
+            map.remove_marker(marker)
+        self.marker_list.clear()
+        self.send_to_sign_in()
+                
 if __name__ == '__main__':
     
     GpsTracker().run()
