@@ -124,7 +124,7 @@ class Interface(ScreenManager):
             try:
                 if not self.gps_blinker:
                     self.gps_blinker = self.ids.blinker
-                self.gps_blinker.blink()                
+                self.gps_blinker.start()                
                 gps.start(5000, 10)
                 self.ids.locationBtn.text = self.btn_stop                
             except Exception as e:
@@ -257,7 +257,7 @@ class GpsTracker(App):
                 m.lon = pos['lng']
                 self.marker_list.append(m)
                 map.add_marker(m)
-                m.blink()
+                m.start()
         map.trigger_update(True)
         if not self.has_centered_map:
             map.center_on(self.lat, self.lon)
