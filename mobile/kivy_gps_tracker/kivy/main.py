@@ -3,20 +3,13 @@ from threading import Thread
 
 import httpx
 from gpsblinker import GpsBlinker
-from kivy_garden.mapview import MapMarker
 from plyer import gps
 
 from kivy.app import App
 from kivy.clock import mainthread
 from kivy.factory import Factory
-from kivy.graphics import Color, Rectangle
-from kivy.lang import Builder
-from kivy.metrics import dp
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import FadeTransition, ScreenManager
 from kivy.utils import platform
-
-DEBUG = False
 
 CONFIG_API = 'https://a-unique-public-bucket-name.s3.us-east-1.amazonaws.com/config.json'
 
@@ -57,14 +50,14 @@ class Interface(ScreenManager):
         """
         user = self.ids.userIdTxt.text
         pwd = self.ids.passwordTxt.text
+        self.props = get_config()
 
-        if DEBUG:
+        if bool(self.props.get('debug', None)):
             self.token = '123'
             self.switch_screen('Map')
             return
-
+        
         try:
-            self.props = get_config()
             response = httpx.post(self.props['api'] + '/auth/token', 
                                 data={"username": user, "password": pwd, "grant_type": "password"},
                                 headers={"content-type": "application/x-www-form-urlencoded"})
@@ -154,11 +147,18 @@ def worker(gpsTracker):
     token = gpsTracker.root.token
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     api = gpsTracker.root.props['api']
-    response = httpx.post(api + '/location/update', 
-                             json={'user_name': 'user1', 'lat': gpsTracker.lat, 'lng': gpsTracker.lon},
-                             headers=headers)
-    positions = []
-    if response.status_code == 201:
+
+    response = None
+    try:
+        response = httpx.post(api + '/location/update', 
+                                json={'user_name': 'user1', 'lat': gpsTracker.lat, 'lng': gpsTracker.lon},
+                                headers=headers)
+    except Exception as e:
+        print(f'Error occurred while sending location: {e}')
+
+    if response is None:
+        gpsTracker.update_blinker_positions([])
+    elif response.status_code == 201:
         # Reporting of user's GPS position was successful.
         #  The response will contain the GPS position of all other 
         #  users logged into the application. 
@@ -167,7 +167,7 @@ def worker(gpsTracker):
     elif response.status_code in [401, 403]: 
         # Forbidden: probably a sign-in expiration.
         #  Return user to login screen.
-        gpsTracker.close_gps_app()
+        gpsTracker.root.signout_click()
     else:
         print(f'Location update failed: {response.status_code=} {response.text=}')
 
@@ -230,8 +230,11 @@ class GpsTracker(App):
         print(f'{gps_location=}')
         self.lon = kwargs['lon']
         self.lat = kwargs['lat']
-        p = Thread(target=worker, args=(self,))
-        p.start()
+        if self.root.props['debug']:
+          self.update_blinker_positions([])
+        else:
+          p = Thread(target=worker, args=(self,))
+          p.start()
 
     @mainthread
     def send_to_sign_in(self):
@@ -269,8 +272,6 @@ class GpsTracker(App):
         print(f'{gps_status=}')
 
     def close_gps_app(self):
-        gps_blinker = self.root.ids.blinker
-        if gps_blinker: gps_blinker.stop() 
         map = self.root.ids.theMap
         for marker in self.marker_list:
             marker.stop()
