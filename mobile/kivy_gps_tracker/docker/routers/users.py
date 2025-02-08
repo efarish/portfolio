@@ -14,17 +14,12 @@ from starlette import status
 
 from .auth import check_user_name, user_dependency
 
-#from collections import namedtuple
-
-
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
 
 router = APIRouter(
     prefix='/users',
     tags=['users']
 )
-
-#AUser = namedtuple('AUser', ['x', 'y'])
 
 class CreateUserRequest(BaseModel):
     user_name: str

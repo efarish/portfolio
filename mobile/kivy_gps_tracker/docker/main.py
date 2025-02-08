@@ -5,7 +5,7 @@ from db import SessionLocal, engine
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from model import Base
-from routers import auth, user_location, users
+from routers import auth, user_location, users, websoc
 from starlette import status
 
 load_dotenv()
@@ -45,6 +45,7 @@ def health_check():
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(user_location.router)
+app.include_router(websoc.router)
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=80)
