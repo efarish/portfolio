@@ -99,8 +99,10 @@ Use the command below to install the modified MapView package,
 python toolchain.py pip install $< PATH TO THE CLONED MAPVIEW DIRECTOY >
 ```
 3. When using Xcode to deploy to a IOS device, I had to edit the Xcode projects's Info.plist (in this project the file was called gps_tracker-Info.plist) with the following entry to the <dict> element. This allows the target device to access the GPS location: 
+```bash
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>${PRODUCT_NAME}</string>
+```
 
 # Clean Up 
 
