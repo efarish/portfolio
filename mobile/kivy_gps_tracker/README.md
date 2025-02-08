@@ -29,7 +29,7 @@ The architecture diagram is below.
 
 A PyTest suite can be run using the `./docker/test/TestSuite.py` script.
 
-# Deployment
+# AWS Deployment
 
 Three AWS CodePipelines are created to deploy and maintain this application.
 
@@ -51,6 +51,49 @@ Three AWS resources are not provisioned by `create-pipeline` and need to be manu
 1. The AWS Developer Tools GitHub Connection referenced by the `GitHubConnectionArn` property in the pipeline templates will need to be manually created in any AWS account trying to run these pipelines. The connection needs to point to where this code is stored and its ARN used to update the pipeline templates property. For this project, the code was stored in the Git Hub repository `https://github.com/efarish/portfolio`. 
 2. An AWS ECR repository with the name `ecs1` is assumed to exist. This repository is referenced by the CloudFormation templates and the pipeline `buildspec.yml` files.
 3. CodePipeline requires an S3 bucket. To run these pipelines, replace the `S3ArtifactBucket` values in the template files with a bucket from the AWS account the pipelines are run in.
+
+# Kivy Android Deployment
+
+I've done another project that goes into the details of setting up a Kivy Android deployment environment using Buildozer. Please see [this](https://github.com/efarish/portfolio/tree/main/mobile/kivy_img_post) project for details. 
+
+# Kivy IOS Deployment
+
+To deploy the Kivy app to an IOS device, I used a Mac workstation and the [kivy-ios](https://github.com/kivy/kivy-ios) framework. I found these resource useful in setting it up.
+
+* [This](https://www.youtube.com/watch?v=6gLGyrlgqCU) Youtube video to set up the environment.
+* The [Kivy-ios](https://github.com/kivy/kivy-ios) documentation for reference.
+
+## Addition Configuration
+
+1. I ran the following Toolchain commands:
+  - python toolchain.py pip install httpx
+  - python toolchain.py pip install git+https://github.com/kivy/plyer.git@master
+  - python toolchain.py pip install httpcore
+  - python toolchain.py pip install anyio
+  - python toolchain.py pip install certifi
+  - python toolchain.py pip install idna
+  - python toolchain.py pip install h11
+  - python toolchain.py pip install openssl
+2. The Kivy Garden MapView code appears to have a bug when running on IOS. The code attempts to create a cache for the map images to a directory it doesn't have permission to. I cloned the project from GitHub and made the following change to the `kivy_garden/mapview/constants.py` to put the cache in directory the app would have access to:
+```bash
+if platform == 'ios': 
+  root_folder = App().get_running_app().user_data_dir
+  CACHE_DIR = os.path.join(root_folder, 'cache')
+else:
+  CACHE_DIR = "cache"
+```   
+Use the command below to install the modified MapView package, 
+```bash
+python toolchain.py pip install $<PATHJ TO THE CLONED MAPVIEW DIRECTOYR>
+```
+3. When using Xcode to deploy to a IOS device, I had to edit the Xcode projects's Info.plist (in this project the file was called gps_tracker-Info.plist) with the following entry to the <dict> element. This allows the target device to access the GPS location: 
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>${PRODUCT_NAME}</string>
+
+ 
+
+
+
 
 # Clean Up 
 

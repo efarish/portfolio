@@ -1,6 +1,7 @@
 {
     "config": {
-        "api": "https://rfczwiutnk.execute-api.us-east-1.amazonaws.com"
+        "api": "https://21ul1wb5dj.execute-api.us-east-1.amazonaws.com",
+        "debug": ""
     } 
 
 }
