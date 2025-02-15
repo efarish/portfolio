@@ -33,6 +33,9 @@ Resources:
         MaximumEventAgeInSeconds: 21600
         MaximumRetryAttempts: 2
       ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lamdba_function.lambda_handler_auth
       PackageType: Image
       Policies:
         - Statement:

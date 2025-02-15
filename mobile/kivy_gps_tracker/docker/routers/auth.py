@@ -73,7 +73,9 @@ def create_access_token(id: int, username: str, role: str, expires_delta: timede
 
 @router.get("/check_token", status_code=status.HTTP_200_OK)
 async def check_token(user: user_dependency):
-
+    """
+    Check if a token is valid.
+    """
     if user is None:
         raise HTTPException(status_code=401, detail='Token Authentication Failed')
     return user
@@ -81,6 +83,9 @@ async def check_token(user: user_dependency):
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
+    """
+    Authenticate user, generate and return JWT.
+    """
     user = await authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
