@@ -47,5 +47,6 @@ async def disconnect(connect_request: WebSocConnectRequest,
 
 @router.post("/update_location", status_code=status.HTTP_201_CREATED, response_model=UserLocation)
 async def get_user_locations(user: user_dependency, user_loc=UserLocation):
+    pass
     
 
