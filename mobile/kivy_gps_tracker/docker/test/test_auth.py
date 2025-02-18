@@ -19,7 +19,7 @@ async def test_token(insert_user):
     data = response.json()
     user = await get_current_user(data['access_token'])
     assert user['id'] == 1
-    assert user['user_name'] == 'test_user'
+    assert user['user_name'] == 'test_admin_user'
     assert user['role'] == 'admin'
 
 @pytest.mark.parametrize(

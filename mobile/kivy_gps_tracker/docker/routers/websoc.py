@@ -1,4 +1,4 @@
-from decimal import Decimal
+from typing import List
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -12,16 +12,7 @@ router = APIRouter(
 )
 
 class WebSocConnectRequest(BaseModel):
-    connectionId: str
-
-class UserLocation(BaseModel):
-    id: int
-    user_name: str
-    lat: Decimal = Field(max_digits=12, decimal_places=8)
-    lng: Decimal = Field(max_digits=12, decimal_places=8)
-    
-    class Config:
-        from_attributes = True
+    connectionId: int
 
 CONNECTIONS = {}
 
@@ -31,22 +22,34 @@ async def connect(connect_request: WebSocConnectRequest,
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')   
     
-    print(f'User {user.get('id')}:{user.user_name} with websocket connect connection id: {connect_request.connectionId}')
-    CONNECTIONS[user.user_name] = connect_request.connectionId
+    print(f'User {user.get('id')}:{user.get('user_name')} with websocket connect connection id: {connect_request.connectionId}')
+    CONNECTIONS[user.get('user_name')] = connect_request.connectionId
 
-@router.delete("/disconnect", status_code=status.HTTP_201_CREATED)
+@router.post("/disconnect", status_code=status.HTTP_201_CREATED)
 async def disconnect(connect_request: WebSocConnectRequest,
                       user: user_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')   
     print(f'{user.get('id')} websocket disconnect connection id: {connect_request.connectionId}')
     try:
-        CONNECTIONS.pop(user.user_name)
+        CONNECTIONS.pop(user.get('user_name'))
     except Exception as e:
         print('Connection Id for user not found.')
 
-@router.post("/update_location", status_code=status.HTTP_201_CREATED, response_model=UserLocation)
-async def get_user_locations(user: user_dependency, user_loc=UserLocation):
-    pass
+@router.post("/get_websocket_ids", status_code=status.HTTP_200_OK)
+async def get_websocket_ids(connect_request: WebSocConnectRequest, 
+                            user: user_dependency) -> List[int]:
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')   
+    
+    print(f'{user.get("id")} websocket update location: {connect_request.connectionId}')
+    
+    other_user_connections = [val for key, val in CONNECTIONS.items() if key != user.get('user_name') ]
+
+    print(f'{other_user_connections=}')
+
+    return other_user_connections
+   
+    
     
 

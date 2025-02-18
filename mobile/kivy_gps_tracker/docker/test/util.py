@@ -15,7 +15,7 @@ from sqlalchemy.pool import StaticPool
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
 
 def get_mock_admin_user(id: int = 1):
-    return {'id': id, 'user_name': 'test_user',
+    return {'id': id, 'user_name': 'test_admin_user',
             'role': 'admin'}
 
 def get_mock_user(id: int = 2):
