@@ -7,7 +7,7 @@ phases:
       - PROJECT_NAME=kivy_gps_tracker # Used build path to source files.
       - ECR_REPO=ecs1                          # Name of ECR image repository.
       - LAMBDA_FUNC_NAME=LambdaAuth
-      - LAMBDA_FUNC_NAME_WEBSOCKET=LambdaWebSoc
+      - LAMBDA_FUNC_NAME_WEBSOCKET=LambdaWebSocket
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - IMG_NAME=lambda
       - ECR_IMG_NAME=${ECR_REPO}:${IMG_NAME}
