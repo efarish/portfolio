@@ -129,7 +129,7 @@ def handle_update_location(event, context):
     return {'statusCode': 201, 'body': 'Location updated.'}
 
 def lambda_handler_websocket(event, context):
-    print(f'event=')
+    print(f'{event=}')
     event_type = event["requestContext"]["eventType"]
     if event_type == 'CONNECT':
         return handle_conn_disc(event, context, 'connect')
