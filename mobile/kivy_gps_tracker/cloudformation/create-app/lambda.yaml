@@ -55,6 +55,50 @@ Resources:
         SubnetIds: !Ref DeploymentSubnetIds
         Ipv6AllowedForDualStack: false
 
+  LambdaWebSoc:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'LambdaWebSocket'
+      CodeUri: .
+      Description: 'A Lambda to proxy websocket requests.'
+      MemorySize: 128
+      Timeout: 3
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lambda_function.lambda_handler_websocket
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - servicediscovery:*
+                - ec2:*
+                - cloudmap:*
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+        - Statement:
+            - Effect: Allow
+              Action:
+                - execute-api:Invoke
+                - execute-api:ManageConnections
+              Resource: 'arn:aws:execute-api:*:*:*'
+      SnapStart:
+        ApplyOn: None
+      VpcConfig:
+        SecurityGroupIds: [!Ref LambdaSecurityGroup]
+        SubnetIds: !Ref DeploymentSubnetIds
+        Ipv6AllowedForDualStack: false
+
 # -------------------------------------------------------------------------
 # Information about the stack.
 # -------------------------------------------------------------------------
@@ -62,5 +106,8 @@ Outputs:
   LambdaAuthArn:
     Description: Arn of Lambda function.
     Value: !GetAtt LambdaAuth.Arn
+  LambdaWebsocketArn:
+    Description: Arn of Lambda websocket handler.
+    Value: !GetAtt LambdaWebSoc.Arn
   
 
