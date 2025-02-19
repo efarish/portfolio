@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 class WebSocConnectRequest(BaseModel):
-    connectionId: int
+    connectionId: str
 
 CONNECTIONS = {}
 
@@ -43,6 +43,8 @@ async def get_websocket_ids(connect_request: WebSocConnectRequest,
         raise HTTPException(status_code=401, detail='Authentication Failed')   
     
     print(f'{user.get("id")} websocket update location: {connect_request.connectionId}')
+
+    print(f'{CONNECTIONS=}')
     
     other_user_connections = [val for key, val in CONNECTIONS.items() if key != user.get('user_name') ]
 
