@@ -7,9 +7,11 @@ phases:
       - PROJECT_NAME=kivy_gps_tracker # Used build path to source files.
       - ECR_REPO=ecs1                          # Name of ECR image repository.
       - LAMBDA_FUNC_NAME=LambdaAuth
+      - LAMBDA_FUNC_NAME_WEBSOCKET=LambdaWebSoc
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-      - ECR_IMG_NAME=${ECR_REPO}:${LAMBDA_FUNC_NAME}
-      - ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_REPO}:${LAMBDA_FUNC_NAME}-${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
+      - IMG_NAME=lambda
+      - ECR_IMG_NAME=${ECR_REPO}:${IMG_NAME}
+      - ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_IMG_NAME}-${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
@@ -19,4 +21,5 @@ phases:
   post_build:
     commands:
       - aws lambda update-function-code --function-name ${LAMBDA_FUNC_NAME} --image-uri ${ECR_IMAGE_URI}
+      - aws lambda update-function-code --function-name ${LAMBDA_FUNC_NAME_WEBSOCKET} --image-uri ${ECR_IMAGE_URI}
 
