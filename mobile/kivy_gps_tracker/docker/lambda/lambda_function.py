@@ -55,7 +55,7 @@ def lambda_handler_auth(event, context):
 
     return {"isAuthorized": True}
 
-def lambda_handler_connect(event, context):
+def handle_conn_disc(event, context, action_type):
 
     headers = event['headers']
 
@@ -69,7 +69,7 @@ def lambda_handler_connect(event, context):
 
     # The code below assumes the string in headers['authorization'] begins with "Bearer".
     request_header = {"Authorization": f"{headers['authorization']}", "Content-Type": "application/json"}
-    url = api + '/websoc/connect'
+    url = f'{api}/websoc/{action_type}'
     print(f'{url=}')
     response = get_client().post(url, json={'connectionId': connectionId}, headers=request_header, timeout=5)
 
@@ -79,31 +79,7 @@ def lambda_handler_connect(event, context):
 
     return {'statusCode': 201, 'body': 'Connected.'} 
 
-def lambda_handler_disconnect(event, context):
-
-    headers = event['headers']
-
-    if('authorization' not in headers):
-        print('No Authorization header')
-        return {"statusCode": 401, 'body': 'User not authorized.'}
-    
-    connectionId = event['requestContext']['connectionId']
-
-    api = get_api()
-
-    # The code below assumes the string in headers['authorization'] begins with "Bearer".
-    request_header = {"Authorization": f"{headers['authorization']}", "Content-Type": "application/json"}
-    url = api + '/websoc/disconnect'
-    print(f'{url=}')
-    response = get_client().post(url, json={'connectionId': connectionId}, headers=request_header, timeout=5)
-
-    if(response.status_code != 201):
-        print(f'Error: {response.status_code}, {response.text}')
-        return {'statusCode': response.status_code, 'body': response.text}
-
-    return {'statusCode': 201, 'body': 'disconnected.'}
-
-def lambda_handler_update_location(event, context):
+def handle_update_location(event, context):
 
     headers = event['headers']
 
@@ -133,10 +109,13 @@ def lambda_handler_update_location(event, context):
     user_location = event['body'].decode('utf-8')
     print(f'{user_location=}')
 
-    s3 = boto3.resource('s3')
-    config_json = s3.Object('a-unique-public-bucket-name', 'config.json').get()['Body'].read().decode('utf-8')  
-    config = json.loads(config_json)  
-    ws_call_back = config['config']['web_socket_callback']   
+    #s3 = boto3.resource('s3')
+    #config_json = s3.Object('a-unique-public-bucket-name', 'config.json').get()['Body'].read().decode('utf-8')  
+    #config = json.loads(config_json)  
+    #ws_call_back = config['config']['web_socket_callback']   
+    domain_name = event["requestContext"]["domainName"]
+    stage = event["requestContext"]["stage"]
+    ws_call_back = f"https://{domain_name}/{stage}"
     print(f'{ws_call_back=}')
 
     if len(web_soc_ids) > 0:
@@ -148,3 +127,16 @@ def lambda_handler_update_location(event, context):
     else: print('No connections to broadcast to.')
 
     return {'statusCode': 201, 'body': 'Location updated.'}
+
+def lambda_handler_websocket(event, context):
+    print(f'event=')
+    event_type = event["requestContext"]["eventType"]
+    if event_type == 'CONNECT':
+        return handle_conn_disc(event, context, 'connect')
+    elif event_type == 'DISCONNECT': 
+        return handle_conn_disc(event, context, 'disconnect')
+    elif event_type == 'MESSAGE':
+        return handle_update_location(event, context)
+    else:
+        return {'statusCode': 400, 'body': f'Invalid event type: {event_type}.'}
+
