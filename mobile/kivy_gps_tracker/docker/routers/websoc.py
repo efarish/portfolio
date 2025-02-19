@@ -37,7 +37,7 @@ async def disconnect(connect_request: WebSocConnectRequest,
         print('Connection Id for user not found.')
 
 @router.post("/get_websocket_ids", status_code=status.HTTP_200_OK)
-async def get_websocket_ids(connect_request: WebSocConnectRequest) -> List[int]: #, user: user_dependency
+async def get_websocket_ids(connect_request: WebSocConnectRequest) -> List[str]: #, user: user_dependency
     #if user is None:
     #    raise HTTPException(status_code=401, detail='Authentication Failed')   
     
