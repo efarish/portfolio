@@ -37,16 +37,15 @@ async def disconnect(connect_request: WebSocConnectRequest,
         print('Connection Id for user not found.')
 
 @router.post("/get_websocket_ids", status_code=status.HTTP_200_OK)
-async def get_websocket_ids(connect_request: WebSocConnectRequest, 
-                            user: user_dependency) -> List[int]:
-    if user is None:
-        raise HTTPException(status_code=401, detail='Authentication Failed')   
+async def get_websocket_ids(connect_request: WebSocConnectRequest) -> List[int]: #, user: user_dependency
+    #if user is None:
+    #    raise HTTPException(status_code=401, detail='Authentication Failed')   
     
-    print(f'{user.get("id")} websocket update location: {connect_request.connectionId}')
+    print(f'Websocket update location: {connect_request.connectionId}')
 
     print(f'{CONNECTIONS=}')
     
-    other_user_connections = [val for key, val in CONNECTIONS.items() if key != user.get('user_name') ]
+    other_user_connections = [val for key, val in CONNECTIONS.items() if val != connect_request.connectionId ]
 
     print(f'{other_user_connections=}')
 

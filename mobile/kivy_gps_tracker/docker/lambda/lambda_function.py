@@ -82,22 +82,22 @@ def handle_conn_disc(event, context, action_type):
 
 def handle_update_location(event, context):
 
-    headers = event['headers']
+    #headers = event['headers']
 
-    if('Authorization' not in headers):
-        print('No Authorization header')
-        return {"statusCode": 401, 'body': 'User not authorized.'}
+    #if('Authorization' not in headers):
+    #    print('No Authorization header')
+    #    return {"statusCode": 401, 'body': 'User not authorized.'}
     
     connectionId = event['requestContext']['connectionId']
 
     api = get_api()
 
     # The code below assumes the string in headers['authorization'] begins with "Bearer".
-    request_header = {"Authorization": f"{headers['Authorization']}", "Content-Type": "application/json"}
-    print(f'{request_header=}')
+    #request_header = {"Authorization": f"{headers['Authorization']}", "Content-Type": "application/json"}
+    #print(f'{request_header=}')
     url = api + '/websoc/get_websocket_ids'
     print(f'{url=}')
-    response = get_client().post(url, json={'connectionId': connectionId}, headers=request_header, timeout=5)
+    response = get_client().post(url, json={'connectionId': connectionId}, timeout=5) #headers=request_header,
 
     if(response.status_code != 200):
         print(f'Error: {response.status_code}, {response.text}')
