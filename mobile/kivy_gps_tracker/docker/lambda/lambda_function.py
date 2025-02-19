@@ -28,7 +28,7 @@ def get_api():
 
     api = f'http://{ip_address}:{port}'
 
-    print(f"api=")
+    print(f"{api=}")
 
     return api    
 

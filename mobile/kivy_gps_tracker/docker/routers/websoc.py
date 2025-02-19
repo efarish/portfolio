@@ -45,7 +45,7 @@ async def get_websocket_ids(connect_request: WebSocConnectRequest) -> List[int]:
 
     print(f'{CONNECTIONS=}')
     
-    other_user_connections = [val for key, val in CONNECTIONS.items() if val != connect_request.connectionId ]
+    other_user_connections = [val for key, val in CONNECTIONS.items()] # if val != connect_request.connectionId ]
 
     print(f'{other_user_connections=}')
 
