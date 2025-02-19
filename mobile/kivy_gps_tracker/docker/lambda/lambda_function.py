@@ -108,7 +108,7 @@ def handle_update_location(event, context):
     web_soc_ids = response.json()
     print(f'{web_soc_ids=}')
 
-    user_location = event['body'].decode('utf-8')
+    user_location = event['body'] #.decode('utf-8')
     print(f'{user_location=}')
 
     #s3 = boto3.resource('s3')
