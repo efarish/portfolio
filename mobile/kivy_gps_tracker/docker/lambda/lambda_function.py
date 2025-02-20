@@ -1,4 +1,4 @@
-import json
+#import json
 
 import boto3
 import requests
@@ -81,23 +81,24 @@ def handle_conn_disc(event, context, action_type):
     return {'statusCode': 201, 'body': 'Connected.'} 
 
 def handle_update_location(event, context):
-
-    #headers = event['headers']
-
-    #if('Authorization' not in headers):
-    #    print('No Authorization header')
-    #    return {"statusCode": 401, 'body': 'User not authorized.'}
-    
+  
     connectionId = event['requestContext']['connectionId']
+    user_location = event['body']
+    print(f'{user_location=}')
+    domain_name = event["requestContext"]["domainName"]
+    stage = event["requestContext"]["stage"]
+    ws_call_back = f"https://{domain_name}/{stage}"
+    print(f'{ws_call_back=}')    
 
     api = get_api()
-
-    # The code below assumes the string in headers['authorization'] begins with "Bearer".
-    #request_header = {"Authorization": f"{headers['Authorization']}", "Content-Type": "application/json"}
-    #print(f'{request_header=}')
     url = api + '/websoc/get_websocket_ids'
     print(f'{url=}')
-    response = get_client().post(url, json={'connectionId': connectionId}, timeout=5) #headers=request_header,
+
+    response = get_client().post(url, 
+                                 json={'connectionId': connectionId, 
+                                       'location': user_location,
+                                       'callback': ws_call_back}, 
+                                 timeout=5) 
 
     if(response.status_code != 200):
         print(f'Error: {response.status_code}, {response.text}')
@@ -107,26 +108,6 @@ def handle_update_location(event, context):
 
     web_soc_ids = response.json()
     print(f'{web_soc_ids=}')
-
-    user_location = event['body'] #.decode('utf-8')
-    print(f'{user_location=}')
-
-    #s3 = boto3.resource('s3')
-    #config_json = s3.Object('a-unique-public-bucket-name', 'config.json').get()['Body'].read().decode('utf-8')  
-    #config = json.loads(config_json)  
-    #ws_call_back = config['config']['web_socket_callback']   
-    domain_name = event["requestContext"]["domainName"]
-    stage = event["requestContext"]["stage"]
-    ws_call_back = f"https://{domain_name}/{stage}"
-    print(f'{ws_call_back=}')
-
-    if len(web_soc_ids) > 0:
-        client = boto3.client('apigatewaymanagementapi', endpoint_url=ws_call_back) 
-        message=user_location.encode('utf-8')
-        for id in web_soc_ids:
-            response = client.post_to_connection(ConnectionId=id, Data=message)
-            print(response)
-    else: print('No connections to broadcast to.')
 
     return {'statusCode': 201, 'body': 'Location updated.'}
 

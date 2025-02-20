@@ -21,22 +21,22 @@ lf.get_client = get_client_override
 
 def test_connect():
     app.dependency_overrides[get_current_user] = get_mock_user
-    event = {'headers': {'authorization': 1}, 'requestContext': {'connectionId':1, 'eventType': 'CONNECT'}}
+    event = {'headers': {'authorization': 1}, 'requestContext': {'connectionId': "1", 'eventType': 'CONNECT'}}
     lf.lambda_handler_websocket(event, None)
 
 def test_disconnect():
     app.dependency_overrides[get_current_user] = get_mock_user
-    event = {'headers': {'authorization': 1}, 'requestContext': {'connectionId':1, 'eventType': 'DISCONNECT'}}
+    event = {'headers': {'authorization': 1}, 'requestContext': {'connectionId': "1", 'eventType': 'DISCONNECT'}}
     lf.lambda_handler_websocket(event, None)
 
 def test_lambda_handler_update_location():
     app.dependency_overrides[get_current_user] = get_mock_user
     event = {'headers': {'authorization': 1}, 
-             'requestContext': {'connectionId':1, 
+             'requestContext': {'connectionId': "1", 
                                 'eventType': 'MESSAGE',
                                 'domainName': 'bla.us-east1.com',
                                 'stage': 'production'},
-             'body': json.dumps({'user_name':'test', 'lat': 1.0, 'lng': 1.0 }).encode('utf-8')
+             'body': json.dumps({'user_name':'test', 'lat': 1.0, 'lng': 1.0 })
              }
     lf.lambda_handler_websocket(event, None)
     
