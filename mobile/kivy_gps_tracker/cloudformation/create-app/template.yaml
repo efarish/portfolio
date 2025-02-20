@@ -150,6 +150,8 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - execute-api:Invoke
+                  - execute-api:ManageConnections
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
