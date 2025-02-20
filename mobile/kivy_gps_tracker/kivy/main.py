@@ -216,7 +216,7 @@ class GpsTracker(App):
         if platform == "android":
             print("Android detected. Requesting permissions")
             self.request_android_permissions()
-        else: print(f'Not a supported platform: {platform}')
+        else: print(f'Platform detected: {platform}')
 
     def on_start(self):
         print("App started.")
