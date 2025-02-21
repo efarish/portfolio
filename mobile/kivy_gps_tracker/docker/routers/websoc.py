@@ -53,15 +53,21 @@ async def get_websocket_ids(connect_request: LocationUpdateRequest) -> List[str]
 
     print(f'{CONNECTIONS=}')
     
-    other_connections = [val for key, val in CONNECTIONS.items()] # if val != connect_request.connectionId ]
+    other_connections = [val for key, val in CONNECTIONS.items() if val != connect_request.connectionId ]
 
     print(f'{other_connections=}')
 
     if len(other_connections) > 0:
         client = boto3.client('apigatewaymanagementapi', endpoint_url=connect_request.callback) 
-        for id in other_connections:
-            response = client.post_to_connection(ConnectionId=id, Data=connect_request.location)
-            print(response)
+        try:
+            for id in other_connections:
+                response = client.post_to_connection(ConnectionId=id, Data=connect_request.location)
+                print(response)
+        except Exception as e:
+                print(f'Exception on WebSocket callback: {e}')
+        finally:
+            client.close()
+
     else: print('No connections to broadcast to.')
 
     return other_connections
