@@ -12,6 +12,15 @@ import sys
 import httpx
 import websockets
 
+CONFIG_API = 'https://a-unique-public-bucket-name.s3.us-east-1.amazonaws.com/config.json'
+
+def get_config() -> dict:
+    response = httpx.get(CONFIG_API)
+    print(f'Config:{response.text}')
+    props = response.json()['config'] 
+    print(f'{props=}')
+    return props
+
 
 class WebSocketClient:
     def __init__(self, uri, jwt_header):
@@ -41,23 +50,32 @@ class WebSocketClient:
 async def main(ws_api, admin_headers):
 
     client = WebSocketClient(ws_api, admin_headers)
+
     await client.connect()
 
-    await client.send("{'action':'updateLocation', 'user_name':'test_user', 'lat': 1.0, 'lng': 1.0}")
+    #await asyncio.sleep(5)
+
+    await client.send('{"action":"updateLocation", "user_name":"test_user", "lat": 40.7128, "lng": -74.0060}')
     response = await client.receive()
     print(f'Received: {response}')
+
+    #await asyncio.sleep(5)
     
-    await client.send("{'action':'updateLocation', 'user_name':'test_user', 'lat': 2.0, 'lng': 2.0}")
-    response2 = await client.receive()
-    print(f'Received: {response2}')
+    #await client.send("{'action':'updateLocation', 'user_name':'test_user', 'lat': 40.0, 'lng': 74.0}")
+    #response2 = await client.receive()
+    #print(f'Received: {response2}')
 
     await client.close()
     
 
 if __name__ == "__main__":
 
-    rest_api = 'https://35gjbulhtk.execute-api.us-east-1.amazonaws.com'
-    ws_api   = 'wss://8rbn146wuh.execute-api.us-east-1.amazonaws.com/production'
+    config = get_config()
+
+    print(f'config=')
+
+    rest_api = config['api'] #'https://wgq1eiqq1d.execute-api.us-east-1.amazonaws.com'
+    ws_api   = config['ws_api'] #'wss://ju9wgkz7wl.execute-api.us-east-1.amazonaws.com/production'
 
     print(f'{sys.argv=}')
 

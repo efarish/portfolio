@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,git+https://github.com/kivy-garden/mapview.git,git+https://github.com/kivy/plyer.git@master,android,httpx,httpcore,anyio,certifi,idna,h11,openssl,urllib3,requests,futures
+requirements = python3,kivy,git+https://github.com/kivy-garden/mapview.git,git+https://github.com/kivy/plyer.git@master,android,httpx,httpcore,anyio,certifi,idna,h11,openssl,urllib3,requests,futures,websockets
 
 # (list) Garden requirements
 #garden_requirements = mapview

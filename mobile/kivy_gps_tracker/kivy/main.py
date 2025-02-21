@@ -1,9 +1,12 @@
+import asyncio
+import json
 from os.path import dirname, join
 from threading import Thread
 
 import httpx
 from gpsblinker import GpsBlinker
 from plyer import gps
+from websocket_client import WebSocketClient
 
 from kivy.app import App
 from kivy.clock import mainthread
@@ -20,6 +23,33 @@ def get_config() -> dict:
     print(f'{props=}')
     return props
 
+async def location_updates(client):
+    try:
+        while True:
+            print('Waiting for location updates....')
+            position = await client.receive()
+            print(f'{position=}')
+            try:
+                position = json.loads(position)
+                App.get_running_app().update_blinker_positions([position,])
+            except Exception as e:
+                print(f'Location Update exception: {e}')
+    except asyncio.CancelledError as e:
+        print('Location updates canceled', e)
+    finally:
+        # when canceled, print that it finished
+        print('Stopped updates.')
+
+async def send_location_update(client, user, lat, lng):
+    try:
+        print('Sending location update....')
+        await client.send(f'{"user_name": "{user}"", "lat": {lat}, "lng": {lng}}')
+    except Exception as e:
+        print('Sending update failed:', e)
+    finally:
+        # when canceled, print that it finished
+        print('Done sending update.')
+
 class Interface(ScreenManager):
     """
     The Kivy user interface. 
@@ -35,10 +65,12 @@ class Interface(ScreenManager):
         self.token = None # JWT token of logged in user.
         self.user = None  # Application user name of logged in user.
         self.props = None # Application config retrieved from S3. 
+        self.location_update_task = None # Coroutine for location updates.
+        self.ws = None
 
     def switch_screen(self, screen_name: str):
         """
-        Method used to swtich between Kivy screens.
+        Method used to switch between Kivy screens.
         """
         self.current = screen_name
 
@@ -67,8 +99,10 @@ class Interface(ScreenManager):
                 self.token = token['access_token']
                 self.user = user
                 print(f'{self.token=}')
-                self.ids.userIdRegisterTxt.text = ""
-                self.ids.passwordRegisterTxt.text = ""                
+                jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
+                self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
+                loop = asyncio.get_event_loop()
+                self.location_update_task = loop.create_task(location_updates(self.ws))   
                 self.switch_screen('Map')
             else:
                 popup = Factory.ErrorPopup()
@@ -133,43 +167,14 @@ class Interface(ScreenManager):
     def signout_click(self):
         if gps: gps.stop
         if self.gps_blinker: self.gps_blinker.stop()
+        if self.location_update_task:
+            self.location_update_task.cancel()
+            self.location_update_task = None
+        if self.ws: 
+            self.ws.close()
+            self.ws = None
         self.ids.locationBtn.text = self.btn_send
         App.get_running_app().close_gps_app()
-
-
-def worker(gpsTracker):
-    """
-    Function to be called by worker Thread report application user's 
-      GPS position. The endpoint used to report the user GPS position
-      also returns the position of anyone else logged into the application.
-    """
-    print('Worker started')
-    token = gpsTracker.root.token
-    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    api = gpsTracker.root.props['api']
-
-    response = None
-    try:
-        response = httpx.post(api + '/location/update', 
-                                json={'user_name': 'user1', 'lat': gpsTracker.lat, 'lng': gpsTracker.lon},
-                                headers=headers)
-    except Exception as e:
-        print(f'Error occurred while sending location: {e}')
-
-    if response is None:
-        gpsTracker.update_blinker_positions([])
-    elif response.status_code == 201:
-        # Reporting of user's GPS position was successful.
-        #  The response will contain the GPS position of all other 
-        #  users logged into the application. 
-        positions = response.json()
-        gpsTracker.update_blinker_positions(positions)
-    elif response.status_code in [401, 403]: 
-        # Forbidden: probably a sign-in expiration.
-        #  Return user to login screen.
-        gpsTracker.root.signout_click()
-    else:
-        print(f'Location update failed: {response.status_code=} {response.text=}')
 
 class GpsTracker(App):
 
@@ -177,7 +182,9 @@ class GpsTracker(App):
         super().__init__(**kwargs)
         self.lastMarker = None
         self.has_centered_map = False
-        self.marker_list = []
+        self.marker_map = {}
+        self.lat = None
+        self.lon = None
 
     def request_android_permissions(self):
         """
@@ -233,8 +240,8 @@ class GpsTracker(App):
         if self.root.props['debug']:
           self.update_blinker_positions([])
         else:
-          p = Thread(target=worker, args=(self,))
-          p.start()
+          loop = asyncio.get_event_loop()
+          loop.create_task(send_location_update(self.ws, self.user, self.lat, self.lon))
 
     @mainthread
     def send_to_sign_in(self):
@@ -244,25 +251,28 @@ class GpsTracker(App):
     def update_blinker_positions(self, positions):
         # First update the application user's marker. 
         gps_blinker = self.root.ids.blinker
-        gps_blinker.lat = self.lat
-        gps_blinker.lon = self.lon
+        if self.lat and self.lon:
+            gps_blinker.lat = self.lat
+            gps_blinker.lon = self.lon
         map = self.root.ids.theMap
         # Remove other users markers.
-        for marker in self.marker_list:
-            marker.stop()
-            map.remove_marker(marker)
-        self.marker_list.clear()
-        # Add markers for any users found by the endpoint.
-        for pos in positions: 
-            if pos['user_name'] != self.root.user:
+        for pos in positions:
+            if pos['user_name'] == self.root.user:
+                continue
+            marker = self.marker_map.pop(pos['user_name'], ...)
+            if not marker is ...: 
+                marker.lat = pos['lat']
+                marker.lon = pos['lng']
+            else:
                 m = GpsBlinker() 
                 m.lat = pos['lat']
                 m.lon = pos['lng']
-                self.marker_list.append(m)
+                m.user_name = pos['user_name']
+                self.marker_map[m.user_name] = m
                 map.add_marker(m)
-                m.start()
+                m.start()            
         map.trigger_update(True)
-        if not self.has_centered_map:
+        if not self.has_centered_map and self.lat and self.lon:
             map.center_on(self.lat, self.lon)
             self.has_centered_map = True
 
@@ -273,12 +283,16 @@ class GpsTracker(App):
 
     def close_gps_app(self):
         map = self.root.ids.theMap
-        for marker in self.marker_list:
+        for marker in self.marker_map.values():
             marker.stop()
             map.remove_marker(marker)
-        self.marker_list.clear()
+        self.marker_map.clear()
         self.send_to_sign_in()
                 
 if __name__ == '__main__':
     
-    GpsTracker().run()
+    #GpsTracker().run()
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(GpsTracker().async_run(async_lib='asyncio'))
+    loop.close()
