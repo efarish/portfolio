@@ -1,42 +1,76 @@
+"""
+Client script that logs into remote app 
+  and opens websocket.
+
+Parameters:
+  usr - user name to login in with.
+  pwd - user password.
+"""
+import asyncio
+import sys
+
 import httpx
-import websocket
+import websockets
 
 
-def on_message(ws, message):
-    print(f"Received message: {message}")
+class WebSocketClient:
+    def __init__(self, uri, jwt_header):
+        self.uri = uri
+        self.jwt_header = jwt_header
+        self.websocket = None
+        
+    async def connect(self):
+        if self.websocket is None or self.websocket.state != websockets.State.OPEN:
+            self.websocket = await websockets.connect(uri=self.uri, additional_headers=self.jwt_header)
+            print(f"Connected to {self.uri}")
 
-def on_error(ws, error):
-    print(f"Encountered error: {error}")
+    async def send(self, message):
+        await self.connect()
+        await self.websocket.send(message)
 
-def on_close(ws, close_status_code, close_msg):
-    print("Connection closed")
-    print(f'{ws=}')
-    print(f'{close_status_code=}')
-    print(f'{close_msg=}')
+    async def receive(self):
+        await self.connect()
+        return await self.websocket.recv()
 
-def on_open(ws):
-    print("Connection opened")
-    #ws.send("Hello, Server!")
-    ws.send("{'action':'updateLocation', 'user_name':'test_user', 'lat': 1.0, 'lng': 1.0}")
+    async def close(self):
+         if self.websocket:
+            await self.websocket.close()
+            self.websocket = None
+            print("Disconnected")
+
+async def main(ws_api, admin_headers):
+
+    client = WebSocketClient(ws_api, admin_headers)
+    await client.connect()
+
+    await client.send("{'action':'updateLocation', 'user_name':'test_user', 'lat': 1.0, 'lng': 1.0}")
+    response = await client.receive()
+    print(f'Received: {response}')
+    
+    await client.send("{'action':'updateLocation', 'user_name':'test_user', 'lat': 2.0, 'lng': 2.0}")
+    response2 = await client.receive()
+    print(f'Received: {response2}')
+
+    await client.close()
+    
 
 if __name__ == "__main__":
 
-    api = 'https://ce0bls31xl.execute-api.us-east-1.amazonaws.com'
+    rest_api = 'https://35gjbulhtk.execute-api.us-east-1.amazonaws.com'
+    ws_api   = 'wss://8rbn146wuh.execute-api.us-east-1.amazonaws.com/production'
 
-    response = httpx.post(api + '/auth/token', data={"username": "admin", 
-                                                    "password": "a_password_", "grant_type": "password"},
-                            headers={"content-type": "application/x-www-form-urlencoded"})
+    print(f'{sys.argv=}')
+
+    usr = sys.argv[1]
+    pwd = sys.argv[2]
+
+    response = httpx.post(rest_api + '/auth/token', data={"username": usr, 
+                                                          "password": pwd, "grant_type": "password"},
+                                                    headers={"content-type": "application/x-www-form-urlencoded"})
     print(f'{response.status_code}')
     admin_token = response.json()
     print(f'{admin_token=}')
     admin_headers = {"Authorization": f"Bearer {admin_token['access_token']}", "Content-Type": "application/json"}
     print(f'{admin_headers=}')
 
-    ws = websocket.WebSocketApp("wss://ifr5fwz8g6.execute-api.us-east-1.amazonaws.com/production",
-                                on_message=on_message,
-                                on_error=on_error,
-                                on_close=on_close,
-                                header=admin_headers)
-    ws.on_open = on_open
-    ws.run_forever()
-    
+    asyncio.run(main(ws_api, admin_headers))
