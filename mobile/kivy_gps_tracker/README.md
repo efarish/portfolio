@@ -2,20 +2,33 @@
 
 THIS IS A WORK-IN-PROGRESS
 
-This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI framework for Python) to implement a mobile device tracker. The AWS highlights include a RESTFul API web service implemented using CloudFormation, CodePipeline, API Gateway, a Lambda Authorizer, ECS, FastAPI, and SQLAlchemy. A mobile client app is implemented using Kivy. Once installed, the app calls the web service to report its GSP location and to retrieve the locations of any other mobile device logged into the appliacation. The device locations are then displayed on an interactive map. 
+This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI framework for Python) to implement a mobile device tracker. Highlights include:
+
+* A RESTFul API web service implemented using FastAPI
+* IaC using CloudFormation
+* CI/CD using CodePipeline
+* HTTP and WebSocket API Gateways
+* AWS Lambda functions including an API Gateway Authorizer
+* ECS integration with API Gateway
+* Using SQLAlchemy for SQLite persistence
+* A Kivy mobile app which calls the API web service
+* PyTest for unit testing
+
+The Kivy mobile app reports its GSP location to an application stack deployed to AWS stack. The mobile app uses Kivy Garden MapView to visualize the device location and any other device logged into the service.  
 
 I made some architecture decisions to reduce the cost of deploying this app to AWS: 
 
 * Cloud Map instead of an ALB is used integrate API Gateway and ECS.
-* A single ECS task is provisioned.
-* SQLite is used for data storage. 
 * To avoid the expense of a NAT Gateway, all resources are deployed to a single public subnet. 
 
 A couple of additional notes:
 
 * Lambdas deployed to a public subnet have no internet access so VPC Interface Endpoints are used to access AWS services.
 * The ECS service is secured by using its security group to restrict inbound access to API Gateway, Cloud Map, and Lambda.   
-* Some of the AWS services used were for self-didactic teaching. For example, a Lambda Authorizer was included to experiment with securing an API Gateway. ECS and FastAPI are used to implement the endpoints instead of Lambda Functions. 
+* Some of the AWS services used were for self-didactic teaching. For example:
+  * A Lambda Authorizer was included to experiment with securing an API Gateway. 
+  * ECS and FastAPI are used to implement the endpoints instead of Lambda Functions.
+  * SQLite and SQLAlchemy are used to experiment with Python RDBMS persistence. 
  
 A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, an application load balancer is more expensive than Cloud Map. For larger clusters, this is probably not true.
 
@@ -34,10 +47,10 @@ A PyTest suite can be run using the `./docker/test/TestSuite.py` script.
 Three AWS CodePipelines are available to deploy and maintain this application.
 
 - Create Pipeline: Runs the CloudFormation templates found in the directory `./create-app` to create the application.
-- Update Lambda Pipeline: Update the Lambda with the latest code. 
+- Update Lambda Pipeline: Update the Lambdas with the latest code. 
 - Update Pipeline: Update the AWS ECS task with the latest code. 
 
-As soon as any of these pipeline are deployed to AWS, it executes. Therefore, be sure to create the `Create Pipeline` first, and the other two after that. The following SAM CLI commands were used to build and deploy the pipelines.
+As soon as any of these pipelines are deployed to AWS, it executes. Therefore, be sure to create the `Create Pipeline` first and let it finish. The two update pipelines only need to be run if the ECS or Lambda needs to be updated after the stack's initial deploy. The following SAM CLI commands were used to build and deploy the pipelines.
 
 ```bash
 
@@ -48,7 +61,7 @@ sam deploy
 
 Three AWS resources are not provisioned by `create-pipeline` and need to be manually created before running any of the pipelines:
 
-1. The AWS Developer Tools GitHub Connection referenced by the `GitHubConnectionArn` property in the pipeline templates will need to be manually created in any AWS account trying to run these pipelines. The connection needs to point to where this code is stored and its ARN used to update the pipeline templates property. For this project, the code was stored in the Git Hub repository `https://github.com/efarish/portfolio`. 
+1. The AWS Developer Tools GitHub Connection referenced by the `GitHubConnectionArn` property in the pipeline templates will need to be manually created in any AWS account trying to run these pipelines. The connection needs to point to where this code is stored and it's ARN used to update the pipeline template's property. For this project, the code was stored in the Git Hub repository `https://github.com/efarish/portfolio`. 
 2. An AWS ECR repository with the name `ecs1` is assumed to exist. This repository is referenced by the CloudFormation templates and the pipeline `buildspec.yml` files.
 3. CodePipeline requires an S3 bucket. To run these pipelines, replace the `S3ArtifactBucket` values in the template files with a bucket from the AWS account the pipelines are run in.
 
@@ -59,6 +72,10 @@ Below are clients provided in this project to interact with AWS.
 ## Jupyter Notebook
 
 In the `client` directory is a Jupyter notebook that has examples of called the AWS service.
+
+## A WebSocket Python Script
+
+A script to connect to the API Gateway WebSocket. 
 
 ## Kivy Client
 
@@ -135,7 +152,17 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 
 * The costs of demonstration projects can be significantly reduced with a few architecture decisions,
 * The up-front effort of implementing CI/CD pipelines and IaC templates reduces development time.
+* Mobile apps are fun.
+
+# Future Work
+
+* Create a version of this app with all Python code in Lambdas.
+* Use an AWS service for persistence.
+* Create a React Native mobile client.
 
 # TODO
 
 1. Add a CloudFormation template for the ECR repository.
+1. Update create stack pipeline to update S3 config file with WSS and API Gateway URIs.
+
+
