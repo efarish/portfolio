@@ -17,6 +17,7 @@ from kivy.utils import platform
 CONFIG_API = 'https://a-unique-public-bucket-name.s3.us-east-1.amazonaws.com/config.json'
 
 def get_config() -> dict:
+    """Method to download client app configuration."""
     response = httpx.get(CONFIG_API)
     print(f'Config:{response.text}')
     props = response.json()['config'] 
@@ -24,6 +25,7 @@ def get_config() -> dict:
     return props
 
 async def location_updates(client):
+    """Coroutine to receive location updates from WebSocket."""
     try:
         while True:
             print('Waiting for location updates....')
@@ -41,6 +43,7 @@ async def location_updates(client):
         print('Stopped updates.')
 
 async def send_location_update(client, user, lat, lng):
+    """Coroutine to send GPS location to server using WebSocket."""
     try:
         print('Sending location update....')
         await client.send(f'{"user_name": "{user}"", "lat": {lat}, "lng": {lng}}')
@@ -52,9 +55,10 @@ async def send_location_update(client, user, lat, lng):
 
 class Interface(ScreenManager):
     """
-    The Kivy user interface. 
+    The Kivy user interface. This class also managers location updates using: 
+      1) The GPS service started by the Kivy app class and 
+      2) Manages a WebSocket with the cloud service. 
     """
-
     btn_send = "Start Tracking..."
     btn_stop = "Stop Tracking"
 
@@ -66,7 +70,7 @@ class Interface(ScreenManager):
         self.user = None  # Application user name of logged in user.
         self.props = None # Application config retrieved from S3. 
         self.location_update_task = None # Coroutine for location updates.
-        self.ws = None
+        self.ws = None # A websocket connection.
 
     def switch_screen(self, screen_name: str):
         """
@@ -98,11 +102,7 @@ class Interface(ScreenManager):
             if response.status_code == 200:
                 self.token = token['access_token']
                 self.user = user
-                print(f'{self.token=}')
-                jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
-                self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
-                loop = asyncio.get_event_loop()
-                self.location_update_task = loop.create_task(location_updates(self.ws))   
+                print(f'{self.token=}')  
                 self.switch_screen('Map')
             else:
                 popup = Factory.ErrorPopup()
@@ -115,6 +115,7 @@ class Interface(ScreenManager):
             popup.open()
 
     def register(self):
+        """Create app users."""
         user = self.ids.userIdRegisterTxt.text
         pwd = self.ids.passwordRegisterTxt.text
         response = None
@@ -146,37 +147,56 @@ class Interface(ScreenManager):
     def on_map_relocated(self, **kwargs):
         pass
         
-    def location_click(self):
-        if self.ids.locationBtn.text == self.btn_send:
-            try:
-                if not self.gps_blinker:
-                    self.gps_blinker = self.ids.blinker
-                self.gps_blinker.start()                
-                gps.start(5000, 10)
-                self.ids.locationBtn.text = self.btn_stop                
-            except Exception as e:
-                print(f'{e=}')
-                popup = Factory.ErrorPopup()
-                popup.message.text = 'Location tracking failed.'
-                popup.open()
-        else:
-            self.ids.locationBtn.text = self.btn_send
-            self.gps_blinker.stop()
-            gps.stop()
+    def start_updates(self):
+        """Utility method to setup and initiate location updates."""
+        # Start User marker. 
+        if not self.gps_blinker:
+            self.gps_blinker = self.ids.blinker
+        self.gps_blinker.start()                
+        # Start User GPS updates.
+        gps.start(5000, 10)
+        self.ids.locationBtn.text = self.btn_stop
+        #Start WebSocket.
+        jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
+        self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
+        loop = asyncio.get_event_loop()
+        self.location_update_task = loop.create_task(location_updates(self.ws))         
 
-    def signout_click(self):
-        if gps: gps.stop
+    def stop_updates(self):
+        """Utility method to stop and deallocate resources for location updates."""
         if self.gps_blinker: self.gps_blinker.stop()
+        if gps: gps.stop
         if self.location_update_task:
             self.location_update_task.cancel()
             self.location_update_task = None
         if self.ws: 
             self.ws.close()
             self.ws = None
+
+    def location_click(self):
+        """Called by UI to start/stop location updates."""
+        if self.ids.locationBtn.text == self.btn_send:
+            try:
+                self.start_updates()
+            except Exception as e:
+                print(f'{e=}')
+                popup = Factory.ErrorPopup()
+                popup.message.text = 'Location tracking failed.'
+                popup.open()
+        else:
+            self.stop_updates()
+            self.ids.locationBtn.text = self.btn_send
+
+    def signout_click(self):
+        """Called by UI to logoff."""
+        self.stop_updates()
         self.ids.locationBtn.text = self.btn_send
         App.get_running_app().close_gps_app()
 
 class GpsTracker(App):
+    """
+    Kivy app class. This class also initializes the Kivy Garden GPS service.  
+    """
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -255,7 +275,7 @@ class GpsTracker(App):
             gps_blinker.lat = self.lat
             gps_blinker.lon = self.lon
         map = self.root.ids.theMap
-        # Remove other users markers.
+        # Remove other user markers.
         for pos in positions:
             if pos['user_name'] == self.root.user:
                 continue
@@ -291,8 +311,6 @@ class GpsTracker(App):
                 
 if __name__ == '__main__':
     
-    #GpsTracker().run()
-
     loop = asyncio.get_event_loop()
     loop.run_until_complete(GpsTracker().async_run(async_lib='asyncio'))
     loop.close()
