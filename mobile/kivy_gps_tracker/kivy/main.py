@@ -1,7 +1,5 @@
 import asyncio
 import json
-from os.path import dirname, join
-from threading import Thread
 
 import httpx
 from gpsblinker import GpsBlinker
