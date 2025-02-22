@@ -168,7 +168,8 @@ class Interface(ScreenManager):
             self.location_update_task.cancel()
             self.location_update_task = None
         if self.ws: 
-            self.ws.close()
+            loop = asyncio.get_event_loop()
+            loop.create_task(self.ws.close())            
             self.ws = None
 
     def location_click(self):
@@ -255,11 +256,9 @@ class GpsTracker(App):
         print(f'{gps_location=}')
         self.lon = kwargs['lon']
         self.lat = kwargs['lat']
-        if self.root.props['debug']:
-          self.update_blinker_positions([])
-        else:
-          loop = asyncio.get_event_loop()
-          loop.create_task(send_location_update(self.ws, self.user, self.lat, self.lon))
+        self.update_blinker_positions([])
+        loop = asyncio.get_event_loop()
+        loop.create_task(send_location_update(self.ws, self.user, self.lat, self.lon))
 
     @mainthread
     def send_to_sign_in(self):
