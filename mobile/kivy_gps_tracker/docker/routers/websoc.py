@@ -59,14 +59,14 @@ async def get_websocket_ids(connect_request: LocationUpdateRequest) -> List[str]
 
     if len(other_connections) > 0:
         client = boto3.client('apigatewaymanagementapi', endpoint_url=connect_request.callback) 
-        try:
-            for id in other_connections:
+        for id in other_connections:
+            try:
                 response = client.post_to_connection(ConnectionId=id, Data=connect_request.location)
                 print(response)
-        except Exception as e:
+            except Exception as e:
                 print(f'Exception on WebSocket callback: {e}')
-        finally:
-            client.close()
+                CONNECTIONS.pop(id,...) #Assuming connection id is not longer valid, so remove.
+        client.close()
 
     else: print('No connections to broadcast to.')
 
