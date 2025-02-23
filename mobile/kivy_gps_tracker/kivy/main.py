@@ -28,23 +28,28 @@ async def location_updates(client):
         while True:
             print('Waiting for location updates....')
             position = await client.receive()
-            print(f'{position=}')
+            print(f'Received a position update: {position=}')
             try:
                 position = json.loads(position)
-                App.get_running_app().update_blinker_positions([position,])
+                if not 'action' in position and not 'user_name' in position:
+                    print(f'Message not a position update: {position}')
+                else:
+                    App.get_running_app().update_blinker_positions([position,])
             except Exception as e:
                 print(f'Location Update exception: {e}')
-    except asyncio.CancelledError as e:
-        print('Location updates canceled', e)
+    except asyncio.CancelledError as ace:
+        print(f'Location updates canceled: {ace}')
+    except Exception as e:
+        print(f'Location update exception: {e}')        
     finally:
         # when canceled, print that it finished
-        print('Stopped updates.')
+        print('Stopped location updates.')
 
 async def send_location_update(client, user, lat, lng):
     """Coroutine to send GPS location to server using WebSocket."""
     try:
         print('Sending location update....')
-        await client.send(f'{"user_name": "{user}"", "lat": {lat}, "lng": {lng}}')
+        await client.send(f'{{"action":"updateLocation", "user_name": "{user}", "lat": {lat}, "lng": {lng}}}')
     except Exception as e:
         print('Sending update failed:', e)
     finally:
@@ -151,14 +156,13 @@ class Interface(ScreenManager):
         if not self.gps_blinker:
             self.gps_blinker = self.ids.blinker
         self.gps_blinker.start()                
-        # Start User GPS updates.
-        gps.start(5000, 10)
-        self.ids.locationBtn.text = self.btn_stop
         #Start WebSocket.
         jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
         self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
-        loop = asyncio.get_event_loop()
-        self.location_update_task = loop.create_task(location_updates(self.ws))         
+        loop = App.get_running_app().event_loop
+        self.location_update_task = loop.create_task(location_updates(self.ws))
+        # Start User GPS updates.
+        gps.start(5000, 10)         
 
     def stop_updates(self):
         """Utility method to stop and deallocate resources for location updates."""
@@ -168,7 +172,7 @@ class Interface(ScreenManager):
             self.location_update_task.cancel()
             self.location_update_task = None
         if self.ws: 
-            loop = asyncio.get_event_loop()
+            loop = App.get_running_app().event_loop
             loop.create_task(self.ws.close())            
             self.ws = None
 
@@ -176,6 +180,7 @@ class Interface(ScreenManager):
         """Called by UI to start/stop location updates."""
         if self.ids.locationBtn.text == self.btn_send:
             try:
+                self.ids.locationBtn.text = self.btn_stop
                 self.start_updates()
             except Exception as e:
                 print(f'{e=}')
@@ -197,8 +202,9 @@ class GpsTracker(App):
     Kivy app class. This class also initializes the Kivy Garden GPS service.  
     """
 
-    def __init__(self,**kwargs):
+    def __init__(self, event_loop, **kwargs):
         super().__init__(**kwargs)
+        self.event_loop = event_loop
         self.lastMarker = None
         self.has_centered_map = False
         self.marker_map = {}
@@ -257,8 +263,7 @@ class GpsTracker(App):
         self.lon = kwargs['lon']
         self.lat = kwargs['lat']
         self.update_blinker_positions([])
-        loop = asyncio.get_event_loop()
-        loop.create_task(send_location_update(self.ws, self.user, self.lat, self.lon))
+        self.event_loop.create_task(send_location_update(self.root.ws, self.root.user, self.lat, self.lon))
 
     @mainthread
     def send_to_sign_in(self):
@@ -266,7 +271,8 @@ class GpsTracker(App):
 
     @mainthread
     def update_blinker_positions(self, positions):
-        # First update the application user's marker. 
+        # First update the application user's marker.
+        print(f'Updating blinker positions with: {positions}') 
         gps_blinker = self.root.ids.blinker
         if self.lat and self.lon:
             gps_blinker.lat = self.lat
@@ -277,10 +283,12 @@ class GpsTracker(App):
             if pos['user_name'] == self.root.user:
                 continue
             marker = self.marker_map.pop(pos['user_name'], ...)
-            if not marker is ...: 
+            if not marker is ...:
+                print(f"Updating marker for {pos['user_name']}") 
                 marker.lat = pos['lat']
                 marker.lon = pos['lng']
             else:
+                print(f"Adding new marker for {pos['user_name']}")
                 m = GpsBlinker() 
                 m.lat = pos['lat']
                 m.lon = pos['lng']
@@ -305,9 +313,18 @@ class GpsTracker(App):
             map.remove_marker(marker)
         self.marker_map.clear()
         self.send_to_sign_in()
+
+    def run_app(self):
+        '''Run Kivy app.
+        '''
+        async def run_wrapper():
+            await self.async_run(async_lib='asyncio')
+            print('App done')
+
+        return self.event_loop.create_task(run_wrapper())
                 
 if __name__ == '__main__':
     
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(GpsTracker().async_run(async_lib='asyncio'))
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(GpsTracker(event_loop=loop).run_app())
     loop.close()

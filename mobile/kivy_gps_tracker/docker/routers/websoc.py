@@ -30,7 +30,7 @@ async def connect(connect_request: WebSocConnectRequest,
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')   
     
-    print(f'User {user.get('id')}:{user.get('user_name')} with websocket connect connection id: {connect_request.connectionId}')
+    print(f'User {user.get('id')}:{user.get('user_name')} connected with connection id: {connect_request.connectionId}')
     CONNECTIONS[user.get('user_name')] = connect_request.connectionId
     print(f'{CONNECTIONS=}')
 
@@ -39,7 +39,7 @@ async def disconnect(connect_request: WebSocConnectRequest,
                       user: user_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')   
-    print(f'{user.get('id')} websocket disconnect connection id: {connect_request.connectionId}')
+    print(f'{user.get('user_name')} disconnected with connection id: {connect_request.connectionId}')
     try:
         CONNECTIONS.pop(user.get('user_name'))
         print(f'{CONNECTIONS=}')

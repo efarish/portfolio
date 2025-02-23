@@ -51,21 +51,18 @@ async def main(ws_api, admin_headers):
 
     client = WebSocketClient(ws_api, admin_headers)
 
-    await client.connect()
+    #await client.connect()
 
     #await asyncio.sleep(5)
 
-    await client.send('{"action":"updateLocation", "user_name":"test_user", "lat": 40.7128, "lng": -74.0060}')
-    response = await client.receive()
-    print(f'Received: {response}')
-
-    #await asyncio.sleep(5)
+    await client.send('{"action":"updateLocation", "user_name":"mari", "lat": 40.6743044, "lng": -73.9735552}')
+    print(f'Message sent.')
     
-    #await client.send("{'action':'updateLocation', 'user_name':'test_user', 'lat': 40.0, 'lng': 74.0}")
-    #response2 = await client.receive()
-    #print(f'Received: {response2}')
+    while True:    
+        response = await client.receive()
+        print(f'Received: {response}')
 
-    await client.close()
+    #await client.close()
     
 
 if __name__ == "__main__":
