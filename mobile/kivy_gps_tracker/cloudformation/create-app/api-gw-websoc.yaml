@@ -24,7 +24,7 @@ Resources:
     - DisconnectRoute
     - DefaultRoute
     Properties:
-      ApiId: !Ref WebsocketAPI
+      ApiId: !Ref WebSocketApi
 
   ConnectRoute:
     Type: AWS::ApiGatewayV2::Route
