@@ -233,6 +233,16 @@ Resources:
         DiscoveryService: !GetAtt DiscoveryService.Arn
         LambdaAuthorizerArn: !GetAtt LambdaAuthorizerStack.Outputs.LambdaAuthArn
 
+  # API Gateway WebSocket
+  APIGatewayWebSocketStack:
+    DependsOn:
+      - LambdaAuthorizerStack
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./api-gw-websoc.yaml
+      Parameters:
+        LambdaAuthorizerArn: !GetAtt LambdaAuthorizerStack.Outputs.LambdaWebsocketArn
+
 # -------------------------------------------------------------------------
 # Information about the stack.
 # -------------------------------------------------------------------------
@@ -240,6 +250,6 @@ Outputs:
   ApiUrl:
     Description: API Gateway URL
     Value: !GetAtt APIGatewayStack.Outputs.ApiUrl 
-  LambdaAuthArn:
-    Description: Lambda Authorizer ARN
-    Value: !GetAtt LambdaAuthorizerStack.Outputs.LambdaAuthArn
+  WebSocketURI:
+    Description: WEebSocket API Gateway URL
+    Value: !GetAtt APIGatewayWebSocketStack.WebSocketUri

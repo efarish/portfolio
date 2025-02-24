@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: The template used to create an AWS API Gateway WebSocket.
+
+
+Parameters:
+  LambdaWebsocketArn: 
+    Type: String
+    Description: ARN of the lambda websocket handler.
+
+WebSocketApi:
+  Type: AWS::ApiGatewayV2::Api
+  Properties:
+    Name: !Sub "${AWS::StackName}-WebSocketApi"
+    ProtocolType: WEBSOCKET
+    RouteSelectionExpression: $request.body.action
+
+# Defines the deploy of API
+WebsocketAPIDeployment:
+  Type: AWS::ApiGatewayV2::Deployment
+  DependsOn:
+  - ConnectRoute
+  - DisconnectRoute
+  - DefaultRoute
+  Properties:
+    ApiId: !Ref WebsocketAPI
+
+ConnectRoute:
+  Type: AWS::ApiGatewayV2::Route
+  Properties:
+    ApiId: !Ref WebSocketApi
+    RouteKey: $connect
+    AuthorizationType: NONE
+    OperationName: ConnectRoute
+    Target: !Join
+      - "/"
+      - - "integrations"
+        - !Ref ConnectIntegration
+
+ConnectIntegration:
+  Type: AWS::ApiGatewayV2::Integration
+  Properties:
+    ApiId: !Ref WebSocketApi
+    Description: WebSocket Connect Integration
+    IntegrationType: AWS_PROXY
+    IntegrationUri: !Ref LambdaWebsocketArn
+
+DisconnectRoute:
+  Type: AWS::ApiGatewayV2::Route
+  Properties:
+    ApiId: !Ref WebSocketApi
+    RouteKey: $disconnect
+    AuthorizationType: NONE
+    OperationName: DisconnectRoute
+    Target: !Join
+      - "/"
+      - - "integrations"
+        - !Ref DisconnectIntegration
+
+DisconnectIntegration:
+  Type: AWS::ApiGatewayV2::Integration
+  Properties:
+    ApiId: !Ref WebSocketApi
+    Description: WebSocket Disconnect Integration
+    IntegrationType: AWS_PROXY
+    IntegrationUri: !Ref LambdaWebsocketArn
+
+DefaultRoute:
+  Type: AWS::ApiGatewayV2::Route
+  Properties:
+    ApiId: !Ref WebSocketApi
+    RouteKey: $default
+    AuthorizationType: NONE
+    OperationName: DefaultRoute
+    Target: !Join
+      - "/"
+      - - "integrations"
+        - !Ref DefaultIntegration
+
+DefaultIntegration:
+  Type: AWS::ApiGatewayV2::Integration
+  Properties:
+    ApiId: !Ref WebSocketApi
+    Description: WebSocket Default Integration
+    IntegrationType: AWS_PROXY
+    IntegrationUri: !Ref LambdaWebsocketArn
+
+WebSocketStage:
+  Type: AWS::ApiGatewayV2::Stage
+  Properties:
+    ApiId: !Ref WebSocketApi
+    StageName: "production"
+    AutoDeploy: true
+
+Outputs:
+  WebSocketUri:
+    Description: "The WSS Protocol URI"
+    Value: !Join [ '', [ 'wss://', !Ref WebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'WebSocketStage'] ]
