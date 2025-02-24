@@ -44,7 +44,9 @@ Resources:
       ApiId: !Ref WebSocketApi
       Description: WebSocket Connect Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri: !Ref LambdaWebsocketArn
+      IntegrationUri: 
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaWebsocketArn}/invocations
 
   DisconnectRoute:
     Type: AWS::ApiGatewayV2::Route
@@ -64,7 +66,9 @@ Resources:
       ApiId: !Ref WebSocketApi
       Description: WebSocket Disconnect Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri: !Ref LambdaWebsocketArn
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaWebsocketArn}/invocations
 
   DefaultRoute:
     Type: AWS::ApiGatewayV2::Route
@@ -84,7 +88,9 @@ Resources:
       ApiId: !Ref WebSocketApi
       Description: WebSocket Default Integration
       IntegrationType: AWS_PROXY
-      IntegrationUri: !Ref LambdaWebsocketArn
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaWebsocketArn}/invocations
 
   WebSocketStage:
     Type: AWS::ApiGatewayV2::Stage
