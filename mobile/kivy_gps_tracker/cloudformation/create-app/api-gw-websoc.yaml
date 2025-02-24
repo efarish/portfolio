@@ -12,7 +12,7 @@ Resources:
   WebSocketApi:
     Type: AWS::ApiGatewayV2::Api
     Properties:
-      Name: !Sub "${AWS::StackName}-WebSocketApi"
+      Name: Tracker-WebSocket-api
       ProtocolType: WEBSOCKET
       RouteSelectionExpression: $request.body.action
 
