@@ -96,4 +96,4 @@ Resources:
 Outputs:
   WebSocketUri:
     Description: "The WSS Protocol URI"
-    Value: !Join [ '', [ 'wss://', !Ref WebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'WebSocketStage'] ]
+    Value: !Join [ '', [ 'wss://', !Ref WebSocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'WebSocketStage'] ]
