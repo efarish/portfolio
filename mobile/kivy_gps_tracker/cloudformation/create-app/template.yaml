@@ -252,4 +252,4 @@ Outputs:
     Value: !GetAtt APIGatewayStack.Outputs.ApiUrl 
   WebSocketURI:
     Description: WEebSocket API Gateway URL
-    Value: !GetAtt APIGatewayWebSocketStack.WebSocketUri
+    Value: !GetAtt APIGatewayWebSocketStack.Outputs.WebSocketUri
