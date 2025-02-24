@@ -241,7 +241,7 @@ Resources:
     Properties:
       Location: ./api-gw-websoc.yaml
       Parameters:
-        LambdaAuthorizerArn: !GetAtt LambdaAuthorizerStack.Outputs.LambdaWebsocketArn
+        LambdaWebsocketArn: !GetAtt LambdaAuthorizerStack.Outputs.LambdaWebsocketArn
 
 # -------------------------------------------------------------------------
 # Information about the stack.
