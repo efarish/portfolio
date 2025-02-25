@@ -163,8 +163,8 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 # TODO
 
 1. Add a CloudFormation template for the ECR repository.
-1. Since API GW WS doesn't include JWT header on disconnect, need to update ECS to update using connection id.
 1. Kivy: WSS certification verification is turned off. Need to figure out how to get AWS cert in python. 
+1. Create endpoint to initialize users positions.
 1. Kivy: inactivity timeout.
 1. Kivy: Handle dropped websocket reconnect.
 1. Kivy: Handle JWT expiration.

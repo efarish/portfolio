@@ -31,20 +31,26 @@ async def connect(connect_request: WebSocConnectRequest,
         raise HTTPException(status_code=401, detail='Authentication Failed')   
     
     print(f'User {user.get('id')}:{user.get('user_name')} connected with connection id: {connect_request.connectionId}')
+    
     CONNECTIONS[user.get('user_name')] = connect_request.connectionId
+    
     print(f'{CONNECTIONS=}')
 
 @router.post("/disconnect", status_code=status.HTTP_201_CREATED)
-async def disconnect(connect_request: WebSocConnectRequest,
-                      user: user_dependency):
-    if user is None:
-        raise HTTPException(status_code=401, detail='Authentication Failed')   
-    print(f'{user.get('user_name')} disconnected with connection id: {connect_request.connectionId}')
-    try:
-        CONNECTIONS.pop(user.get('user_name'))
-        print(f'{CONNECTIONS=}')
-    except Exception as e:
-        print('Connection Id for user not found.')
+async def disconnect(connect_request: WebSocConnectRequest):
+
+    print(f'Disconnect called with connection id: {connect_request.connectionId}')
+    
+    print(f'{CONNECTIONS=}')
+
+    user_connection = [key for key, val in  CONNECTIONS.items() if val == connect_request.connectionId]
+
+    for user in user_connection:
+        print(f'Removing user: {user}')
+        CONNECTIONS.pop(user)
+
+    print(f'{CONNECTIONS=}')
+ 
 
 @router.post("/get_websocket_ids", status_code=status.HTTP_200_OK)
 async def get_websocket_ids(connect_request: LocationUpdateRequest) -> List[str]:
@@ -67,7 +73,6 @@ async def get_websocket_ids(connect_request: LocationUpdateRequest) -> List[str]
                 print(f'Exception on WebSocket callback: {e}')
                 CONNECTIONS.pop(id,...) #Assuming connection id is not longer valid, so remove.
         client.close()
-
     else: print('No connections to broadcast to.')
 
     return other_connections
