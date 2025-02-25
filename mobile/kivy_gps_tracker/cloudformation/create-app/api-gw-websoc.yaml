@@ -93,11 +93,11 @@ Resources:
         Fn::Sub:
           arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaWebsocketArn}/invocations
 
-  APIWebSocLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: /aws/apigateway/TrackerWebSocket
-      RetentionInDays: 1
+  #APIWebSocLogGroup:
+  #  Type: AWS::Logs::LogGroup
+  #  Properties:
+  #    LogGroupName: /aws/apigateway/TrackerWebSocket
+  #    RetentionInDays: 1
 
   WebSocketStage:
     Type: AWS::ApiGatewayV2::Stage
@@ -113,7 +113,7 @@ Resources:
   OnConnectPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
-      - WebsocketAPI
+      - WebSocketApi
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref LambdaWebsocketArn
