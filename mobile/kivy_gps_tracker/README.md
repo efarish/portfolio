@@ -162,7 +162,6 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 
 # TODO
 
-1. Create CF template for API GW Websocket.
 1. Add a CloudFormation template for the ECR repository.
 1. Update create stack pipeline to update S3 config file with WSS and API Gateway URIs.
 1. Since API GW WS doesn't include JWT header on disconnect, need to update ECS to update using connection id.

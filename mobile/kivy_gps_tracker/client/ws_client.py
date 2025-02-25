@@ -30,6 +30,7 @@ class WebSocketClient:
         
     async def connect(self):
         if self.websocket is None or self.websocket.state != websockets.State.OPEN:
+            print(f'{self.uri=}')
             self.websocket = await websockets.connect(uri=self.uri, additional_headers=self.jwt_header)
             print(f"Connected to {self.uri}")
 
@@ -51,10 +52,6 @@ async def main(ws_api, admin_headers):
 
     client = WebSocketClient(ws_api, admin_headers)
 
-    #await client.connect()
-
-    #await asyncio.sleep(5)
-
     await client.send('{"action":"updateLocation", "user_name":"mari", "lat": 40.6743044, "lng": -73.9735552}')
     print(f'Message sent.')
     
@@ -71,8 +68,8 @@ if __name__ == "__main__":
 
     print(f'config=')
 
-    rest_api = config['api'] #'https://wgq1eiqq1d.execute-api.us-east-1.amazonaws.com'
-    ws_api   = config['ws_api'] #'wss://ju9wgkz7wl.execute-api.us-east-1.amazonaws.com/production'
+    rest_api = config['api'] 
+    ws_api = config['ws_api'] 
 
     print(f'{sys.argv=}')
 
