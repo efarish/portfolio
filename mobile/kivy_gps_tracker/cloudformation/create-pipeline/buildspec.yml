@@ -7,7 +7,7 @@ phases:
       - PROJECT_NAME=kivy_gps_tracker # Used build path to source files.
       - ECR_REPO=ecs1                 # Name of ECR image repository.
       - DOCKER_IMAGE_NAME=tracker     # Name of Tracker Docker image.
-      - DOCKER_LAMBDA_IMAGE_NAME=lambda # Name of Lambda Docker image.
+      - DOCKER_LAMBDA_IMAGE_NAME=tracker_lambda # Name of Lambda Docker image.
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - ECR_IMG_NAME=${ECR_REPO}:${DOCKER_IMAGE_NAME}
       - ECR_LAMBDA_IMG_NAME=${ECR_REPO}:${DOCKER_LAMBDA_IMAGE_NAME}

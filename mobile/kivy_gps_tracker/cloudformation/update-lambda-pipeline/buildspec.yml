@@ -9,7 +9,7 @@ phases:
       - LAMBDA_FUNC_NAME=LambdaAuth
       - LAMBDA_FUNC_NAME_WEBSOCKET=LambdaWebSocket
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-      - IMG_NAME=lambda
+      - IMG_NAME=tracker_lambda
       - ECR_IMG_NAME=${ECR_REPO}:${IMG_NAME}
       - ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_IMG_NAME}-${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
