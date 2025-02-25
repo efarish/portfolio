@@ -165,6 +165,18 @@ Resources:
                 - Name: BuildArtifact
               Region: !Ref AWS::Region
               Namespace: DeployVariables
+            - Name: S3ConfigCopy
+              ActionTypeId:
+                Category: Compute
+                Owner: AWS
+                Provider: Commands
+                Version: '1'
+              RunOrder: 2
+              RoleArn: !GetAtt CodePipeLineECSRole.Arn
+              Region: !Ref AWS::Region
+              Commands:
+                - echo "{\"config\":{\"api\":\"#{DeployVariables.ApiUrl}\", \"ws_api\":\"#{DeployVariables.WebSocketURI}\", \"debug\":\"\" }}" > config.json
+                - aws s3 cp ./config.json s3://a-unique-public-bucket-name
 
            
 
