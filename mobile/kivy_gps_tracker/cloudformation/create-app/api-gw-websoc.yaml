@@ -96,15 +96,15 @@ Resources:
   APIWebSocLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        LogGroupName: !Sub /aws/apigateway/Tracker-WebSocket-api
+        LogGroupName: /aws/apigateway/Tracker-WebSocket-api
         RetentionInDays: 1
 
   WebSocketStage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:
-      ApiId: !Ref WebSocketApi
-      StageName: "production"
+      StageName: production
       AutoDeploy: true
+      ApiId: !Ref WebSocketApi
       AccessLogSettings:
         DestinationArn: !GetAtt APIWebSocLogGroup.Arn 
         Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'
