@@ -96,7 +96,7 @@ Resources:
   APIWebSocLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
-        LogGroupName: /aws/apigateway/Tracker-WebSocket-api
+        LogGroupName: /aws/apigateway/TrackerWebSocket
         RetentionInDays: 1
 
   WebSocketStage:
