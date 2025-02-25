@@ -105,9 +105,19 @@ Resources:
       StageName: production
       AutoDeploy: true
       ApiId: !Ref WebSocketApi
-      AccessLogSettings:
-        DestinationArn: !GetAtt APIWebSocLogGroup.Arn 
-        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'
+      #AccessLogSettings:
+      #  DestinationArn: !GetAtt APIWebSocLogGroup.Arn 
+      #  Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'
+
+  # Defines permission to Websocket API invoke the Lambda Function
+  OnConnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - WebsocketAPI
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaWebsocketArn
+      Principal: apigateway.amazonaws.com
 
 Outputs:
   WebSocketUri:
