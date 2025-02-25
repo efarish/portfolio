@@ -13,6 +13,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: Tracker-WebSocket-api
+      Description: WebSocket API Linking to Tracker Service.
       ProtocolType: WEBSOCKET
       RouteSelectionExpression: $request.body.action
 
@@ -92,12 +93,21 @@ Resources:
         Fn::Sub:
           arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaWebsocketArn}/invocations
 
+  APIWebSocLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/apigateway/Tracker-WebSocket-api
+        RetentionInDays: 1
+
   WebSocketStage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:
       ApiId: !Ref WebSocketApi
       StageName: "production"
       AutoDeploy: true
+      AccessLogSettings:
+        DestinationArn: !GetAtt APIWebSocLogGroup.Arn 
+        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'
 
 Outputs:
   WebSocketUri:
