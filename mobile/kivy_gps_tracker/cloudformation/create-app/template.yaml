@@ -214,7 +214,7 @@ Resources:
       Parameters:
         VpcId: !GetAtt VPC.Outputs.VpcId
         DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
-        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:lambda
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:tracker_lambda
         LambdaSecurityGroup: !Ref LambdaSecurityGroup
 
   # API Gateway
