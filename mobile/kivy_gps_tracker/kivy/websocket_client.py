@@ -1,5 +1,6 @@
 import ssl
 
+import certifi
 import websockets
 
 
@@ -10,21 +11,20 @@ class WebSocketClient:
         self.websocket = None
         
     async def connect(self):
-        if self.websocket is None or self.websocket.state != websockets.State.OPEN:
+        if self.websocket is None: # or self.websocket.state != websockets.State.OPEN:
             print(f'Connecting with wss URI: {self.uri}')
-            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            ssl_context.check_hostname = False
-            ssl_context.verify_mode = ssl.CERT_NONE
+            #ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            #ssl_context.check_hostname = False
+            #ssl_context.verify_mode = ssl.CERT_NONE
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
             self.websocket = await websockets.connect(uri=self.uri, ssl=ssl_context, 
                                                       additional_headers=self.jwt_header)
             print(f"Connected to {self.uri}")
 
     async def send(self, message):
-        await self.connect()
         await self.websocket.send(message)
 
     async def receive(self):
-        await self.connect()
         return await self.websocket.recv()
 
     async def close(self):

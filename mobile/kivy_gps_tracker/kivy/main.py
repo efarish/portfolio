@@ -97,7 +97,7 @@ class Interface(ScreenManager):
             return
         
         try:
-            response = httpx.post(self.props['api'] + '/auth/token', 
+            response = httpx.post(self.props['api'] + 'auth/token', 
                                 data={"username": user, "password": pwd, "grant_type": "password"},
                                 headers={"content-type": "application/x-www-form-urlencoded"})
             print(f'{response.status_code}')
@@ -129,7 +129,7 @@ class Interface(ScreenManager):
             return
         try:
             self.props = get_config()
-            response = httpx.post(self.props['api'] + '/users/create_user', 
+            response = httpx.post(self.props['api'] + 'users/create_user', 
                                 json={"user_name": user, "password": pwd, "role": "user"})
         except Exception as e:
             print(f'{e=}')
@@ -150,7 +150,7 @@ class Interface(ScreenManager):
     def on_map_relocated(self, **kwargs):
         pass
         
-    def start_updates(self):
+    async def start_updates(self):
         """Utility method to setup and initiate location updates."""
         # Start User marker. 
         if not self.gps_blinker:
@@ -159,15 +159,22 @@ class Interface(ScreenManager):
         #Start WebSocket.
         jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
         self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
+        await self.ws.connect()
         loop = App.get_running_app().event_loop
         self.location_update_task = loop.create_task(location_updates(self.ws))
-        # Start User GPS updates.
-        gps.start(5000, 10)         
+        #Start User GPS updates.
+        try:
+            gps.start(5000, 10)
+        except NotImplementedError:
+            print(f'No GSP support on this platform.')         
 
     def stop_updates(self):
         """Utility method to stop and deallocate resources for location updates."""
         if self.gps_blinker: self.gps_blinker.stop()
-        if gps: gps.stop
+        try:
+          gps.stop()
+        except NotImplementedError:
+            print(f'No GSP support on this platform.')
         if self.location_update_task:
             self.location_update_task.cancel()
             self.location_update_task = None
@@ -181,7 +188,7 @@ class Interface(ScreenManager):
         if self.ids.locationBtn.text == self.btn_send:
             try:
                 self.ids.locationBtn.text = self.btn_stop
-                self.start_updates()
+                loop.create_task(self.start_updates())
             except Exception as e:
                 print(f'{e=}')
                 popup = Factory.ErrorPopup()
@@ -282,7 +289,7 @@ class GpsTracker(App):
         for pos in positions:
             if pos['user_name'] == self.root.user:
                 continue
-            marker = self.marker_map.pop(pos['user_name'], ...)
+            marker = self.marker_map.get(pos['user_name'], ...)
             if not marker is ...:
                 print(f"Updating marker for {pos['user_name']}") 
                 marker.lat = pos['lat']
@@ -326,5 +333,6 @@ class GpsTracker(App):
 if __name__ == '__main__':
     
     loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop) 
     loop.run_until_complete(GpsTracker(event_loop=loop).run_app())
     loop.close()

@@ -76,7 +76,7 @@ if __name__ == "__main__":
     usr = sys.argv[1]
     pwd = sys.argv[2]
 
-    response = httpx.post(rest_api + '/auth/token', data={"username": usr, 
+    response = httpx.post(rest_api + 'auth/token', data={"username": usr, 
                                                           "password": pwd, "grant_type": "password"},
                                                     headers={"content-type": "application/x-www-form-urlencoded"})
     print(f'{response.status_code}')
