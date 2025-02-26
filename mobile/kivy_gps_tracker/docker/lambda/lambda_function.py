@@ -59,20 +59,23 @@ def handle_conn_disc(event, context, action_type):
 
     headers = event['headers']
 
-    if('Authorization' not in headers):
+    if(action_type == 'connect' and 'Authorization' not in headers):
         print('No Authorization header')
         return {"statusCode": 401, 'body': 'User not authorized.'}
     
     connectionId = event['requestContext']['connectionId']
 
     api = get_api()
-
-    # The code below assumes the string in headers['authorization'] begins with "Bearer".
-    request_header = {"Authorization": f"{headers['Authorization']}", "Content-Type": "application/json"}
-    print(f'{request_header=}')
     url = f'{api}/websoc/{action_type}'
     print(f'{url=}')
-    response = get_client().post(url, json={'connectionId': connectionId}, headers=request_header, timeout=5)
+
+    # The code below assumes the string in headers['authorization'] begins with "Bearer".
+    if action_type == 'connect':
+        request_header = {"Authorization": f"{headers['Authorization']}", "Content-Type": "application/json"}
+        print(f'{request_header=}')
+        response = get_client().post(url, json={'connectionId': connectionId}, headers=request_header, timeout=5)
+    else: 
+        response = get_client().post(url, json={'connectionId': connectionId}, timeout=5)
 
     if(response.status_code != 201):
         print(f'Error: {response.status_code}, {response.text}')
