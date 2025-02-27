@@ -38,7 +38,7 @@ The architecture diagram is below.
   <img src="./assets/img/Tracker.png" />
 </p>
 
-The API Gateway HTTP handles sign-ins and creating users. The API Gateway WebSocket handles GPS updates sent sent by the Kivy client installed on mobile devices.
+The API Gateway HTTP handles sign-ins and creating users. The API Gateway WebSocket handles GPS updates sent by the Kivy client installed on mobile devices.
 
 # Test Suite
 
@@ -74,11 +74,11 @@ Below are clients provided in this project to interact with AWS.
 
 ## Jupyter Notebook
 
-In the `client` directory is a Jupyter notebook that has examples of called the AWS service.
+In the `client` directory is a Jupyter notebook that has examples of called the AWS API Gateway HTTP API.
 
 ## A WebSocket Python Script
 
-A script to connect to the API Gateway WebSocket. 
+A script demonstrating sending and receiving message to the AWS API Gateway WebSocket API. 
 
 ## Kivy Client
 
