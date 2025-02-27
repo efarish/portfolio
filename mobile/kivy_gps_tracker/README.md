@@ -35,7 +35,7 @@ A final note on costs. For small ECS clusters, the AWS cost for public IPs and V
 The architecture diagram is below.
 
 <p align="center">
-  <img src="./assets/img/tracker.png" />
+  <img src="./assets/img/Tracker.png" />
 </p>
 
 The API Gateway HTTP handles sign-ins and creating users. The API Gateway WebSocket handles GPS updates sent sent by the Kivy client installed on mobile devices.
