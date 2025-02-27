@@ -35,8 +35,10 @@ A final note on costs. For small ECS clusters, the AWS cost for public IPs and V
 The architecture diagram is below.
 
 <p align="center">
-  <img src="./assets/img/nw1.png" />
+  <img src="./assets/img/tracker.png" />
 </p>
+
+The API Gateway HTTP handles sign-ins and creating users. The API Gateway WebSocket handles GPS updates sent sent by the Kivy client installed on mobile devices.
 
 # Test Suite
 
@@ -141,9 +143,9 @@ Let the deletion of each stack finish before deleting the next.
 
 The Docker images in the `ecs1` repository created for this project need to be deleted.
 
-### S3 Bucket
+### S3 Buckets
 
-Delete the bucket created for the pipelines.
+Delete the buckets created for the pipelines.
 
 ### Github Code Connection
 
