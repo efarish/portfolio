@@ -159,12 +159,6 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 * Create a version of this app with all Python code in Lambdas.
 * Use an AWS service for persistence.
 * Create a React Native mobile client.
-
-# TODO
-
-1. Create endpoint to initialize users positions.
-1. Kivy: add inactivity timeout.
-1. Kivy: add ability to handle dropped websocket reconnect.
-1. Kivy: Handle JWT expiration.
+* In Kivy client: add inactivity and JWT timeout and reconnect on websocket drop
 
 

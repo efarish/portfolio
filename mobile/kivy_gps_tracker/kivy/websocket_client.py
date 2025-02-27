@@ -13,9 +13,6 @@ class WebSocketClient:
     async def connect(self):
         if self.websocket is None: # or self.websocket.state != websockets.State.OPEN:
             print(f'Connecting with wss URI: {self.uri}')
-            #ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            #ssl_context.check_hostname = False
-            #ssl_context.verify_mode = ssl.CERT_NONE
             ssl_context = ssl.create_default_context(cafile=certifi.where())
             self.websocket = await websockets.connect(uri=self.uri, ssl=ssl_context, 
                                                       additional_headers=self.jwt_header)
@@ -32,3 +29,4 @@ class WebSocketClient:
             await self.websocket.close()
             self.websocket = None
             print("Disconnected")
+
