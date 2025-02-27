@@ -63,12 +63,8 @@ async def create_user_util(db, create_user_request):
 
 @router.post("/create_user", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency,
-                      create_user_request: CreateUserRequest,
-                      user: user_dependency):
-    
-    if user is None or user.get('role') != 'admin':
-        raise HTTPException(status_code=401, detail='Authentication Failed')   
-    
+                      create_user_request: CreateUserRequest):
+        
     await create_user_util(db, create_user_request)
 
 @router.put("/update", status_code=status.HTTP_204_NO_CONTENT)
