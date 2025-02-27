@@ -1,7 +1,5 @@
 # Project: Mobile Device Tracker
 
-THIS IS A WORK-IN-PROGRESS
-
 This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI framework for Python) to implement a mobile device tracker. Highlights include:
 
 * A RESTFul API web service implemented using FastAPI running on ECS
@@ -9,6 +7,7 @@ This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI fram
 * CI/CD using CodePipeline
 * HTTP and WebSocket API Gateways
 * AWS Lambda functions including an API Gateway Authorizer
+* Using Docker images for Lambda and ECS code.
 * ECS integration with API Gateway
 * Using SQLAlchemy for SQLite persistence
 * A Kivy mobile app send GPS location info to the web service
