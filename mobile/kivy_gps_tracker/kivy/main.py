@@ -166,7 +166,7 @@ class Interface(ScreenManager):
         try:
             gps.start(5000, 10)
         except NotImplementedError:
-            print(f'No GSP support on this platform.')         
+            print(f'No GPS support on this platform.')         
 
     def stop_updates(self):
         """Utility method to stop and deallocate resources for location updates."""
@@ -174,7 +174,7 @@ class Interface(ScreenManager):
         try:
           gps.stop()
         except NotImplementedError:
-            print(f'No GSP support on this platform.')
+            print(f'No GPS support on this platform.')
         if self.location_update_task:
             self.location_update_task.cancel()
             self.location_update_task = None
