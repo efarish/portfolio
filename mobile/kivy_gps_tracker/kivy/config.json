@@ -1,8 +1,0 @@
-{
-    "config": {
-        "api": "https://mqycl1yk2g.execute-api.us-east-1.amazonaws.com",
-        "ws_api": "wss://ht1lv89nxe.execute-api.us-east-1.amazonaws.com/production",
-        "debug": ""
-    } 
-
-}
