@@ -4,26 +4,26 @@ THIS IS A WORK-IN-PROGRESS
 
 This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI framework for Python) to implement a mobile device tracker. Highlights include:
 
-* A RESTFul API web service implemented using FastAPI
+* A RESTFul API web service implemented using FastAPI running on ECS
 * IaC using CloudFormation
 * CI/CD using CodePipeline
 * HTTP and WebSocket API Gateways
 * AWS Lambda functions including an API Gateway Authorizer
 * ECS integration with API Gateway
 * Using SQLAlchemy for SQLite persistence
-* A Kivy mobile app which calls the API web service
+* A Kivy mobile app send GPS location info to the web service
 * PyTest for unit testing
 
-The Kivy mobile app reports its GSP location to an application stack deployed to AWS stack. The mobile app uses Kivy Garden MapView to visualize the device location and any other device logged into the service.  
+The Kivy mobile app reports its GSP location to an application stack deployed to AWS. The mobile app uses Kivy Garden MapView to visualize the device location and any other device logged into the service.  
 
 I made some architecture decisions to reduce the cost of deploying this app to AWS: 
 
-* Cloud Map instead of an ALB is used integrate API Gateway and ECS.
+* Cloud Map instead of an Application Load Balancer is used integrate API Gateway and ECS.
 * To avoid the expense of a NAT Gateway, all resources are deployed to a single public subnet. 
 
 A couple of additional notes:
 
-* Lambdas deployed to a public subnet have no internet access so VPC Interface Endpoints are used to access AWS services.
+* Lambdas deployed to a public subnet have no internet access, so VPC Interface Endpoints are used to access AWS services.
 * The ECS service is secured by using its security group to restrict inbound access to API Gateway, Cloud Map, and Lambda.   
 * Some of the AWS services used were for self-didactic teaching. For example:
   * A Lambda Authorizer was included to experiment with securing an API Gateway. 
@@ -44,9 +44,9 @@ A PyTest suite can be run using the `./docker/test/TestSuite.py` script.
 
 # AWS Deployment
 
-Three AWS CodePipelines are available to deploy and maintain this application.
+In the directory `./cloudformation/` are three AWS CodePipelines to deploy and maintain this application.
 
-- Create Pipeline: Runs the CloudFormation templates found in the directory `./create-app` to create the application.
+- Create Pipeline: Runs the CloudFormation templates found in the directory `./cloudformation/create-app` to create the application.
 - Update Lambda Pipeline: Update the Lambdas with the latest code. 
 - Update Pipeline: Update the AWS ECS task with the latest code. 
 
@@ -59,11 +59,12 @@ sam deploy
 
 ```
 
-Three AWS resources are not provisioned by `create-pipeline` and need to be manually created before running any of the pipelines:
+Four AWS resources are not provisioned by `create-pipeline` and need to be manually created before running any of the pipelines:
 
 1. The AWS Developer Tools GitHub Connection referenced by the `GitHubConnectionArn` property in the pipeline templates will need to be manually created in any AWS account trying to run these pipelines. The connection needs to point to where this code is stored and it's ARN used to update the pipeline template's property. For this project, the code was stored in the Git Hub repository `https://github.com/efarish/portfolio`. 
 2. An AWS ECR repository with the name `ecs1` is assumed to exist. This repository is referenced by the CloudFormation templates and the pipeline `buildspec.yml` files.
 3. CodePipeline requires an S3 bucket. To run these pipelines, replace the `S3ArtifactBucket` values in the template files with a bucket from the AWS account the pipelines are run in.
+4. `Create Pipeline` pushes a configuration file called `config.json` containing the latest API Gateway HTTP And Websocket URLs to a public S3 bucket called `s3://a-unique-public-bucket-name`. The Kivy client makes an HTTP request to this this bucket to get `config.json` files.  
 
 # Clients
 

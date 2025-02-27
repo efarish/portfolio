@@ -1,3 +1,6 @@
+"""
+REST FastAPI for persisting the location history of users.  
+"""
 from decimal import Decimal
 from typing import Annotated, List
 
