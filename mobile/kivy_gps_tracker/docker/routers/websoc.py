@@ -52,9 +52,11 @@ async def disconnect(connect_request: WebSocConnectRequest):
     print(f'{CONNECTIONS=}')
  
 
-@router.post("/get_websocket_ids", status_code=status.HTTP_200_OK)
-async def get_websocket_ids(connect_request: LocationUpdateRequest) -> List[str]:
-    
+@router.post("/update_location", status_code=status.HTTP_200_OK)
+async def update_location(connect_request: LocationUpdateRequest) -> List[str]:
+    """
+    Distributes location reported by a user to all other users signed into the app.  
+    """
     print(f'Websocket update location: {connect_request.connectionId}')
 
     print(f'{CONNECTIONS=}')

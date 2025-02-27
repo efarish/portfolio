@@ -92,7 +92,7 @@ def handle_update_location(event, context):
     print(f'{ws_call_back=}')    
 
     api = get_api()
-    url = api + '/websoc/get_websocket_ids'
+    url = api + '/websoc/update_location'
     print(f'{url=}')
 
     response = get_client().post(url, 
