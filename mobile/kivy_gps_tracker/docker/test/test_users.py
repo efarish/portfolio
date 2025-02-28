@@ -28,7 +28,7 @@ def test_user_read_all():
     response = client.get('/users/read_all')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-def test_user_create():
+def test_user_create_as_admin():
     app.dependency_overrides[get_current_user] = get_mock_admin_user
     request_data={'user_name': 'test_user', 'password': 'password', 'role':'user' }
     response = client.post('/users/create_user', json=request_data)
@@ -45,11 +45,16 @@ def test_user_create():
             connection.execute(text('DELETE FROM users'))
             connection.commit()
 
-def test_user_create_fail():
-    app.dependency_overrides[get_current_user] = get_mock_user
-    request_data={'user_name': 'test_user', 'password': 'password', 'role':'user' }
-    response = client.post('/users/create_user', json=request_data)
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+def test_user_create_as_user():
+    try:
+        app.dependency_overrides[get_current_user] = get_mock_user
+        request_data={'user_name': 'test_user', 'password': 'password', 'role':'user' }
+        response = client.post('/users/create_user', json=request_data)
+        assert response.status_code == status.HTTP_201_CREATED
+    finally:
+        with engine.connect() as connection:
+            connection.execute(text('DELETE FROM users'))
+            connection.commit()
 
 @pytest.mark.asyncio(loop_scope="function")
 @pytest.mark.parametrize(

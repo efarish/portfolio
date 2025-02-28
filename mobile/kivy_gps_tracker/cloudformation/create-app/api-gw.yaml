@@ -122,7 +122,19 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApiSvcConnect
-      RouteKey: 'POST /location/update'
+      RouteKey: 'POST /location/get_locations'
+      AuthorizationType: CUSTOM
+      AuthorizerId: !GetAtt Authorizer.AuthorizerId
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute6:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiSvcConnect
+      RouteKey: 'GET /location/get_latest_locations'
       AuthorizationType: CUSTOM
       AuthorizerId: !GetAtt Authorizer.AuthorizerId
       Target: !Join

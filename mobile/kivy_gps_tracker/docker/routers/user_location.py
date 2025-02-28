@@ -29,7 +29,7 @@ class GetUserLocationRequest(BaseModel):
     ids: List[int]
 
 class UserLocations(BaseModel):
-    id: int
+    id: int | None
     user_name: str
     lat: Decimal = Field(max_digits=12, decimal_places=8)
     lng: Decimal = Field(max_digits=12, decimal_places=8)
@@ -43,7 +43,8 @@ db_dependency = Annotated[Session, Depends(get_db)]
 @router.post("/get_locations", status_code=status.HTTP_200_OK, response_model=List[UserLocations])
 async def get_user_locations(user: user_dependency, db: db_dependency,
                                get_user_location: GetUserLocationRequest):
-    if user is None:
+    
+    if user is None or user.get('role') != 'admin':
         raise HTTPException(status_code=401, detail='Authentication Failed')
     
     ul = aliased(User_Location)
@@ -52,21 +53,14 @@ async def get_user_locations(user: user_dependency, db: db_dependency,
         .filter(Users.id.in_(get_user_location.ids))
     result = await db.execute(statement)
     locs = result.fetchall()
+
     return locs
 
-@router.post("/update", status_code=status.HTTP_201_CREATED, response_model=List[UserLocations])
-async def update_user_location(user: user_dependency, db: db_dependency,
-                               update_user_location: UpdateLocationRequest):
+@router.get("/get_latest_locations", status_code=status.HTTP_200_OK, response_model=List[UserLocations])
+async def get_latest_locations(db: db_dependency, user: user_dependency,):
+
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
-    
-    user_location_model = User_Location(
-        user_id=user.get('id'), 
-        lat=update_user_location.lat,
-        lng=update_user_location.lng
-    )
-    db.add(user_location_model)
-    await db.commit()
 
     ul = aliased(User_Location)
     cte = select(
@@ -75,8 +69,22 @@ async def update_user_location(user: user_dependency, db: db_dependency,
     ).group_by(ul.user_id).cte(name='latest_user_locations')
     statement = select(Users.id, Users.user_name, ul.lat, ul.lng) \
         .join(cte, ul.id == cte.c.max_loc_id) \
-        .join(Users, Users.id == cte.c.user_id)
+        .join(Users, Users.id == cte.c.user_id).order_by(Users.id.asc())
     result = await db.execute(statement)
     locs = result.fetchall()
+
+    return locs    
+
+async def update_user_location(db: db_dependency, location_update: UpdateLocationRequest):
+
+    statement = select(Users.id).where(Users.user_name == location_update.user_name)
+    result = await db.execute(statement)
+    user_id = result.one()[0]
     
-    return locs
+    user_location_model = User_Location(
+        user_id=user_id, 
+        lat=location_update.lat,
+        lng=location_update.lng
+    )
+    db.add(user_location_model)
+    await db.commit()

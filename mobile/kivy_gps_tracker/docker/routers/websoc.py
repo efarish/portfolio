@@ -1,10 +1,12 @@
-#import json
-
-from typing import List
+import json
+from typing import Annotated, List
 
 import boto3
-from fastapi import APIRouter, HTTPException
+from db import get_db
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from routers.user_location import UpdateLocationRequest, update_user_location
+from sqlalchemy.orm import Session
 from starlette import status
 
 from .auth import user_dependency
@@ -23,6 +25,8 @@ class LocationUpdateRequest(BaseModel):
     callback: str     
 
 CONNECTIONS = {}
+
+db_dependency = Annotated[Session, Depends(get_db)]
 
 @router.post("/connect", status_code=status.HTTP_201_CREATED)
 async def connect(connect_request: WebSocConnectRequest,
@@ -53,24 +57,29 @@ async def disconnect(connect_request: WebSocConnectRequest):
  
 
 @router.post("/update_location", status_code=status.HTTP_200_OK)
-async def update_location(connect_request: LocationUpdateRequest) -> List[str]:
+async def update_location(db: db_dependency, update_request: LocationUpdateRequest) -> List[str]:
     """
     Distributes location reported by a user to all other users signed into the app.  
     """
-    print(f'Websocket update location: {connect_request.connectionId}')
+    print(f'Websocket update location: {update_request.connectionId}')
 
     print(f'{CONNECTIONS=}')
     
-    other_connections = [val for key, val in CONNECTIONS.items() if val != connect_request.connectionId ]
+    other_connections = [val for key, val in CONNECTIONS.items() if val != update_request.connectionId ]
 
     print(f'{other_connections=}')
 
-    if len(other_connections) > 0:
-        client = boto3.client('apigatewaymanagementapi', endpoint_url=connect_request.callback) 
+    user_location = json.loads(update_request.location)
+    location = UpdateLocationRequest(id=None, user_name=user_location['user_name'], 
+                                     lat=user_location['lat'], lng=user_location['lng'])
+    await update_user_location(db, location)
+
+    if len(other_connections) > 0: 
+        client = boto3.client('apigatewaymanagementapi', endpoint_url=update_request.callback)
         for id in other_connections:
             try:
-                response = client.post_to_connection(ConnectionId=id, Data=connect_request.location)
-                print(response)
+                response = client.post_to_connection(ConnectionId=id, Data=update_request.location)
+                print(f'API GW post response: {response}')
             except Exception as e:
                 print(f'Exception on WebSocket callback: {e}')
                 CONNECTIONS.pop(id,...) #Assuming connection id is not longer valid, so remove.

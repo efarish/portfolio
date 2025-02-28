@@ -29,14 +29,22 @@ def test_disconnect():
     event = {'headers': {'authorization': 1}, 'requestContext': {'connectionId': "1", 'eventType': 'DISCONNECT'}}
     lf.lambda_handler_websocket(event, None)
 
-def test_lambda_handler_update_location():
+@pytest.mark.parametrize(
+    'insert_user',
+    ([get_mock_user()]),
+    indirect=True
+)
+def test_lambda_handler_update_location(insert_user):
     app.dependency_overrides[get_current_user] = get_mock_user
     event = {'headers': {'authorization': 1}, 
              'requestContext': {'connectionId': "1", 
                                 'eventType': 'MESSAGE',
                                 'domainName': 'bla.us-east1.com',
                                 'stage': 'production'},
-             'body': json.dumps({'user_name':'test', 'lat': 1.0, 'lng': 1.0 })
-             }
+             'body': json.dumps({'user_name': insert_user.user_name, 'lat': 1.0, 'lng': 1.0 })}
     lf.lambda_handler_websocket(event, None)
+    
+    with engine.connect() as connection:
+        connection.execute(text('DELETE FROM user_location'))
+        connection.commit()
     
