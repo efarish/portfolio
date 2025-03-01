@@ -7,10 +7,10 @@ This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI fram
 * CI/CD using CodePipeline
 * HTTP and WebSocket API Gateways
 * AWS Lambda functions including an API Gateway Authorizer
-* Using Docker images for Lambda and ECS code.
+* Using Docker images for Lambda and ECS code
 * ECS integration with API Gateway
 * Using SQLAlchemy for SQLite persistence
-* A Kivy mobile app send GPS location info to the web service
+* A Kivy mobile app that sends GPS location info to the web service API
 * PyTest for unit testing
 
 The Kivy mobile app reports its GSP location to an application stack deployed to AWS. The mobile app uses Kivy Garden MapView to visualize the device location and any other device logged into the service.  
