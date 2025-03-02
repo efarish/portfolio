@@ -123,6 +123,26 @@ python toolchain.py pip install $< PATH TO THE CLONED MAPVIEW DIRECTOY >
 <string>${PRODUCT_NAME}</string>
 ```
 
+# Kivy Demo
+
+Below is a demo of the Kivy demo code located in the `kivy` directory. This simple app has three screens: 
+
+1. A Sign-in screen.
+1. A Sing-up screen.
+1. A map showing the location of user logged into the service. 
+
+Below is a screen shot of the Sign-in screen.
+
+<p align="center">
+  <img src="./assets/img/demo0.jpg" width=20% height=20% />
+</p>
+
+For the next screenshot, the Kivy app was installed to Android and iPhone devices. The blue dots are the GPS coordinates of the two phones which were first transmitted and then broadcasted to the signed-in users using a API Gateway Websocket.
+
+<p align="center">
+  <img src="./assets/img/demo1.jpg" width=20% height=20% />
+</p>
+
 # Clean Up 
 
 ### CloudFormation Stacks
@@ -152,7 +172,7 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 
 # Conclusions
 
-* The costs of demonstration projects can be significantly reduced with a few architecture decisions,
+* The costs of AWS stacks can be significantly reduced with a few architecture decisions,
 * The up-front effort of implementing CI/CD pipelines and IaC templates reduces development time.
 * Mobile apps are fun.
 
@@ -161,6 +181,6 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 * Create a version of this app with all Python code in Lambdas.
 * Use an AWS service for persistence.
 * Create a React Native mobile client.
-* In Kivy client: add inactivity and JWT timeout and reconnect on websocket drop
+* In Kivy client: add inactivity logout, JWT timeout reconnects, and reconnect on websocket drop.
 
 
