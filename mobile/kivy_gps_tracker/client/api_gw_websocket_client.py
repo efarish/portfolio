@@ -48,11 +48,11 @@ class WebSocketClient:
             self.websocket = None
             print("Disconnected")
 
-async def main(ws_api, admin_headers):
+async def main(ws_api, admin_headers, usr):
 
     client = WebSocketClient(ws_api, admin_headers)
 
-    await client.send('{"action":"updateLocation", "user_name":"mari", "lat": 40.6743044, "lng": -73.9735552}')
+    await client.send(f'{{"action":"updateLocation", "user_name":"{usr}", "lat": 40.6743044, "lng": -73.9735552}}')
     print(f'Message sent.')
     
     while True:    
@@ -61,7 +61,6 @@ async def main(ws_api, admin_headers):
 
     #await client.close()
     
-
 if __name__ == "__main__":
 
     config = get_config()
@@ -85,4 +84,4 @@ if __name__ == "__main__":
     admin_headers = {"Authorization": f"Bearer {admin_token['access_token']}", "Content-Type": "application/json"}
     print(f'{admin_headers=}')
 
-    asyncio.run(main(ws_api, admin_headers))
+    asyncio.run(main(ws_api, admin_headers, usr))
