@@ -105,6 +105,8 @@ To deploy the Kivy app to an IOS device, I used a Mac workstation and the [kivy-
   - python toolchain.py pip install idna
   - python toolchain.py pip install h11
   - python toolchain.py pip install openssl
+  - python toolchain.py pip install websockets
+
 2. The Kivy Garden MapView code appears to have a bug when running on a IOS device. The MapView code attempts to create a cache for the map images to a directory it doesn't have permission to. I cloned the project from GitHub and made the following change to the `kivy_garden/mapview/constants.py` to put the cache in directory the app would have access to:
 ```bash
 if platform == 'ios': 
@@ -125,11 +127,13 @@ python toolchain.py pip install $< PATH TO THE CLONED MAPVIEW DIRECTOY >
 
 # Kivy Demo
 
-Below is a demo of the Kivy demo code located in the `kivy` directory. This simple app has three screens: 
+Below is a demo of the Kivy app located in the `kivy` directory. This simple app has three screens: 
 
 1. A Sign-in screen.
-1. A Sing-up screen.
-1. A map showing the location of user logged into the service. 
+1. A Sign-up screen.
+1. A map view showing the location of user logged into the service. 
+
+The Sign-in and Sign-up screens use an API Gateway HTTP API. The map view screen using the HTTP API to initialize user locations and the WebSocket API to transmit and receive GPS location updates. 
 
 Below is a screen shot of the Sign-in screen.
 
@@ -137,7 +141,7 @@ Below is a screen shot of the Sign-in screen.
   <img src="./assets/img/demo0.jpg" width=20% height=20% />
 </p>
 
-For the next screenshot, the Kivy app was installed to Android and iPhone devices. The blue dots are the GPS coordinates of the two phones which were first transmitted and then broadcasted to the signed-in users using a API Gateway Websocket.
+For the next screenshot, the Kivy app was installed to Android and iPhone devices. The blue dots are the GPS coordinate locations of the two phones whose GPS coordinates were first transmitted to the AWS cloud service and then broadcasted back to the signed-in users using a API Gateway Websocket connection.
 
 <p align="center">
   <img src="./assets/img/demo1.jpg" width=20% height=20% />
