@@ -155,14 +155,20 @@ class Interface(ScreenManager):
         # Start User marker. 
         if not self.gps_blinker:
             self.gps_blinker = self.ids.blinker
-        self.gps_blinker.start()                
-        #Start WebSocket.
+        self.gps_blinker.start()
         jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
+        # Initialize other user locations.
+        #   Get latest locations
+        response = httpx.get(self.props['api'] +  'location/get_latest_locations', headers=jwt_header)
+        positions = response.json()
+        #   Update positions
+        App.get_running_app().update_blinker_positions(positions)            
+        # Start WebSocket.
         self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
         await self.ws.connect()
         loop = App.get_running_app().event_loop
         self.location_update_task = loop.create_task(location_updates(self.ws))
-        #Start User GPS updates.
+        # Start User GPS updates.
         try:
             gps.start(5000, 10)
         except NotImplementedError:
@@ -297,8 +303,8 @@ class GpsTracker(App):
             else:
                 print(f"Adding new marker for {pos['user_name']}")
                 m = GpsBlinker() 
-                m.lat = pos['lat']
-                m.lon = pos['lng']
+                m.lat = float(pos['lat'])
+                m.lon = float(pos['lng'])
                 m.user_name = pos['user_name']
                 self.marker_map[m.user_name] = m
                 map.add_marker(m)
