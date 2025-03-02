@@ -1,3 +1,7 @@
+"""
+Main module for kivy app.
+"""
+
 import asyncio
 import json
 
