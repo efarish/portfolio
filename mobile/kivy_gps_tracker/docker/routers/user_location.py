@@ -40,17 +40,15 @@ class UserLocations(BaseModel):
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-@router.post("/get_locations", status_code=status.HTTP_200_OK, response_model=List[UserLocations])
-async def get_user_locations(user: user_dependency, db: db_dependency,
-                               get_user_location: GetUserLocationRequest):
+@router.get("/get_locations", status_code=status.HTTP_200_OK, response_model=List[UserLocations])
+async def get_locations(user: user_dependency, db: db_dependency):
     
     if user is None or user.get('role') != 'admin':
         raise HTTPException(status_code=401, detail='Authentication Failed')
     
     ul = aliased(User_Location)
     statement = select(Users.id, Users.user_name, ul.lat, ul.lng) \
-        .join(ul, ul.user_id == Users.id) \
-        .filter(Users.id.in_(get_user_location.ids))
+        .join(ul, ul.user_id == Users.id)
     result = await db.execute(statement)
     locs = result.fetchall()
 

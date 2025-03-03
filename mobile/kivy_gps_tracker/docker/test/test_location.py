@@ -42,7 +42,7 @@ async def test_update_location(insert_user):
 def test_get_locations(insert_location):
     app.dependency_overrides[get_current_user] = get_mock_admin_user
     mock_loc = get_mock_user_location()
-    response = client.post('/location/get_locations', json={'ids': [mock_loc['user_id']]})
+    response = client.get('/location/get_locations')
     assert response.status_code == status.HTTP_200_OK
     mock_loc = get_mock_user_location()
     response = response.json()[0]

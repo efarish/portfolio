@@ -122,7 +122,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApiSvcConnect
-      RouteKey: 'POST /location/get_locations'
+      RouteKey: 'GET /location/get_locations'
       AuthorizationType: CUSTOM
       AuthorizerId: !GetAtt Authorizer.AuthorizerId
       Target: !Join
