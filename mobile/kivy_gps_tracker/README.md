@@ -44,6 +44,12 @@ The API Gateway HTTP handles sign-ins and creating users. The API Gateway WebSoc
 
 A PyTest suite can be run using the `./docker/test/TestSuite.py` script.
 
+The `coverage` module can be used to get unit-test code coverage. Run the commands below from the project root. 
+
+```bash
+coverage run -m pytest 
+coverage report
+```
 # AWS Deployment
 
 In the directory `./cloudformation/` are three AWS CodePipelines to deploy and maintain this application.
