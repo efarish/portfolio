@@ -27,6 +27,7 @@ A couple of additional notes:
 * Some of the AWS services used were for self-didactic teaching. For example:
   * A Lambda Authorizer was included to experiment with securing an API Gateway. 
   * ECS and FastAPI are used to implement the endpoints instead of Lambda Functions.
+  * Using ECS led to experimenting with ways to integrate the API Gateways (HTTP and WebSockets), e.g VPC Link, Cloud Map, and Service Discovery.
   * SQLite and SQLAlchemy are used to experiment with Python RDBMS persistence. 
  
 A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, an application load balancer is more expensive than Cloud Map. For larger clusters, this is probably not true.
@@ -186,5 +187,6 @@ Delete the AWS Developer Tools Code Connections to Github created for this proje
 * Use an AWS service for persistence.
 * Create a React Native mobile client.
 * In Kivy client: add inactivity logout, JWT timeout reconnects, and reconnect on websocket drop.
+* Refine Kivy UI: Add "burger" menu to map screen or improve buttons panel.
 
 
