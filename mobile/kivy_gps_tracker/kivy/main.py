@@ -9,6 +9,7 @@ import httpx
 from gpsblinker import GpsBlinker
 from plyer import gps
 from websocket_client import WebSocketClient
+from websockets.exceptions import ConnectionClosed, ConnectionClosedError
 
 from kivy.app import App
 from kivy.clock import mainthread
@@ -30,24 +31,27 @@ async def location_updates(client):
     """Coroutine to receive location updates from WebSocket."""
     try:
         while True:
-            print('Waiting for location updates....')
-            position = await client.receive()
-            print(f'Received a position update: {position=}')
             try:
+                await client.connect()
+                print('Waiting for location updates....')
+                position = await client.receive()
+                print(f'Received a position update: {position=}')
                 position = json.loads(position)
                 if not 'action' in position and not 'user_name' in position:
                     print(f'Message not a position update: {position}')
                 else:
                     App.get_running_app().update_blinker_positions([position,])
             except Exception as e:
-                print(f'Location Update exception: {e}')
+                print(f'WebSocket error occurred of type {e} with message {e}. Attempting to reconnect.')
+                await client.close()
+                await asyncio.sleep(5)
+                continue
     except asyncio.CancelledError as ace:
-        print(f'Location updates canceled: {ace}')
+        print(f'Update task has been canceled.')
     except Exception as e:
-        print(f'Location update exception: {e}')        
+        print(f'Unexpected error occurred of type {e} with message {e}.') 
     finally:
-        # when canceled, print that it finished
-        print('Stopped location updates.')
+        print('Location updates stopped.')
 
 async def send_location_update(client, user, lat, lng):
     """Coroutine to send GPS location to server using WebSocket."""
@@ -180,7 +184,6 @@ class Interface(ScreenManager):
 
     def stop_updates(self):
         """Utility method to stop and deallocate resources for location updates."""
-        if self.gps_blinker: self.gps_blinker.stop()
         try:
           gps.stop()
         except NotImplementedError:
@@ -197,8 +200,8 @@ class Interface(ScreenManager):
         """Called by UI to start/stop location updates."""
         if self.ids.locationBtn.text == self.btn_send:
             try:
-                self.ids.locationBtn.text = self.btn_stop
                 loop.create_task(self.start_updates())
+                self.ids.locationBtn.text = self.btn_stop
             except Exception as e:
                 print(f'{e=}')
                 popup = Factory.ErrorPopup()
@@ -324,6 +327,7 @@ class GpsTracker(App):
         print(f'{gps_status=}')
 
     def close_gps_app(self):
+        if self.root.gps_blinker: self.root.gps_blinker.stop()
         map = self.root.ids.theMap
         for marker in self.marker_map.values():
             marker.stop()
