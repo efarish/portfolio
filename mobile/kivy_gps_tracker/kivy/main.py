@@ -4,6 +4,7 @@ Main module for kivy app.
 
 import asyncio
 import json
+import socket
 
 import httpx
 from gpsblinker import GpsBlinker
@@ -28,7 +29,7 @@ def get_config() -> dict:
     return props
 
 async def location_updates(client):
-    """Coroutine to receive location updates from WebSocket."""
+    """Coroutine to receive location updates from a WebSocket."""
     try:
         while True:
             try:
@@ -41,8 +42,13 @@ async def location_updates(client):
                     print(f'Message not a position update: {position}')
                 else:
                     App.get_running_app().update_blinker_positions([position,])
-            except Exception as e:
-                print(f'WebSocket error occurred of type {e} with message {e}. Attempting to reconnect.')
+            except ConnectionClosedError as cce:
+                print(f'WebSocket connection closed with message {cce}. Attempting to reconnect.')
+                await client.close()
+                await asyncio.sleep(5)
+                continue
+            except socket.gaierror as e:
+                print(f'WebSocket error: {e}. Attempting to reconnect.')
                 await client.close()
                 await asyncio.sleep(5)
                 continue
@@ -95,16 +101,10 @@ class Interface(ScreenManager):
         a JWT being returned to the user and will be used for all 
         subsequent requests.
         """
-        user = self.ids.userIdTxt.text
-        pwd = self.ids.passwordTxt.text
-        self.props = get_config()
-
-        if bool(self.props.get('debug', None)):
-            self.token = '123'
-            self.switch_screen('Map')
-            return
-        
         try:
+            user = self.ids.userIdTxt.text
+            pwd = self.ids.passwordTxt.text
+            self.props = get_config()
             response = httpx.post(self.props['api'] + 'auth/token', 
                                 data={"username": user, "password": pwd, "grant_type": "password"},
                                 headers={"content-type": "application/x-www-form-urlencoded"})
@@ -160,27 +160,36 @@ class Interface(ScreenManager):
         
     async def start_updates(self):
         """Utility method to setup and initiate location updates."""
-        # Start User marker. 
-        if not self.gps_blinker:
-            self.gps_blinker = self.ids.blinker
-        self.gps_blinker.start()
-        jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
-        # Initialize other user locations.
-        #   Get latest locations
-        response = httpx.get(self.props['api'] +  'location/get_latest_locations', headers=jwt_header)
-        positions = response.json()
-        #   Update positions
-        App.get_running_app().update_blinker_positions(positions)            
-        # Start WebSocket.
-        self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
-        await self.ws.connect()
-        loop = App.get_running_app().event_loop
-        self.location_update_task = loop.create_task(location_updates(self.ws))
-        # Start User GPS updates.
         try:
-            gps.start(5000, 10)
-        except NotImplementedError:
-            print(f'No GPS support on this platform.')         
+            # Start User marker. 
+            if not self.gps_blinker:
+                self.gps_blinker = self.ids.blinker
+            self.gps_blinker.start()
+            jwt_header = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
+            # Initialize other user locations.
+            #   Get latest locations
+            response = httpx.get(self.props['api'] +  'location/get_latest_locations', headers=jwt_header)
+            positions = response.json()
+            #   Update positions
+            App.get_running_app().update_blinker_positions(positions)            
+            # Start WebSocket.
+            self.ws = WebSocketClient(self.props['ws_api'], jwt_header)
+            await self.ws.connect()
+            loop = App.get_running_app().event_loop
+            self.location_update_task = loop.create_task(location_updates(self.ws))
+            # Start User GPS updates.
+            try:
+                gps.start(5000, 10)
+            except NotImplementedError:
+                print(f'No GPS support on this platform.')
+            self.ids.locationBtn.text = self.btn_stop
+        except Exception as e:
+            print(f'{e=}')
+            popup = Factory.ErrorPopup()
+            popup.message.text = f'{e}'
+            popup.open()     
+        finally:
+            self.ids.locationBtn.disabled = False    
 
     def stop_updates(self):
         """Utility method to stop and deallocate resources for location updates."""
@@ -195,26 +204,19 @@ class Interface(ScreenManager):
             loop = App.get_running_app().event_loop
             loop.create_task(self.ws.close())            
             self.ws = None
+        self.ids.locationBtn.text = self.btn_send
 
     def location_click(self):
         """Called by UI to start/stop location updates."""
         if self.ids.locationBtn.text == self.btn_send:
-            try:
-                loop.create_task(self.start_updates())
-                self.ids.locationBtn.text = self.btn_stop
-            except Exception as e:
-                print(f'{e=}')
-                popup = Factory.ErrorPopup()
-                popup.message.text = 'Location tracking failed.'
-                popup.open()
+            self.ids.locationBtn.disabled = True
+            loop.create_task(self.start_updates())
         else:
             self.stop_updates()
-            self.ids.locationBtn.text = self.btn_send
 
     def signout_click(self):
         """Called by UI to logoff."""
         self.stop_updates()
-        self.ids.locationBtn.text = self.btn_send
         App.get_running_app().close_gps_app()
 
 class GpsTracker(App):
