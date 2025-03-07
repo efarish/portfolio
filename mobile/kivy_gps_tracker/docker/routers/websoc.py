@@ -4,7 +4,7 @@ from typing import Annotated, List
 import boto3
 from db import get_db
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from routers.user_location import UpdateLocationRequest, update_user_location
 from sqlalchemy.orm import Session
 from starlette import status
@@ -23,6 +23,10 @@ class LocationUpdateRequest(BaseModel):
     connectionId: str
     location: str
     callback: str     
+
+class ConnectedUsersResponse(BaseModel):
+    user_name: str
+    connectionId: str
 
 CONNECTIONS = {}
 
@@ -87,6 +91,15 @@ async def update_location(db: db_dependency, update_request: LocationUpdateReque
     else: print('No connections to broadcast to.')
 
     return other_connections
+
+@router.get("/get_connected_users", status_code=status.HTTP_200_OK)
+def get_connected_users(user: user_dependency):
+
+    if user is None or user.get('role') != 'admin':
+        raise HTTPException(status_code=401, detail='Authentication Failed')    
+
+    return CONNECTIONS
+
    
     
     

@@ -48,4 +48,35 @@ def test_update_location(insert_user):
         connection.execute(text('DELETE FROM user_location'))
         connection.commit()
 
+def test_get_connected_users():
+    app.dependency_overrides[get_current_user] = get_mock_user
+    response = client.post('/websoc/connect', json={"connectionId": "1"})
+    assert response.status_code == status.HTTP_201_CREATED
+    app.dependency_overrides[get_current_user] = get_mock_user_2
+    response = client.post('/websoc/connect', json={"connectionId": "2"})
+    assert response.status_code == status.HTTP_201_CREATED
+    app.dependency_overrides[get_current_user] = get_mock_admin_user
+    response = client.get('/websoc/get_connected_users')
+    assert response.status_code == status.HTTP_200_OK
+    connections = response.json()
+    assert len(connections) == 2
+    response = client.post('/websoc/disconnect', json={"connectionId": "2"})
+    assert response.status_code == status.HTTP_201_CREATED
+    response = client.post('/websoc/disconnect', json={"connectionId": "1"})
+    assert response.status_code == status.HTTP_201_CREATED    
+    response = client.get('/websoc/get_connected_users')
+    assert response.status_code == status.HTTP_200_OK
+    connections = response.json()
+    assert len(connections) == 0
 
+def test_get_no_connected_users():
+    app.dependency_overrides[get_current_user] = get_mock_admin_user
+    response = client.get('/websoc/get_connected_users')
+    assert response.status_code == status.HTTP_200_OK
+    connections = response.json()
+    assert len(connections) == 0    
+
+def test_get_connected_users_as_user():
+    app.dependency_overrides[get_current_user] = get_mock_user 
+    response = client.get('/websoc/get_connected_users')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
