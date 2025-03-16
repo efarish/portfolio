@@ -27,15 +27,15 @@ Resources:
       GroupDescription: Security group for Lambda function.
       VpcId: !GetAtt VPC.Outputs.VpcId
 
-  # Lambda Authorizer
-  LambdaAuthorizerStack:
+  # Lambda stack
+  LambdaStack:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./lambda.yaml
       Parameters:
         VpcId: !GetAtt VPC.Outputs.VpcId
         DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
-        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:lambda_rds
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:lambda_rds
         LambdaSecurityGroup: !Ref LambdaSecurityGroup
 
 # -------------------------------------------------------------------------
