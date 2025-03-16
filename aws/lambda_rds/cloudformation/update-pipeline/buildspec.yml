@@ -14,10 +14,9 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
-      - docker build -t ${ECR_IMG_NAME} ./mobile/${PROJECT_NAME}/docker
+      - docker build -t ${ECR_IMG_NAME} ./aws/${PROJECT_NAME}/docker
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
   post_build:
     commands:
       - aws lambda update-function-code --function-name ${LAMBDA_FUNC_NAME} --image-uri ${ECR_IMAGE_URI}
-

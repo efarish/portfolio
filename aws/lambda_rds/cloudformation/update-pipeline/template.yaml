@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: CodePipeline for GPS Tracker
+Description: CodePipeline for Lambda RDS
 
 Parameters:
   PipeLineName:
@@ -14,7 +14,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: arn:aws:codeconnections:<YOUR CODE CONNECTION HERE>
+    Default: arn:aws:codeconnections:us-east-1:598185244415:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
@@ -22,7 +22,7 @@ Parameters:
   ProjectBuildSpec: 
     Type: String
     Description: Specifies the Source Project Name.
-    Default: aws/rds_pg/cloudformation/update-pipeline/buildspec.yml
+    Default: aws/lambda_rds/cloudformation/update-pipeline/buildspec.yml
 
 Resources:
 
