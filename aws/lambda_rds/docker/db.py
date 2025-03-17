@@ -1,5 +1,3 @@
-import asyncio
-
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -42,7 +40,12 @@ def main():
         statement = select(text("1"))
         result = conn.execute(statement)
         assert result.one()[0] == 1
-
+        statement = select(text("EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'Users')"))
+        result = conn.execute(statement)
+        is_found = result.one()[0]
+        print(f'{is_found}') 
+        if not is_found:
+            Base.metadata.create_all(bind=engine)
 
 if __name__ == '__main__':
 
