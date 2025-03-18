@@ -1,7 +1,7 @@
 import asyncio
 import os
 
-from db import Base, engine, get_db
+from db import Base, engine, get_async_db, get_db
 from model import User_Location, Users
 from sqlalchemy import select, text
 
@@ -35,15 +35,21 @@ def lambda_handler_create_schema(event, context):
     return {'statusCode': 201, 'body': f'Done.'}
 
 async def insert_user(User):
-    pass
+    
+    async for conn in get_async_db():
+        user_name = 'A_User'
+        create_user_model = Users(
+            user_name=user_name,
+            role='user',
+            password='password')
+        conn.add(create_user_model)
+        await conn.commit()
 
 def lambda_handler_dml(event, context):
 
-    loop = asyncio.get_running_loop()
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(insert_user(None))
 
     return {'statusCode': 201, 'body': f'Done.'}
 
-if __name__ == '__main__':
-    lambda_handler_create_schema(None, None)
 
