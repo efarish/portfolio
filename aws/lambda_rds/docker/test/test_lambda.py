@@ -2,9 +2,10 @@
 import os
 
 import lambda_function
+import pytest
 from db import engine, get_db
 from model import Users
-from sqlalchemy import MetaData, select, text
+from sqlalchemy import MetaData, delete, select, text
 
 
 def test_lambda_1():
@@ -28,17 +29,26 @@ def test_lambda_handler_create_schema():
         metadata.drop_all(engine)
 
 def test_lambda_handler_dml():
-            
     try:
         lambda_function.lambda_handler_create_schema(None, None)
         lambda_function.lambda_handler_dml(None, None)
         for conn in get_db():
-            statement = select(Users.id, Users.user_name, Users.role).where(Users.user_name == 'A_User')
-            result = conn.execute(statement)
+            insert_statement = select(Users.id, Users.user_name, Users.role).where(Users.user_name == 'A_User')
+            result = conn.execute(insert_statement)
             users = result.all()
             assert len(users) == 1
             user = users[0]
             assert user[1] == 'A_User' 
+            delete_statement = delete(Users).where(Users.user_name == 'A_User')
+            result = conn.execute(delete_statement)
+            assert result.rowcount == 1
+            conn.commit()
+        lambda_function.lambda_handler_dml(None, None)
+        for conn in get_db():
+            insert_statement = select(Users.id, Users.user_name, Users.role).where(Users.user_name == 'A_User')
+            result = conn.execute(insert_statement)
+            users = result.all()
+            assert len(users) == 1
     finally:
         metadata = MetaData()
         metadata.reflect(bind=engine)

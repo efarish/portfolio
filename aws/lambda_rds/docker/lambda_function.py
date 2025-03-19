@@ -45,11 +45,14 @@ async def insert_user(User):
         conn.add(create_user_model)
         await conn.commit()
 
+LOOP = None
+
 def lambda_handler_dml(event, context):
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(insert_user(None))
-
+    global LOOP 
+    if not LOOP:
+        LOOP = asyncio.new_event_loop()
+        asyncio.set_event_loop(LOOP) 
+    LOOP.run_until_complete(insert_user(None))
     return {'statusCode': 201, 'body': f'Done.'}
 
 
