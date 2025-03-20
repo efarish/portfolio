@@ -49,6 +49,7 @@ Resources:
                   - codebuild:StartBuild
                   - codebuild:BatchGetBuildBatches
                   - codebuild:StartBuildBatch
+                  - secretsmanager:CreateSecret
                   - cloudformation:*
                   - cloudwatch:*
                   - ec2:*

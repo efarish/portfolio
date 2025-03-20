@@ -45,6 +45,7 @@ Resources:
                 - logs:CreateLogGroup
                 - logs:CreateLogStream
                 - logs:PutLogEvents
+                - secretsmanager:*
               Resource: '*'
       SnapStart:
         ApplyOn: None
