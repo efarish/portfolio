@@ -21,11 +21,23 @@ Resources:
   #---------------------------------------------------------------------
   # Security Groups for resources.
   #---------------------------------------------------------------------
+  VpcEndPointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for VPC Interface Endpoint.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+
   LambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Lambda function.
       VpcId: !GetAtt VPC.Outputs.VpcId
+      SecurityGroupEgress:
+        - Description: Allow the Lambda to communicate to the VPC endpoint.
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          DestinationSecurityGroupId: !Ref VpcEndPointSecurityGroup  
 
   # Lambda stack
   LambdaStack:
@@ -37,6 +49,40 @@ Resources:
         DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:lambda_rds
         LambdaSecurityGroup: !Ref LambdaSecurityGroup
+
+  # DB Secrets Manager
+  DBSecrets:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::SecretsManager::Secret"
+    DeletionPolicy: "Delete"
+    Properties:
+      Name: "lambda_rds/secret"
+      SecretString:
+        Fn::Join: 
+        - ' '
+        - - '{"DB_URL": "postgresql+psycopg://testadmin:a_password_@database-1.cluster-c4bkhqxdo40l.us-east-1.rds.amazonaws.com:5432/testdb",'
+          - '"DB_URL_ASYNC": "postgresql+asyncpg://testadmin:a_password_@database-1.cluster-c4bkhqxdo40l.us-east-1.rds.amazonaws.com:5432/testdb"}'
+
+  SecretsManagerVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      IpAddressType: ipv4
+      DnsOptions:
+        PrivateDnsOnlyForInboundResolverEndpoint: NotSpecified
+        DnsRecordIpType: ipv4
+      SecurityGroupIds: [!Ref VpcEndPointSecurityGroup]
+      SubnetIds: !Split [",", !GetAtt VPC.Outputs.PublicSubnetIds]
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      RouteTableIds: []
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.secretsmanager
+      PolicyDocument:
+        Statement:
+          - Resource: '*'
+            Action: '*'
+            Effect: Allow
+            Principal: '*'
 
 # -------------------------------------------------------------------------
 # Information about the stack.

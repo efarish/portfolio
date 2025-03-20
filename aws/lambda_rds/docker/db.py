@@ -16,7 +16,9 @@ def get_db_secrets():
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
-    client = session.client(service_name='secretsmanager',region_name=region_name)
+    client = session.client(service_name='secretsmanager', 
+                            region_name=region_name,
+                            endpoint_url=f'https://secretsmanager.{region_name}.amazonaws.com')
     get_secret_value_response = client.get_secret_value(SecretId=secret_name)
     secret = get_secret_value_response['SecretString']
     secret = json.loads(secret)
@@ -31,6 +33,9 @@ if os.getenv('DB_URL', ...) is Ellipsis:
 else:
     DB_URL = os.getenv('DB_URL') 
     DB_URL_ASYNC = os.getenv('DB_URL_ASYNC')
+
+print(f'{DB_URL=}')
+print(f'{DB_URL_ASYNC=}')
 
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
