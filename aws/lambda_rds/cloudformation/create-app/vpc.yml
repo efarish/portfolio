@@ -114,8 +114,8 @@ Resources:
     DependsOn:
       - VPC
 
-  S3GatewayEnd point:
-    Type: 'AWS::EC2::VPCEndpoint'
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcEndpointType: 'Gateway'
       VpcId: !Ref VPC
