@@ -138,4 +138,4 @@ Outputs:
     Value: !Ref VPC
   PublicSubnetIds:
     Description: Comma seperated list.
-    Value: !Sub '${PublicSubnet1},{PublicSubnet2}' #Comma separated list, e.g. '${PS1},${PS2}'
+    Value: !Sub '${PublicSubnet1},${PublicSubnet2}' #Comma separated list, e.g. '${PS1},${PS2}'
