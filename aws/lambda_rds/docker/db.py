@@ -11,6 +11,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 def get_db_secrets():
 
+    print('Getting Secrets...')
+
     secret_name = "lambda_rds/secret"
     region_name = "us-east-1"
 
@@ -22,9 +24,14 @@ def get_db_secrets():
     get_secret_value_response = client.get_secret_value(SecretId=secret_name)
     secret = get_secret_value_response['SecretString']
     secret = json.loads(secret)
+
+    print('Got Secrets.')
+
     return secret
 
+print('Loading environment...')
 load_dotenv()
+print('Loaded environment.')
 
 if os.getenv('DB_URL', ...) is Ellipsis:
     secrets = get_db_secrets()

@@ -2,19 +2,27 @@ import asyncio
 import json
 import os
 
+print('import db...')
 from db import Base, engine, get_async_db, get_db
+
+print('imported db.')
 from model import Users
 from sqlalchemy import select, text
 
 
+def say_hello():
+    print('This lambda works.')
+
 def do_select(event, context):
     
-    print(f'{event=}')
+    print(f'DO SELECT: {event=}')
 
     for conn in get_db():
         statement = select(text("1"))
         result = conn.execute(statement)
         assert result.one()[0] == 1
+
+    print(f'DONE SELECT.')
 
     return {'statusCode': 200, 'body': f'Done.'}
 
@@ -61,7 +69,9 @@ def lambda_handler(event, context):
     body = event["body"]
     req = json.loads(body)
     event_type = req['event_type']
-    if event_type == 'CREATE_SCHEMA':
+    if event_type == 'SAY_HELLO':
+        say_hello()
+    elif event_type == 'CREATE_SCHEMA':
         return create_schema(event, context)
     elif event_type == 'DO_SELECT': 
         return do_select(event, context)
