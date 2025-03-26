@@ -1,0 +1,218 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The template used for RDS.
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that RDS is running inside of.
+  DeploymentSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of deployment subnet ID's.
+  LambdaSecurityGroup:
+    Type: String
+
+Resources:
+  KMSKey:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::KMS::Key"
+    DeletionPolicy: "Delete"
+    Properties:
+      Origin: "AWS_KMS"
+      MultiRegion: false
+      Description: "Default master key that protects my RDS database volumes when\
+        \ no other key is defined"
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+        - Condition:
+            StringEquals:
+              kms:CallerAccount: !Sub "${AWS::AccountId}"
+              kms:ViaService: "rds.us-east-1.amazonaws.com"
+          Resource: "*"
+          Action:
+          - "kms:Encrypt"
+          - "kms:Decrypt"
+          - "kms:ReEncrypt*"
+          - "kms:GenerateDataKey*"
+          - "kms:CreateGrant"
+          - "kms:ListGrants"
+          - "kms:DescribeKey"
+          Effect: "Allow"
+          Principal:
+            AWS: "*"
+          Sid: "Allow access through RDS for all principals in the account that are\
+            \ authorized to use RDS"
+        - Resource: "*"
+          Action:
+          - "kms:Describe*"
+          - "kms:Get*"
+          - "kms:List*"
+          - "kms:RevokeGrant"
+          Effect: "Allow"
+          Principal:
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+          Sid: "Allow direct access to key metadata to the account"
+        Id: "auto-rds-2"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      Enabled: true
+      EnableKeyRotation: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      Tags: []
+
+  RDSDBInstance:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::RDS::DBInstance"
+    DeletionPolicy: "Delete"
+    Properties:
+      StorageEncrypted: true
+      AssociatedRoles: []
+      Port: "5432"
+      DBClusterIdentifier:
+        Ref: "RDSDBCluster"
+      ProcessorFeatures: []
+      StorageThroughput: 0
+      PreferredBackupWindow: "07:55-08:25"
+      MonitoringInterval: 0
+      DBParameterGroupName: "default.aurora-postgresql16"
+      NetworkType: "IPV4"
+      DedicatedLogVolume: false
+      CopyTagsToSnapshot: false
+      MultiAZ: false
+      Engine: "aurora-postgresql"
+      Tags: []
+      EngineLifecycleSupport: "open-source-rds-extended-support-disabled"
+      LicenseModel: "postgresql-license"
+      EngineVersion: "16.6"
+      StorageType: "aurora"
+      KmsKeyId:
+        Fn::GetAtt:
+        - "KMSKey"
+        - "Arn"
+      DBInstanceClass: "db.serverless"
+      AvailabilityZone: "us-east-1a"
+      OptionGroupName: "default:aurora-postgresql-16"
+      PreferredMaintenanceWindow: "fri:09:06-fri:09:36"
+      EnablePerformanceInsights: false
+      AutoMinorVersionUpgrade: true
+      DBSubnetGroupName:
+        Ref: "RDSDBSubnetGroupDefaultvpcLambdaRDS"
+      DeletionProtection: false
+      DBInstanceIdentifier: "database-1-instance-1"
+      AllocatedStorage: "1"
+      CACertificateIdentifier: "rds-ca-rsa2048-g1"
+      ManageMasterUserPassword: false
+      MasterUserSecret: {}
+      VPCSecurityGroups:
+      - Fn::GetAtt:
+        - "EC2SecurityGroup"
+        - "GroupId"
+      DBSecurityGroups: []
+      MasterUsername: "testadmin"
+      DBName: "testdb"
+      EnableIAMDatabaseAuthentication: false
+      BackupRetentionPeriod: 7
+      PromotionTier: 1
+      PubliclyAccessible: false
+      EnableCloudwatchLogsExports:
+      - "iam-db-auth-error"
+      - "instance"
+      - "postgresql"
+
+  EC2SecurityGroup:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::EC2::SecurityGroup"
+    DeletionPolicy: "Delete"
+    Properties:
+      GroupDescription: "Lambda_RDS security group."
+      GroupName: "lambda_rds"
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+      - CidrIp: "0.0.0.0/0"
+        IpProtocol: "tcp"
+        FromPort: 5432
+        ToPort: 5432
+      - IpProtocol: "-1"
+        FromPort: -1
+        SourceSecurityGroupId: !Ref LambdaSecurityGroup
+        ToPort: -1
+        SourceSecurityGroupOwnerId: !Sub "${AWS::AccountId}"
+      SecurityGroupEgress:
+      - CidrIp: "0.0.0.0/0"
+        IpProtocol: "-1"
+        FromPort: -1
+        ToPort: -1
+
+  RDSDBSubnetGroupDefaultvpcLambdaRDS:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::RDS::DBSubnetGroup"
+    DeletionPolicy: "Delete"
+    Properties:
+      DBSubnetGroupDescription: "RDS Subnet group."
+      SubnetIds: !Ref DeploymentSubnetIds
+      DBSubnetGroupName: "Lambda_RDS_SN_GrpName"
+
+  RDSDBCluster:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::RDS::DBCluster"
+    DeletionPolicy: "Delete"
+    Properties:
+      DatabaseInsightsMode: "standard"
+      StorageEncrypted: true
+      AssociatedRoles: []
+      EnableHttpEndpoint: true
+      EngineMode: "provisioned"
+      Port: 5432
+      DBClusterIdentifier: "database-1"
+      PreferredBackupWindow: "07:55-08:25"
+      MonitoringInterval: 0
+      NetworkType: "IPV4"
+      VpcSecurityGroupIds:
+      - Fn::GetAtt:   #sg-0e39ffd40872b7706"
+        - "EC2SecurityGroup"
+        - "GroupId"
+      CopyTagsToSnapshot: false
+      Engine: "aurora-postgresql"
+      Tags: []
+      EngineLifecycleSupport: "open-source-rds-extended-support-disabled"
+      EngineVersion: "16.6"
+      StorageType: "aurora"
+      KmsKeyId:
+        Fn::GetAtt:
+        - "KMSKey"
+        - "Arn"
+      AvailabilityZones:
+      - Fn::Select:
+        - 0
+        - Fn::GetAZs: { Ref: "AWS::Region" }
+      - Fn::Select:
+        - 1
+        - Fn::GetAZs: { Ref: "AWS::Region" }
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 0.5
+        MaxCapacity: 1
+      DatabaseName: "testdb"
+      EnableLocalWriteForwarding: false
+      PreferredMaintenanceWindow: "mon:04:59-mon:05:29"
+      AutoMinorVersionUpgrade: true
+      DBSubnetGroupName:
+        Ref: "RDSDBSubnetGroupDefaultvpcLambdaRDS"
+      DeletionProtection: false
+      AllocatedStorage: 1
+      ManageMasterUserPassword: false
+      MasterUserSecret: {}
+      MasterUsername: "testadmin"
+      MasterUserPassword: "a_password_"
+      EnableIAMDatabaseAuthentication: false
+      DBClusterParameterGroupName: "default.aurora-postgresql16"
+      PerformanceInsightsEnabled: false
+      BackupRetentionPeriod: 7
+      EnableCloudwatchLogsExports:
+      - "iam-db-auth-error"
+      - "instance"
+      - "postgresql"
+
+Outputs:
+  RDSClusterEndpoint:
+    Description: URL for cluster.
+    Value: !GetAtt RDSDBCluster.Endpoint.Address

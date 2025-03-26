@@ -56,6 +56,16 @@ Resources:
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:lambda_rds
         LambdaSecurityGroup: !Ref LambdaSecurityGroup
 
+ # RDS stack
+  RDSStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./rds.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
+        LambdaSecurityGroup: !Ref LambdaSecurityGroup
+
   # DB Secrets Manager
   DBSecrets:
     UpdateReplacePolicy: "Retain"
@@ -94,6 +104,6 @@ Resources:
 # Information about the stack.
 # -------------------------------------------------------------------------
 Outputs:
-  Output1:
-    Description: Meaningful outputs will go here.
-    Value: TODO
+  RDSClusterEndpoint:
+    Description: URL of RDS cluster.
+    Value: !GetAtt RDSStack.Outputs.RDSClusterEndpoint
