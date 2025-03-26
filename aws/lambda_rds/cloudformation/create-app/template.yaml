@@ -34,10 +34,16 @@ Resources:
       VpcId: !GetAtt VPC.Outputs.VpcId
       SecurityGroupEgress:
         - Description: Allow the Lambda to communicate to the VPC endpoint.
-          IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
+          IpProtocol: -1
           DestinationSecurityGroupId: !Ref VpcEndPointSecurityGroup  
+
+  VpcEPIngressFromLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow Lambda to call VPC endpoint.
+      GroupId: !Ref VpcEndPointSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref LambdaSecurityGroup
 
   # Lambda stack
   LambdaStack:
