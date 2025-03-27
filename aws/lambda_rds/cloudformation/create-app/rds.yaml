@@ -114,14 +114,14 @@ Resources:
       #DeletionProtection: false
       DBInstanceIdentifier: "database-1-instance-1" #AllocatedStorage: "1"
       CACertificateIdentifier: "rds-ca-rsa2048-g1"
-      ManageMasterUserPassword: false
+      #ManageMasterUserPassword: false
       MasterUserSecret: {}
       VPCSecurityGroups:
       - Fn::GetAtt:
         - "EC2SecurityGroup"
         - "GroupId"
       DBSecurityGroups: []
-      MasterUsername: "testadmin"
+      #MasterUsername: "testadmin"
       DBName: "testdb"
       EnableIAMDatabaseAuthentication: false
       BackupRetentionPeriod: 7
