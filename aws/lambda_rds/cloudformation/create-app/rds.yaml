@@ -116,10 +116,10 @@ Resources:
       #CACertificateIdentifier: "rds-ca-rsa2048-g1"
       #ManageMasterUserPassword: false
       #MasterUserSecret: {}
-      VPCSecurityGroups:
-      - Fn::GetAtt:
-        - "EC2SecurityGroup"
-        - "GroupId"
+      #VPCSecurityGroups:
+      #- Fn::GetAtt:
+      #  - "EC2SecurityGroup"
+      #  - "GroupId"
       #DBSecurityGroups: []
       #MasterUsername: "testadmin"
       #DBName: "testdb"
