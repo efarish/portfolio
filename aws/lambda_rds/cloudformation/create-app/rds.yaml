@@ -93,11 +93,11 @@ Resources:
       #DedicatedLogVolume: false
       #CopyTagsToSnapshot: false
       #MultiAZ: false
-      #Engine: "aurora-postgresql"
+      Engine: "aurora-postgresql"
       #Tags: []
       #EngineLifecycleSupport: "open-source-rds-extended-support-disabled"
       LicenseModel: "postgresql-license"
-      #EngineVersion: "16.6"
+      EngineVersion: "16.6"
       #StorageType: "aurora"
       #KmsKeyId:
       #  Fn::GetAtt:
