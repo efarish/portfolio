@@ -111,8 +111,7 @@ Resources:
       DBSubnetGroupName:
         Ref: "RDSDBSubnetGroupDefaultvpcLambdaRDS"
       DeletionProtection: false
-      DBInstanceIdentifier: "database-1-instance-1"
-      AllocatedStorage: "1"
+      DBInstanceIdentifier: "database-1-instance-1" #AllocatedStorage: "1"
       CACertificateIdentifier: "rds-ca-rsa2048-g1"
       ManageMasterUserPassword: false
       MasterUserSecret: {}
@@ -218,8 +217,7 @@ Resources:
       AutoMinorVersionUpgrade: true
       DBSubnetGroupName:
         Ref: "RDSDBSubnetGroupDefaultvpcLambdaRDS"
-      DeletionProtection: false
-      AllocatedStorage: 1
+      DeletionProtection: false #AllocatedStorage: 1
       ManageMasterUserPassword: false
       MasterUserSecret: {}
       MasterUsername: "testadmin"
