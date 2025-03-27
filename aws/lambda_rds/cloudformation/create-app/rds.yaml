@@ -55,6 +55,12 @@ Resources:
           - "kms:Get*"
           - "kms:List*"
           - "kms:RevokeGrant"
+          - "kms:Create*"
+          - "kms:Put*"
+          - "kms:Update*"
+          - "kms:Revoke*"
+          - "kms:Get*"
+          - "kms:Delete*"          
           Effect: "Allow"
           Principal:
             AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
