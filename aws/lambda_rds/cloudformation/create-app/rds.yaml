@@ -31,6 +31,12 @@ Resources:
               kms:ViaService: "rds.us-east-1.amazonaws.com"
           Resource: "*"
           Action:
+          - "kms:Create*"
+          - "kms:Put*"
+          - "kms:Update*"
+          - "kms:Revoke*"
+          - "kms:Get*"
+          - "kms:Delete*"
           - "kms:Encrypt"
           - "kms:Decrypt"
           - "kms:ReEncrypt*"
