@@ -143,6 +143,14 @@ Resources:
         FromPort: -1
         ToPort: -1
 
+  LambdaEgressToRDS:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Allow Lambda to call RDS.
+      GroupId: !Ref LambdaSecurityGroup
+      IpProtocol: -1
+      DestinationSecurityGroupId: !Ref EC2SecurityGroup
+
   RDSDBSubnetGroupDefaultvpcLambdaRDS:
     UpdateReplacePolicy: "Retain"
     Type: "AWS::RDS::DBSubnetGroup"
