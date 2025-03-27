@@ -79,58 +79,58 @@ Resources:
     Type: "AWS::RDS::DBInstance"
     DeletionPolicy: "Delete"
     Properties:
-      StorageEncrypted: true
-      AssociatedRoles: []
-      Port: "5432"
+      #StorageEncrypted: true
+      #AssociatedRoles: []
+      #Port: "5432"
       DBClusterIdentifier:
         Ref: "RDSDBCluster"
-      ProcessorFeatures: []
-      StorageThroughput: 0
-      PreferredBackupWindow: "07:55-08:25"
-      MonitoringInterval: 0
+      #ProcessorFeatures: []
+      #StorageThroughput: 0
+      #PreferredBackupWindow: "07:55-08:25"
+      #MonitoringInterval: 0
       DBParameterGroupName: "default.aurora-postgresql16"
-      NetworkType: "IPV4"
-      DedicatedLogVolume: false
-      CopyTagsToSnapshot: false
-      MultiAZ: false
-      Engine: "aurora-postgresql"
-      Tags: []
-      EngineLifecycleSupport: "open-source-rds-extended-support-disabled"
+      #NetworkType: "IPV4"
+      #DedicatedLogVolume: false
+      #CopyTagsToSnapshot: false
+      #MultiAZ: false
+      #Engine: "aurora-postgresql"
+      #Tags: []
+      #EngineLifecycleSupport: "open-source-rds-extended-support-disabled"
       LicenseModel: "postgresql-license"
-      EngineVersion: "16.6"
-      StorageType: "aurora"
-      KmsKeyId:
-        Fn::GetAtt:
-        - "KMSKey"
-        - "Arn"
+      #EngineVersion: "16.6"
+      #StorageType: "aurora"
+      #KmsKeyId:
+      #  Fn::GetAtt:
+      #  - "KMSKey"
+      #  - "Arn"
       DBInstanceClass: "db.serverless"
       AvailabilityZone: "us-east-1a"
       OptionGroupName: "default:aurora-postgresql-16"
-      PreferredMaintenanceWindow: "fri:09:06-fri:09:36"
+      #PreferredMaintenanceWindow: "fri:09:06-fri:09:36"
       EnablePerformanceInsights: false
-      AutoMinorVersionUpgrade: true
-      DBSubnetGroupName:
-        Ref: "RDSDBSubnetGroupDefaultvpcLambdaRDS"
+      #AutoMinorVersionUpgrade: true
+      #DBSubnetGroupName:
+      #  Ref: "RDSDBSubnetGroupDefaultvpcLambdaRDS"
       #DeletionProtection: false
       DBInstanceIdentifier: "database-1-instance-1" #AllocatedStorage: "1"
-      CACertificateIdentifier: "rds-ca-rsa2048-g1"
+      #CACertificateIdentifier: "rds-ca-rsa2048-g1"
       #ManageMasterUserPassword: false
-      MasterUserSecret: {}
+      #MasterUserSecret: {}
       VPCSecurityGroups:
       - Fn::GetAtt:
         - "EC2SecurityGroup"
         - "GroupId"
-      DBSecurityGroups: []
+      #DBSecurityGroups: []
       #MasterUsername: "testadmin"
       #DBName: "testdb"
-      EnableIAMDatabaseAuthentication: false
-      BackupRetentionPeriod: 7
-      PromotionTier: 1
+      #EnableIAMDatabaseAuthentication: false
+      #BackupRetentionPeriod: 7
+      #PromotionTier: 1
       PubliclyAccessible: false
-      EnableCloudwatchLogsExports:
-      - "iam-db-auth-error"
-      - "instance"
-      - "postgresql"
+      #EnableCloudwatchLogsExports:
+      #- "iam-db-auth-error"
+      #- "instance"
+      #- "postgresql"
 
   EC2SecurityGroup:
     UpdateReplacePolicy: "Retain"
