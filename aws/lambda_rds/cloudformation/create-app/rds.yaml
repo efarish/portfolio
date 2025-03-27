@@ -60,7 +60,8 @@ Resources:
           - "kms:Update*"
           - "kms:Revoke*"
           - "kms:Get*"
-          - "kms:Delete*"          
+          - "kms:Delete*"   
+          - "kms:Enable*"       
           Effect: "Allow"
           Principal:
             AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
