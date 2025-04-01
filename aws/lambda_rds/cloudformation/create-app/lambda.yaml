@@ -53,6 +53,28 @@ Resources:
         SecurityGroupIds: [!Ref LambdaSecurityGroup]
         SubnetIds: !Ref DeploymentSubnetIds
         Ipv6AllowedForDualStack: false
+      Events:
+        Api1:
+          Type: HttpApi
+          Properties:
+            Path: /health
+            Method: get
+        Api2:
+          Type: HttpApi
+          Properties:
+            Path: /do_select
+            Method: post
+        Api3:
+          Type: HttpApi
+          Properties:
+            Path: /create_schema
+            Method: post
+        Api4:
+          Type: HttpApi
+          Properties:
+            Path: /insert_user
+            Method: post
+
 
 Outputs:
   LambdaRdsConnect:

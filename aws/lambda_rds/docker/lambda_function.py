@@ -65,7 +65,10 @@ def insert_user(event, context):
 
 
 def lambda_handler(event, context):
+
     print(f'{event=}')
+    print(f'{context=}')
+    
     body = event["body"]
     req = json.loads(body)
     event_type = req['event_type']
