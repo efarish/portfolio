@@ -149,12 +149,11 @@ Resources:
       MonitoringInterval: 0
       NetworkType: "IPV4"
       VpcSecurityGroupIds:
-      - Fn::GetAtt:   #sg-0e39ffd40872b7706"
+      - Fn::GetAtt:  
         - "EC2SecurityGroup"
         - "GroupId"
       CopyTagsToSnapshot: false
       Engine: "aurora-postgresql"
-      Tags: []
       EngineLifecycleSupport: "open-source-rds-extended-support-disabled"
       EngineVersion: "16.6"
       StorageType: "aurora"
@@ -178,9 +177,7 @@ Resources:
       AutoMinorVersionUpgrade: true
       DBSubnetGroupName:
         Ref: "RDSDBSubnetGroupDefaultvpcLambdaRDS"
-      #DeletionProtection: false #AllocatedStorage: 1
       ManageMasterUserPassword: false
-      MasterUserSecret: {}
       MasterUsername: "testadmin"
       MasterUserPassword: "a_password_"
       EnableIAMDatabaseAuthentication: false
