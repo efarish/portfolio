@@ -77,7 +77,7 @@ def lambda_handler(event, context):
     event_type = event['rawPath']
     
     match event_type:
-        case '/health':
+        case '/health_check':
             return health_check()
         case '/create_schema':
             return create_schema()
