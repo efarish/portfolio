@@ -7,17 +7,22 @@ from model import Users
 from sqlalchemy import MetaData, delete, select, text
 
 
-def test_lambda_1():
+def test_health_check():
 
-    req = {"body":'{"event_type": "DO_SELECT"}'}
+    event = {'rawPath': '/health_check'}
 
-    lambda_function.lambda_handler(req, None)
+    lambda_function.lambda_handler(event, None)
 
+def test_do_select():
+
+    event = {'rawPath': '/do_select'}
+
+    lambda_function.lambda_handler(event, None)
 
 def test_lambda_handler_create_schema():
-    req = {"body":'{"event_type": "CREATE_SCHEMA"}'}
+    event = {"rawPath": "/create_schema"}
     try:
-        lambda_function.lambda_handler(req, None)
+        lambda_function.lambda_handler(event, None)
         for conn in get_db():
             sql = os.getenv('SCHEMA_CHECK')
             statement = select(text(sql))
@@ -29,30 +34,45 @@ def test_lambda_handler_create_schema():
         metadata.reflect(bind=engine)
         metadata.drop_all(engine)
 
-def test_lambda_handle_insert_user():
+
+def test_lambda_handle_insert_admin_user():
     try:
-        req = {"body":'{"event_type": "CREATE_SCHEMA"}'}
-        lambda_function.lambda_handler(req, None)
-        req = {"body":'{"event_type": "INSERT_USER"}'}
-        lambda_function.lambda_handler(req, None)
+        event = {"rawPath": "/create_schema"}
+        lambda_function.lambda_handler(event, None)
+        event = {"rawPath": "/create_admin_user"}
+        lambda_function.lambda_handler(event, None)
         for conn in get_db():
-            insert_statement = select(Users.id, Users.user_name, Users.role).where(Users.user_name == 'A_User')
-            result = conn.execute(insert_statement)
+            select_statement = select(Users.id, Users.user_name, Users.role).where(Users.user_name == 'admin')
+            result = conn.execute(select_statement)
             users = result.all()
             assert len(users) == 1
             user = users[0]
-            assert user[1] == 'A_User' 
-            delete_statement = delete(Users).where(Users.user_name == 'A_User')
+            assert user[1] == 'admin' 
+            delete_statement = delete(Users).where(Users.user_name == 'admin')
             result = conn.execute(delete_statement)
             assert result.rowcount == 1
             conn.commit()
-        lambda_function.lambda_handler(req, None)
+        lambda_function.lambda_handler(event, None)
         for conn in get_db():
-            insert_statement = select(Users.id, Users.user_name, Users.role).where(Users.user_name == 'A_User')
+            insert_statement = select(Users.id, Users.user_name, Users.role).where(Users.user_name == 'admin')
             result = conn.execute(insert_statement)
             users = result.all()
             assert len(users) == 1
     finally:
         metadata = MetaData()
         metadata.reflect(bind=engine)
-        metadata.drop_all(engine)       
+        metadata.drop_all(engine) 
+
+def test_lambda_handle_insert_user_fail_1():
+    try:
+        event = {"rawPath": "/create_schema"}
+        lambda_function.lambda_handler(event, None)
+        event = {"rawPath": "/create_user", 'body': '{"role": "user", "password": "a_password"}'}
+        result = lambda_function.lambda_handler(event, None)
+        assert result['statusCode'] == 400
+    finally:
+        metadata = MetaData()
+        metadata.reflect(bind=engine)
+        metadata.drop_all(engine)
+
+       

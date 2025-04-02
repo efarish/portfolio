@@ -57,7 +57,7 @@ Resources:
         Api1:
           Type: HttpApi
           Properties:
-            Path: /health
+            Path: /health_check
             Method: get
         Api2:
           Type: HttpApi
@@ -72,7 +72,12 @@ Resources:
         Api4:
           Type: HttpApi
           Properties:
-            Path: /insert_user
+            Path: /create_admin_user
+            Method: post
+        Api5:
+          Type: HttpApi
+          Properties:
+            Path: /create_user
             Method: post
 
 
