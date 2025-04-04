@@ -2,7 +2,6 @@ import json
 import os
 
 import boto3
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.future import select as select_async
@@ -28,10 +27,6 @@ def get_db_secrets():
     print('Got Secrets.')
 
     return secret
-
-print('Loading environment...')
-load_dotenv()
-print('Loaded environment.')
 
 if os.getenv('DB_URL', ...) is Ellipsis:
     secrets = get_db_secrets()

@@ -62,19 +62,14 @@ Resources:
         Api2:
           Type: HttpApi
           Properties:
-            Path: /do_select
+            Path: /create_schema
             Method: post
         Api3:
           Type: HttpApi
           Properties:
-            Path: /create_schema
-            Method: post
-        Api4:
-          Type: HttpApi
-          Properties:
             Path: /create_admin_user
             Method: post
-        Api5:
+        Api4:
           Type: HttpApi
           Properties:
             Path: /create_user

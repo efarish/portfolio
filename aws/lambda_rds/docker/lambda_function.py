@@ -1,11 +1,15 @@
 import json
+import logging
 import os
 
-from db import Base, engine, get_async_db, get_db
-from model import Users
+from dotenv import load_dotenv
+from entity import UserDAO, UtilDAO
 from pydantic import BaseModel, ValidationError
-from sqlalchemy import select, text
 
+load_dotenv()
+
+logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
+logger = logging.getLogger(__name__)
 
 class UserRequest(BaseModel):
     user_name: str
@@ -15,38 +19,22 @@ class UserRequest(BaseModel):
 def health_check():
     return {'statusCode': 200, 'body': 'Service is up!'}
 
-def do_select():
-
-    for conn in get_db():
-        statement = select(text("1"))
-        result = conn.execute(statement)
-        assert result.one()[0] == 1
-
-    return {'statusCode': 200, 'body': 'Done.'}
-
-
 def create_schema():
+    try:
+        UtilDAO.create_schema()
+    except Exception as e:
+        logger.error(f'{e=}')
+        return {'statusCode': 500, 'body': f'Failed to create schema.'} 
 
-    for conn in get_db():
-        sql = os.getenv('SCHEMA_CHECK')
-        statement = select(text(sql))
-        result = conn.execute(statement)
-        is_found = result.one()[0] 
-        if not is_found:
-            print(f'Creating schema...')
-            Base.metadata.create_all(bind=engine)
-        else: print(f'Schema already exists.')
-    
     return {'statusCode': 201, 'body': f'Done.'}
 
 def create_admin_user():
-    for conn in get_db():
-        create_user_model = Users(
-            user_name='admin',
-            role='admin',
-            password='a_password_')
-        conn.add(create_user_model)
-        conn.commit()
+    try:
+        UserDAO.create_admin_user()
+    except Exception as e:
+        logger.error(f'{e=}')
+        return {'statusCode': 500, 'body': f'Failed to create admin user.'}
+
     return {'statusCode': 201, 'body': f'Admin added.'}
 
 def create_user(event):
@@ -54,16 +42,13 @@ def create_user(event):
     print(f'body=')
     try:
         user = UserRequest.model_validate_json(body)
+        UserDAO.create(user.user_name, user.role, user.password)
     except ValidationError as ve:
-        print(f've=')
-        return {'statusCode': 400, 'body': f'Failed to create user.'}
-    for conn in get_db():
-        create_user_model = Users(
-            user_name=user.user_name,
-            role=user.role,
-            password=user.password)
-        conn.add(create_user_model)
-        conn.commit()
+        logger.error(f'{ve=}')
+        return {'statusCode': 400, 'body': f'Validation error.'}
+    except Exception as e:
+        logger.error(f'{e=}')
+        return {'statusCode': 500, 'body': f'Failed to create user.'}
     return {'statusCode': 201, 'body': f'Use {user.user_name} added.'}
 
 def lambda_handler(event, context):
@@ -81,8 +66,6 @@ def lambda_handler(event, context):
             return health_check()
         case '/create_schema':
             return create_schema()
-        case '/do_select': 
-            return do_select()
         case '/create_admin_user':
             return create_admin_user()
         case '/create_user':
