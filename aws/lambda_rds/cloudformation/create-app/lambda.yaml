@@ -59,25 +59,25 @@ Resources:
           Properties:
             Path: /health_check
             Method: get
-            RestApiId: !Ref LambdaApi 
+            ApiId: !Ref LambdaApi 
         Api2:
           Type: HttpApi
           Properties:
             Path: /create_schema
             Method: post
-            RestApiId: !Ref LambdaApi
+            ApiId: !Ref LambdaApi
         Api3:
           Type: HttpApi
           Properties:
             Path: /create_admin_user
             Method: post
-            RestApiId: !Ref LambdaApi
+            ApiId: !Ref LambdaApi
         Api4:
           Type: HttpApi
           Properties:
             Path: /create_user
             Method: post
-            RestApiId: !Ref LambdaApi
+            ApiId: !Ref LambdaApi
 
   LambdaApi:
     Type: AWS::Serverless::HttpApi
