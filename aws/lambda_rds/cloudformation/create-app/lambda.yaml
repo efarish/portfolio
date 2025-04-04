@@ -109,7 +109,7 @@ Outputs:
     Value: !GetAtt LambdaRdsConnect.Arn
   LambdaRdsFunctionUrl:
     Description: "URL of the HTTP API"
-    Value: !GetAtt: LambdaRdsFunction.FunctionUrl #!Ref LambdaApi  # This will be the HttpApiUrl output
+    Value: !GetAtt LambdaRdsFunction.FunctionUrl #!Ref LambdaApi  # This will be the HttpApiUrl output
 
   
 
