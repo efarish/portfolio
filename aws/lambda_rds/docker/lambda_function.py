@@ -26,7 +26,7 @@ def create_schema():
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create schema.'} 
 
-    return {'statusCode': 201, 'body': f'Done.'}
+    return {'statusCode': 201, 'body': f'Schema created.'}
 
 def create_admin_user():
     try:

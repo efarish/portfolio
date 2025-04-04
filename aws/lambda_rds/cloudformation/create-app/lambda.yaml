@@ -17,14 +17,14 @@ Parameters:
 
 Resources:
 
-  LambdaRdsConnect:
+  LambdaRdsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: 'RdsConnect'
+      FunctionName: 'LambdaRdsFunction'
       CodeUri: .
       Description: 'A Lambda To Test Connecting to RDS.'
       MemorySize: 128
-      Timeout: 3
+      Timeout: 10
       Architectures:
         - x86_64
       EphemeralStorage:
@@ -59,27 +59,57 @@ Resources:
           Properties:
             Path: /health_check
             Method: get
+            #RestApiId: !Ref LambdaApi 
         Api2:
           Type: HttpApi
           Properties:
             Path: /create_schema
             Method: post
+            #RestApiId: !Ref LambdaApi
         Api3:
           Type: HttpApi
           Properties:
             Path: /create_admin_user
             Method: post
+            #RestApiId: !Ref LambdaApi
         Api4:
           Type: HttpApi
           Properties:
             Path: /create_user
             Method: post
+            #RestApiId: !Ref LambdaApi
 
+  #LambdaApi:
+  #  Type: AWS::Serverless::HttpApi
+  #  Properties:
+  #    StageName: !Ref APIStage
+  #    MethodSettings:
+  #      - ResourcePath: "/*"
+  #        HttpMethod: "*"
+
+  #APILogGroup:
+  #    Type: AWS::Logs::LogGroup
+  #    Properties:
+  #      LogGroupName: !Sub /aws/apigateway/LambdaRdsFunction
+  #      RetentionInDays: 1
+
+  #APIStage:
+  #  Type: AWS::ApiGatewayV2::Stage
+  #  Properties:
+  #    StageName: $default
+  #    AutoDeploy: true
+  #    ApiId: !Ref LambdaApi
+  #    AccessLogSettings:
+  #      DestinationArn: !GetAtt APILogGroup.Arn 
+  #      Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
 
 Outputs:
-  LambdaRdsConnect:
+  LambdaRdsFunctionArn:
     Description: Arn of Lambda function.
     Value: !GetAtt LambdaRdsConnect.Arn
+  LambdaRdsFunctionUrl:
+    Description: "URL of the HTTP API"
+    Value: !GetAtt: LambdaRdsFunction.FunctionUrl #!Ref LambdaApi  # This will be the HttpApiUrl output
 
   
 

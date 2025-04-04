@@ -107,3 +107,8 @@ Outputs:
   RDSClusterEndpoint:
     Description: URL of RDS cluster.
     Value: !GetAtt RDSStack.Outputs.RDSClusterEndpoint
+  LambdaStackUrl:
+    Description: URL of API GW.
+    Value: !GetAtt LambdaStack.Outputs.LambdaRdsFunctionUrl
+
+    
