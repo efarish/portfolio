@@ -59,49 +59,49 @@ Resources:
           Properties:
             Path: /health_check
             Method: get
-            #RestApiId: !Ref LambdaApi 
+            RestApiId: !Ref LambdaApi 
         Api2:
           Type: HttpApi
           Properties:
             Path: /create_schema
             Method: post
-            #RestApiId: !Ref LambdaApi
+            RestApiId: !Ref LambdaApi
         Api3:
           Type: HttpApi
           Properties:
             Path: /create_admin_user
             Method: post
-            #RestApiId: !Ref LambdaApi
+            RestApiId: !Ref LambdaApi
         Api4:
           Type: HttpApi
           Properties:
             Path: /create_user
             Method: post
-            #RestApiId: !Ref LambdaApi
+            RestApiId: !Ref LambdaApi
 
-  #LambdaApi:
-  #  Type: AWS::Serverless::HttpApi
-  #  Properties:
-  #    StageName: !Ref APIStage
-  #    MethodSettings:
-  #      - ResourcePath: "/*"
-  #        HttpMethod: "*"
+  LambdaApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref APIStage
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
 
-  #APILogGroup:
-  #    Type: AWS::Logs::LogGroup
-  #    Properties:
-  #      LogGroupName: !Sub /aws/apigateway/LambdaRdsFunction
-  #      RetentionInDays: 1
+  APILogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/apigateway/LambdaRdsFunction
+        RetentionInDays: 1
 
-  #APIStage:
-  #  Type: AWS::ApiGatewayV2::Stage
-  #  Properties:
-  #    StageName: $default
-  #    AutoDeploy: true
-  #    ApiId: !Ref LambdaApi
-  #    AccessLogSettings:
-  #      DestinationArn: !GetAtt APILogGroup.Arn 
-  #      Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
+  APIStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: $default
+      AutoDeploy: true
+      ApiId: !Ref LambdaApi
+      AccessLogSettings:
+        DestinationArn: !GetAtt APILogGroup.Arn 
+        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
 
 Outputs:
   LambdaRdsFunctionArn:
@@ -109,7 +109,7 @@ Outputs:
     Value: !GetAtt LambdaRdsFunction.Arn
   LambdaRdsFunctionUrl:
     Description: "URL of the HTTP API"
-    Value: !GetAtt LambdaRdsFunction.FunctionUrl #!Ref LambdaApi  # This will be the HttpApiUrl output
+    Value: !Sub https://${LambdaApi}.execute-api.${AWS::Region}.amazonaws.com #!GetAtt LambdaRdsFunction.FunctionUrl #!Ref LambdaApi  # This will be the HttpApiUrl output
 
   
 
