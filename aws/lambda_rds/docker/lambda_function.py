@@ -42,7 +42,7 @@ def create_user(event):
     print(f'body=')
     try:
         user = UserRequest.model_validate_json(body)
-        UserDAO.create(user.user_name, user.role, user.password)
+        UserDAO.create(**user.model_dump())
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': f'Validation error.'}
