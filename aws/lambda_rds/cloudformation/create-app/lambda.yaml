@@ -82,7 +82,8 @@ Resources:
   LambdaApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      StageName: !Ref APIStage
+      Description: API for user management.
+      #StageName: !Ref APIStage
       #MethodSettings:
       #  - ResourcePath: "/*"
       #    HttpMethod: "*"
@@ -93,15 +94,15 @@ Resources:
         LogGroupName: !Sub /aws/apigateway/LambdaRdsFunction
         RetentionInDays: 1
 
-  APIStage:
-    Type: AWS::ApiGatewayV2::Stage
-    Properties:
-      StageName: $default
-      AutoDeploy: true
-      ApiId: !Ref LambdaApi
-      AccessLogSettings:
-        DestinationArn: !GetAtt APILogGroup.Arn 
-        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
+  #APIStage:
+  #  Type: AWS::ApiGatewayV2::Stage
+  #  Properties:
+  #    StageName: $default
+  #    AutoDeploy: true
+  #    ApiId: !Ref LambdaApi
+  #    AccessLogSettings:
+  #      DestinationArn: !GetAtt APILogGroup.Arn 
+  #      Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
 
 Outputs:
   LambdaRdsFunctionArn:
