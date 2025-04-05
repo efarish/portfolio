@@ -12,7 +12,7 @@ import sys
 import httpx
 import websockets
 
-CONFIG_API = 'https://a-unique-public-bucket-name.s3.us-east-1.amazonaws.com/config.json'
+CONFIG_API = 'https://<An HTTP accessible S3 folder >/config.json'
 
 def get_config() -> dict:
     response = httpx.get(CONFIG_API)
@@ -20,7 +20,6 @@ def get_config() -> dict:
     props = response.json()['config'] 
     print(f'{props=}')
     return props
-
 
 class WebSocketClient:
     def __init__(self, uri, jwt_header):
@@ -59,7 +58,6 @@ async def main(ws_api, admin_headers, usr):
         response = await client.receive()
         print(f'Received: {response}')
 
-    #await client.close()
     
 if __name__ == "__main__":
 
