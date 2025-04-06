@@ -1,5 +1,9 @@
+import sys
+
 import pytest
 from dotenv import load_dotenv
+
+sys.path.append('./docker/entity/')
 
 load_dotenv()
 
