@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from dataclasses import asdict
 
 from dotenv import load_dotenv
 from entity import UserDAO, UtilDAO
@@ -39,7 +40,6 @@ def create_admin_user():
 
 def create_user(event):
     body = event['body']
-    print(f'body=')
     try:
         user = UserRequest.model_validate_json(body)
         UserDAO.create(**user.model_dump())
@@ -51,14 +51,19 @@ def create_user(event):
         return {'statusCode': 500, 'body': f'Failed to create user.'}
     return {'statusCode': 201, 'body': f'Use {user.user_name} added.'}
 
+def get_users():
+    try:
+        users = UserDAO.get_users()
+    except Exception as e:
+        logger.error(f'{e=}')
+        return {'statusCode': 500, 'body': f'Failed to get all users.'}
+    return {'statusCode': 200, 'body': json.dumps([asdict(user) for user in users])}
+
 def lambda_handler(event, context):
 
-    print(f'{event=}')
-    print(f'{context=}')
+    logger.info(f'{event=}')
+    logger.info(f'{context=}')
     
-    #body = json.loads(event["body"])
-    #print(f'body=')
-
     event_type = event['rawPath']
     
     match event_type:
@@ -70,6 +75,8 @@ def lambda_handler(event, context):
             return create_admin_user()
         case '/create_user':
             return create_user(event)
+        case '/get_users':
+            return get_users()
         case _:
             return {'statusCode': 400, 'body': f'Invalid request: {event_type}.'}
 

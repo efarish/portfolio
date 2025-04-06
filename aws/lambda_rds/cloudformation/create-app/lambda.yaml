@@ -78,6 +78,12 @@ Resources:
             Path: /create_user
             Method: post
             ApiId: !Ref LambdaApi
+        Api5:
+          Type: HttpApi
+          Properties:
+            Path: /get_users
+            Method: get
+            ApiId: !Ref LambdaApi
 
   LambdaApi:
     Type: AWS::Serverless::HttpApi
@@ -99,7 +105,7 @@ Outputs:
     Value: !GetAtt LambdaRdsFunction.Arn
   LambdaRdsFunctionUrl:
     Description: "URL of the HTTP API"
-    Value: !Sub https://${LambdaApi}.execute-api.${AWS::Region}.amazonaws.com #!GetAtt LambdaRdsFunction.FunctionUrl #!Ref LambdaApi  # This will be the HttpApiUrl output
+    Value: !Sub https://${LambdaApi}.execute-api.${AWS::Region}.amazonaws.com 
 
   
 

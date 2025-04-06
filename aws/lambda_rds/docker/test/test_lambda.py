@@ -1,4 +1,5 @@
 
+import json
 import os
 
 import lambda_function
@@ -70,6 +71,26 @@ def test_lambda_handle_insert_user_fail_1():
         event = {"rawPath": "/create_user", 'body': '{"role": "user", "password": "a_password"}'}
         result = lambda_function.lambda_handler(event, None)
         assert result['statusCode'] == 400
+    finally:
+        metadata = MetaData()
+        metadata.reflect(bind=engine)
+        metadata.drop_all(engine)
+
+def test_lambda_get_users():
+    try:
+        event = {"rawPath": "/create_schema"}
+        lambda_function.lambda_handler(event, None)
+        event = {"rawPath": "/create_user", 'body': '{"user_name": "user_1", "role": "user", "password": "a_password"}'}
+        result = lambda_function.lambda_handler(event, None)
+        event = {"rawPath": "/create_user", 'body': '{"user_name": "user_2", "role": "user", "password": "a_password"}'}
+        result = lambda_function.lambda_handler(event, None)        
+        event = {"rawPath": "/get_users"}
+        result = lambda_function.lambda_handler(event, None)
+        assert result['statusCode'] == 200
+        users = json.loads(result['body'])
+        assert len(users) == 2
+        assert users[0]['user_name'] == 'user_1'
+        assert users[1]['user_name'] == 'user_2'
     finally:
         metadata = MetaData()
         metadata.reflect(bind=engine)
