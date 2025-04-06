@@ -14,7 +14,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: arn:aws:codeconnections:<ADD CONNECTION HERE>
+    Default: arn:aws:codeconnections:<ADD DEVELOPER TOOLS CODE CONNECTION HERE>
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
@@ -51,6 +51,7 @@ Resources:
                   - codebuild:StartBuildBatch
                   - secretsmanager:CreateSecret
                   - secretsmanager:DeleteSecret 
+                  - apigateway:*
                   - cloudformation:*
                   - cloudwatch:*
                   - ec2:*
@@ -59,6 +60,9 @@ Resources:
                   - s3:*
                   - lambda:*
                   - iam:*
+                  - rds:*
+                  - kms:*
+                  - logs:*
                 Resource:
                   - '*'
       Path: /
