@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The template a Lambda function using Docker.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Name of the project.
+    Default: lambda_dynamodb
+
+Resources:
+
+  # Lambda stack
+  LambdaStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./lambda.yaml
+      Parameters:
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
+
+# -------------------------------------------------------------------------
+# Information about the stack.
+# -------------------------------------------------------------------------
+Outputs:
+
+  LambdaStackUrl:
+    Description: URL of API GW.
+    Value: !GetAtt LambdaStack.Outputs.LambdaDynamoDBFunctionUrl
+
+    
