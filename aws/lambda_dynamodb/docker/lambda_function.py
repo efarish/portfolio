@@ -29,7 +29,7 @@ def create_user(event):
         UsersDAO.create_user(**user.model_dump())
     except ValidationError as ve:
         logger.error(f'{ve=}')
-        return {'statusCode': 400, 'body': f'Validation error.'}
+        return {'statusCode': 400, 'body': 'Validation error.'}
     except Exception as e:
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create user.'}
