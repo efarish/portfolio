@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-from dataclasses import asdict
 
 from dotenv import load_dotenv
 from entity import UsersDAO
@@ -19,7 +18,6 @@ class CreateUserRequest(BaseModel):
 
 class GetUserRequest(BaseModel):
     user_name: str
-    role: str
 
 def health_check():
     return {'statusCode': 200, 'body': 'Service is up!'}
@@ -35,20 +33,22 @@ def create_user(event):
     except Exception as e:
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create user.'}
-    return {'statusCode': 201, 'body': f'Use {user.user_name} added.'}
+    return {'statusCode': 201, 'body': f'User {user.user_name} added.'}
 
 def get_user(event):
     body = event['body']
     try:
         user = GetUserRequest.model_validate_json(body)
-        UsersDAO.create_user(**user.model_dump())
+        result = UsersDAO.get_user(**user.model_dump())
+        assert len(result) == 1
+        user = result[0]
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': f'Validation error.'}
     except Exception as e:
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create user.'}
-    return {'statusCode': 201, 'body': f'Use {user.user_name} added.'}
+    return {'statusCode': 200, 'body': f'{json.dumps(user)}'}
 
 def lambda_handler(event, context):
 

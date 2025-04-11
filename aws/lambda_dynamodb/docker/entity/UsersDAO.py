@@ -1,8 +1,8 @@
 import boto3
-from boto3.dynamodb.conditions import Attr, Key
+from boto3.dynamodb.conditions import Key
 
 
-def add_user(user_name, role, pwd):
+def create_user(user_name, role, pwd):
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table("DeviceTracker_Users")
     user = {
