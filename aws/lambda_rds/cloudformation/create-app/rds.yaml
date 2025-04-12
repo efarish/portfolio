@@ -14,7 +14,7 @@ Parameters:
 
 Resources:
   KMSKey:
-    UpdateReplacePolicy: "Retain"
+    UpdateReplacePolicy: "Delete"  
     Type: "AWS::KMS::Key"
     DeletionPolicy: "Delete"
     Properties:
