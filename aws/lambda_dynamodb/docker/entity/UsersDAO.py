@@ -2,7 +2,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
-USER_TABLE = "DeviceTracker_Users"
+USER_TABLE = "DeviceTracker_User"
 
 def create_user(user_name, role, password):
     dynamodb = boto3.resource("dynamodb")
