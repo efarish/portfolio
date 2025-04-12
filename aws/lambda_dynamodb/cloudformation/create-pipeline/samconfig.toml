@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "lambda-rds-create-pipeline"
+stack_name = "lambda-dynamodb-create-pipeline"
 
 [default.build.parameters]
 parallel = true

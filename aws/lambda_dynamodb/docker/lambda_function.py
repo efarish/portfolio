@@ -30,6 +30,9 @@ def create_user(event):
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': 'Validation error.'}
+    except ValueError as ve:
+        logger.error(f'{ve=}')
+        return {'statusCode': 400, 'body': 'User already exists.'}
     except Exception as e:
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create user.'}

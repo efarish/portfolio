@@ -53,7 +53,7 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /get_user
-            Method: get
+            Method: post
             ApiId: !Ref LambdaApi
 
   LambdaApi:
