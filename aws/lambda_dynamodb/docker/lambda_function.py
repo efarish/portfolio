@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from entity import UsersDAO
 from pydantic import BaseModel, ValidationError
+from util import auth
 
 load_dotenv()
 
@@ -16,11 +17,31 @@ class CreateUserRequest(BaseModel):
     password: str
     role: str
 
+class LoginRequest(BaseModel):
+    user_name: str
+    password: str
+
 class GetUserRequest(BaseModel):
     user_name: str
 
 def health_check():
     return {'statusCode': 200, 'body': 'Service is up!'}
+
+def login(event):
+    body = event['body']
+    try:
+        user = LoginRequest.model_validate_json(body)
+        token = auth.login_for_access_token(user.user_name, user.password)
+    except ValidationError as ve:
+        logger.error(f'{ve=}')
+        return {'statusCode': 400, 'body': 'Validation error.'}
+    except ValueError as ve:
+        logger.error(f'{ve=}')
+        return {'statusCode': 403, 'body': 'Failed login.'}
+    except Exception as e:
+        logger.error(f'{e=}')
+        return {'statusCode': 500, 'body': f'Unexpected login failure.'}
+    return {'statusCode': 200, 'body': json.dumps({"access_token": token, "token_type": "bearer"})}
 
 def create_user(event):
     body = event['body']
@@ -32,7 +53,7 @@ def create_user(event):
         return {'statusCode': 400, 'body': 'Validation error.'}
     except ValueError as ve:
         logger.error(f'{ve=}')
-        return {'statusCode': 400, 'body': 'User already exists.'}
+        return {'statusCode': 403, 'body': 'User already exists.'}
     except Exception as e:
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create user.'}
@@ -42,16 +63,16 @@ def get_user(event):
     body = event['body']
     try:
         user = GetUserRequest.model_validate_json(body)
-        result = UsersDAO.get_user(**user.model_dump())
-        assert len(result) == 1
-        user = result[0]
+        model_user = UsersDAO.get_user(**user.model_dump())
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': f'Validation error.'}
+    except ValueError as ve:
+        return {'statusCode': 404, 'body': f'User not found.'}
     except Exception as e:
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create user.'}
-    return {'statusCode': 200, 'body': f'{json.dumps(user)}'}
+    return {'statusCode': 200, 'body': f'{json.dumps(model_user.model_dump())}'}
 
 def lambda_handler(event, context):
 
@@ -63,6 +84,8 @@ def lambda_handler(event, context):
     match event_type:
         case '/health_check':
             return health_check()
+        case '/login':
+            return login(event)
         case '/create_user':
             return create_user(event)
         case '/get_user':

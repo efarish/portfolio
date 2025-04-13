@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: CodePipeline for Lambda-RDS
+Description: CodePipeline for Lambda-DynamoDB
 
 Parameters:
   PipeLineName:
     Type: String
     Description: Specifies pipeline name.
-    Default: lambda-rds-create-pipeline
+    Default: lambda-dynamodb-create-pipeline
   SourceRepository:
     Type: String
     Description: Specifies a GitHub repository to use as the source repository.
@@ -14,7 +14,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: arn:aws:codeconnections:<ADD DEVELOPER TOOLS CODE CONNECTION HERE>
+    Default: arn:aws:codeconnections:us-east-1:598185244415:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
@@ -60,7 +60,7 @@ Resources:
                   - s3:*
                   - lambda:*
                   - iam:*
-                  - rds:*
+                  - dynamodb:*
                   - kms:*
                   - logs:*
                 Resource:
@@ -97,7 +97,7 @@ Resources:
       Visibility: PRIVATE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: aws/lambda_rds/cloudformation/create-pipeline/buildspec.yml
+        BuildSpec: aws/lambda_dynamodb/cloudformation/create-pipeline/buildspec.yml
         InsecureSsl: false
 
   CodePipeline1:

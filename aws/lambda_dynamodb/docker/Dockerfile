@@ -13,5 +13,7 @@ COPY .env ${LAMBDA_TASK_ROOT}
 COPY *.py ${LAMBDA_TASK_ROOT}
 RUN mkdir /${LAMBDA_TASK_ROOT}/entity
 COPY ./entity/*.py /${LAMBDA_TASK_ROOT}/entity
+RUN mkdir /${LAMBDA_TASK_ROOT}/util
+COPY ./util/*.py /${LAMBDA_TASK_ROOT}/util
 
 
