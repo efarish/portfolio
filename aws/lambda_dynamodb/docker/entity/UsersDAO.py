@@ -17,7 +17,8 @@ class User:
         return asdict(self)
     
 def get_client():
-    return boto3.client("dynamodb")
+    #return boto3.client("dynamodb")
+    return boto3.resource('dynamodb')
 
 def create_user(user_name: str, role: str, password: str) -> User:
     client = get_client()
