@@ -71,7 +71,7 @@ Resources:
         ThrottlingRateLimit: 10
       AccessLogSettings:
         DestinationArn: !GetAtt APILogGroup.Arn 
-        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status, "connectionId": "$context.connectionId" }'      
+        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": "$context.status" }'      
 
   APILogGroup:
       Type: AWS::Logs::LogGroup
