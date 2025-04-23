@@ -10,6 +10,9 @@ BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8')
 ALGORITHM = 'HS256'
 
 def get_current_user(token):
+
+    print(f'JWT Token in current user: {token=}')
+
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')

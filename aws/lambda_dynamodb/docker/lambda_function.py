@@ -33,6 +33,9 @@ def check_logged_in(event) -> User | None:
     if('authorization' not in headers):
         print('No Authorization header')
         return None
+
+    print(f'JWT Token: {headers['authorization']}')
+
     user: User | None = None
     try:
         user = get_current_user(headers['authorization'])
@@ -95,7 +98,7 @@ def get_user(event):
         return {'statusCode': 404, 'body': f'User not found.'}
     except Exception as e:
         logger.error(f'{e=}')
-        return {'statusCode': 500, 'body': f'Failed to create user.'}
+        return {'statusCode': 500, 'body': f'Failed to get user.'}
     return {'statusCode': 200, 'body': f'{json.dumps(model_user.model_dump())}'}
 
 def lambda_handler(event, context):
