@@ -27,7 +27,7 @@ def create_pwd_hash(password):
 def check_user_name(username: str):
 
     try:
-        user: UsersDAO.User = UsersDAO.get_user(username)
+        user: UsersDAO.User = UsersDAO.get_user(username,True)
     except ValueError:
         return None
     
@@ -37,7 +37,8 @@ def authenticate_user(username: str, password: str):
     user = check_user_name(username) 
     if not user:
         return False
-    check = bcrypt.checkpw(password=password.encode('UTF-8'), hashed_password=user.password)
+    #check = bcrypt.checkpw(password=password.encode('UTF-8'), hashed_password=user.password)
+    check = create_pwd_hash(password).decode('UTF-8') == user.password
     if not check:
         return False
     return user

@@ -1,4 +1,5 @@
 from dataclasses import asdict, dataclass
+from typing import Optional
 
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -11,7 +12,7 @@ USER_TABLE = "DeviceTracker_User"
 class User:
     user_name: str
     role: str
-    password: str
+    password: Optional[str]= None
 
     def model_dump(self):
         return asdict(self)
@@ -23,7 +24,8 @@ def get_client():
 def create_user(user_name: str, role: str, password: str) -> User:
     client = get_client()
     table = client.Table(USER_TABLE)
-    user = {"user_name": user_name,"role": role,"password":auth.create_pwd_hash('a_password')}
+    pwd = auth.create_pwd_hash(password).decode('UTF-8')
+    user = {"user_name": user_name,"role": role,"password": pwd}
     try:
         table.put_item(Item=user, ConditionExpression='attribute_not_exists(user_name)')
     except ClientError as e:  
@@ -32,12 +34,17 @@ def create_user(user_name: str, role: str, password: str) -> User:
     return User(**user)
 
 
-def get_user(user_name) -> User:
+def get_user(user_name, return_password=False) -> User:
 
     client = get_client()
     table = client.Table(USER_TABLE)
-    response = table.query(KeyConditionExpression=Key("user_name").eq(user_name))
+    if not return_password:
+        response = table.query(KeyConditionExpression=Key("user_name").eq(user_name), 
+                               ExpressionAttributeNames={"#user_role":"role"}, ProjectionExpression= 'user_name, #user_role')    
+    else:
+        response = table.query(KeyConditionExpression=Key("user_name").eq(user_name))
     if response["Count"] == 0:
         raise ValueError("User not found")
     else:
-        return User(**response["Items"][0])
+        user = response["Items"][0]
+        return User(**user)
