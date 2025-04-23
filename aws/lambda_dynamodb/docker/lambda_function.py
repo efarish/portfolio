@@ -5,9 +5,10 @@ import os
 from dotenv import load_dotenv
 from entity import UsersDAO
 from pydantic import BaseModel, ValidationError
-from util import auth
 
 load_dotenv()
+
+from util import auth
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger(__name__)
