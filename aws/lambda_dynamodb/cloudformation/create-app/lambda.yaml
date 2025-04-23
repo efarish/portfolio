@@ -70,6 +70,21 @@ Resources:
         DestinationArn: !GetAtt APILogGroup.Arn 
         Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
 
+  GateWayUsagePlan:
+    Type: 'AWS::ApiGateway::UsagePlan'
+    Properties:
+      ApiStages:
+        - ApiId: !Ref LambdaApi 
+          Stage: $default
+      Description: HTTP API Usage Plan for LambdaDynamoDBFunction
+      Quota: 
+        Limit: 1000
+        Period: DAY
+      Throttle: 
+        BurstLimit: 20
+        RateLimit: 10
+      UsagePlanName: LambdaDynamoDBFunctionPlan
+
   APILogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
