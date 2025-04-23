@@ -55,6 +55,12 @@ Resources:
             Path: /get_user
             Method: post
             ApiId: !Ref LambdaApi
+        Api4:
+          Type: HttpApi
+          Properties:
+            Path: /login
+            Method: post
+            ApiId: !Ref LambdaApi
 
   LambdaApi:
     Type: AWS::Serverless::HttpApi
