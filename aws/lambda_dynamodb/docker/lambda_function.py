@@ -8,7 +8,8 @@ from pydantic import BaseModel, ValidationError
 load_dotenv()
 
 from entity import UsersDAO
-from util import auth
+from entity.UsersDAO import User
+from util.auth import get_current_user, login_for_access_token
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 logger = logging.getLogger(__name__)
@@ -25,6 +26,22 @@ class LoginRequest(BaseModel):
 class GetUserRequest(BaseModel):
     user_name: str
 
+
+def check_logged_in(event) -> User | None:
+
+    headers = event['headers']
+    if('authorization' not in headers):
+        print('No Authorization header')
+        return None
+    user: User | None = None
+    try:
+        user = get_current_user(headers['authorization'])
+    except ValueError as e:
+        logger.warning(f'{e=}')
+  
+    return user
+
+
 def health_check():
     return {'statusCode': 200, 'body': 'Service is up!'}
 
@@ -32,7 +49,7 @@ def login(event):
     body = event['body']
     try:
         user = LoginRequest.model_validate_json(body)
-        token = auth.login_for_access_token(user.user_name, user.password)
+        token = login_for_access_token(user.user_name, user.password)
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': 'Validation error.'}
@@ -61,7 +78,13 @@ def create_user(event):
     return {'statusCode': 201, 'body': f'User {user.user_name} added.'}
 
 def get_user(event):
+
+    user = check_logged_in(event)
+    if not user:
+        return {'statusCode': 401, 'body': 'Unauthorized.'}
+
     body = event['body']
+
     try:
         user = GetUserRequest.model_validate_json(body)
         model_user = UsersDAO.get_user(**user.model_dump())

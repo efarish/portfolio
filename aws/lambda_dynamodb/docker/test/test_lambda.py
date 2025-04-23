@@ -34,16 +34,22 @@ def test_create_user(mock_dao, user, expected):
 @pt.mark.parametrize('user_request, user_response, expected_status', 
                      [({'user_name': 'a_user'},
                        {'user_name':'a_user', 'role':'user', 'password':'a_password'},200),
-                      ({'user': 'a_user'},None,400), 
+                      ({'user': 'a_user'},{'user_name':'a_user', 'role':'user', 'password':'a_password'},400), 
                       ])
+
+@mock.patch('lambda_function.get_current_user')
 @mock.patch('lambda_function.UsersDAO.get_client')
-def test_get_user(mock_dao, user_request, user_response, expected_status):
+def test_get_user(mock_dao, mock_user, user_request, user_response, expected_status):
 
     mt = MockTable(query_result=[user_response])
     mb = MockBoto3(mockTable=mt)
     mock_dao.return_value = mb
+
+    mock_user.return_value = user_response
     
-    event = {'rawPath': '/get_user', 'body': f'{json.dumps(user_request)}'}
+    event = {'rawPath': '/get_user', 
+             'headers': {'authorization': 'Bearer a token'},
+             'body': f'{json.dumps(user_request)}'}
 
     result = lambda_function.lambda_handler(event, None)
 

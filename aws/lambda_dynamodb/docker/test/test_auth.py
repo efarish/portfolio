@@ -18,6 +18,9 @@ def test_login(mock_dao, user_request, user_response):
     user = auth.get_current_user(token)
     assert user.get('user_name') == user_request.get('user_name')
     assert user.get('role') == user_response.get('role')
+    current_user = auth.get_current_user(token)
+    assert current_user.get('user_name') == user_request.get('user_name')
+    assert current_user.get('role') == user_response.get('role')
 
 
 
