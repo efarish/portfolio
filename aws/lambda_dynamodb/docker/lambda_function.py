@@ -34,8 +34,6 @@ def check_logged_in(event) -> User | None:
         print('No Authorization header')
         return None
 
-    print(f'JWT Token: {headers['authorization']}')
-
     user: User | None = None
     try:
         user = get_current_user(headers['authorization'])
