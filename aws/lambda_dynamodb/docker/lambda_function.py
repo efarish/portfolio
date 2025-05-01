@@ -124,7 +124,7 @@ def lambda_handler(event, context):
     
     event_type = event.get('rawPath',...)
     if event_type is Ellipsis:
-        event['info']['parentTypeName']
+        event_type = event['info']['parentTypeName']
     
     match event_type:
         case '/health_check':
