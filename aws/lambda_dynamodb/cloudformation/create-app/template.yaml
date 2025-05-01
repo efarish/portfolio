@@ -15,12 +15,22 @@ Resources:
     Properties:
       Location: ./lambda.yaml
       Parameters:
+        ProjectName: !Ref ProjectName
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
 
   DynamoDBStack:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./dynamodb.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+
+  GraphQLStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./graphql.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
 
 # -------------------------------------------------------------------------
 # Information about the stack.

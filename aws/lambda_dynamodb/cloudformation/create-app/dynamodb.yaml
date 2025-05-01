@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: The template used for DynamoDB tables.
 
+Parameters:
+  ProjectName:
+    Type: String
+
 Resources:
 
   DynamoDBTableDeviceTrackerUser:
@@ -9,7 +13,7 @@ Resources:
     Type: "AWS::DynamoDB::Table"
     DeletionPolicy: "Delete"
     Properties:
-      TableName: "DeviceTracker_User"
+      TableName: !Sub "${ProjectName}_User"
       AttributeDefinitions:
       - AttributeType: "S"
         AttributeName: "user_name"

@@ -3,6 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Description: The template used for Lambda functions.
 
 Parameters:
+  ProjectName:
+    Type: String
   ImageUrl:
     Type: String
     Description: The url of a docker image that contains the task application.
