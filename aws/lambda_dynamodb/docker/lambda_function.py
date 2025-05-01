@@ -13,6 +13,7 @@ from util.auth import get_current_user, login_for_access_token
 
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_level = getattr(logging, log_level_str)
+print(f'{log_level_str=} {log_level=}')
 logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
@@ -121,7 +122,9 @@ def lambda_handler(event, context):
 
     print(f'{event=} {context=}')
     
-    event_type = event.get('rawPath',event['info']['parentTypeName'])
+    event_type = event.get('rawPath',...)
+    if event_type is Ellipsis:
+        event['info']['parentTypeName']
     
     match event_type:
         case '/health_check':
