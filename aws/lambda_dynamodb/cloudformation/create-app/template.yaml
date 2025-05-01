@@ -10,13 +10,17 @@ Parameters:
 
 Resources:
 
-  # Lambda stack
   LambdaStack:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./lambda.yaml
       Parameters:
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
+
+  DynamoDBStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./dynamodb.yaml
 
 # -------------------------------------------------------------------------
 # Information about the stack.

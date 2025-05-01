@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The template used for DynamoDB tables.
+
+Resources:
+
+  DynamoDBTableDeviceTrackerUser:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Delete"
+    Properties:
+      TableName: "DeviceTracker_User"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "user_name"
+      BillingMode: "PAY_PER_REQUEST"
+      WarmThroughput:
+        ReadUnitsPerSecond: 100
+        WriteUnitsPerSecond: 100
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "user_name"
+      DeletionProtectionEnabled: false
+      TableClass: "STANDARD"
+
