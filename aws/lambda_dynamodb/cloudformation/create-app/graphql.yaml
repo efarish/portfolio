@@ -71,7 +71,16 @@ Resources:
       PayloadFormatVersion: '1.0'
       Description: "API GW Integration with AppSync GraphQL API"
 
-
+  APIRouteGraphQL:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HTTPApiGWAppId
+      RouteKey: 'POST /get_user_gql'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref ApiGatewayGraphQLIntegration
+          
 Outputs:
   GraphQLAPIURL:
     Description: URL of the GraphQL API
