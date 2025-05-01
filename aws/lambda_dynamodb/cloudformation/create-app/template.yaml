@@ -34,6 +34,7 @@ Resources:
       Parameters:
         ProjectName: !Ref ProjectName
         HTTPApiGWAppId: !GetAtt LambdaStack.Outputs.HTTPApiGWAppId
+        LambdaFunctionArn: !GetAtt LambdaStack.Outputs.LambdaFunctionArn
 
 # -------------------------------------------------------------------------
 # Information about the stack.

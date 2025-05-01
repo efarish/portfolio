@@ -83,7 +83,7 @@ Resources:
 
 
 Outputs:
-  LambdaDynamoDBFunctionArn:
+  LambdaFunctionArn:
     Description: Arn of Lambda function.
     Value: !GetAtt LambdaDynamoDBFunction.Arn
   HTTPApiGWAppId:
