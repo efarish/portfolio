@@ -5,7 +5,7 @@ Description: The template used for GraphQL API.
 Parameters:
   ProjectName:
     Type: String
-  HTTPApiGWArn:
+  HTTPApiGWAppId:
     Type: String
 
 Resources:
@@ -64,7 +64,7 @@ Resources:
   ApiGatewayGraphQLIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
-      ApiId: !Ref HTTPApiGWArn
+      ApiId: !Ref HTTPApiGWAppId
       IntegrationType: HTTP_PROXY
       IntegrationMethod: POST
       IntegrationUri: !GetAtt GraphQLApi.GraphQLUrl

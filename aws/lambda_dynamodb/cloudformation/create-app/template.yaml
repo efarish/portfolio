@@ -10,23 +10,13 @@ Parameters:
 
 Resources:
 
-  ApiGWtack:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./api-gw.yaml
-      Parameters:
-        ProjectName: !Ref ProjectName
-
   LambdaStack:
     Type: AWS::Serverless::Application
-    DependsOn:
-      - ApiGWtack
     Properties:
       Location: ./lambda.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
-        HTTPApiGWArn: !GetAtt ApiGWtack.Outputs.HTTPApiGWArn
 
   DynamoDBStack:
     Type: AWS::Serverless::Application
@@ -38,12 +28,12 @@ Resources:
   GraphQLStack:
     Type: AWS::Serverless::Application
     DependsOn:
-      - ApiGWtack
+      - LambdaStack
     Properties:
       Location: ./graphql.yaml
       Parameters:
         ProjectName: !Ref ProjectName
-        HTTPApiGWArn: !GetAtt ApiGWtack.Outputs.HTTPApiGWArn
+        HTTPApiGWAppId: !GetAtt LambdaStack.Outputs.HTTPApiGWAppId
 
 # -------------------------------------------------------------------------
 # Information about the stack.
@@ -52,6 +42,6 @@ Outputs:
 
   LambdaStackUrl:
     Description: URL of API GW.
-    Value: !GetAtt ApiGWtack.Outputs.HTTPApiGWUrl
+    Value: !GetAtt LambdaStack.Outputs.HTTPApiGWUrl
 
     

@@ -30,6 +30,6 @@ Outputs:
   HTTPApiGWUrl:
     Description: "API GW URL."
     Value: !Sub https://${HTTPApiGW}.execute-api.${AWS::Region}.amazonaws.com 
-  HTTPApiGWArn:
-    Description: "ARN of API GW."
-    Value: !Ref HTTPApiGW 
+  HTTPApiGWAppId:
+    Description: "AppId of API GW."
+    Value: !Ref HTTPApiGW
