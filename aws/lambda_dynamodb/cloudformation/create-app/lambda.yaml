@@ -8,6 +8,9 @@ Parameters:
   ImageUrl:
     Type: String
     Description: The url of a docker image that contains the task application.
+  HTTPApiGWArn:
+    Type: String
+    Description: The ARN of the HTTP API Gateway.
 
 Resources:
 
@@ -44,50 +47,31 @@ Resources:
           Properties:
             Path: /health_check
             Method: get
-            ApiId: !Ref LambdaApi 
+            ApiId: !Ref HTTPApiGWArn 
         Api2:
           Type: HttpApi
           Properties:
             Path: /create_user
             Method: post
-            ApiId: !Ref LambdaApi
+            ApiId: !Ref HTTPApiGWArn
         Api3:
           Type: HttpApi
           Properties:
             Path: /get_user
             Method: post
-            ApiId: !Ref LambdaApi
+            ApiId: !Ref HTTPApiGWArn
         Api4:
           Type: HttpApi
           Properties:
             Path: /login
             Method: post
-            ApiId: !Ref LambdaApi
-
-  LambdaApi:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      Description: API for user management.
-      DefaultRouteSettings:
-        ThrottlingBurstLimit: 20
-        ThrottlingRateLimit: 10
-      AccessLogSettings:
-        DestinationArn: !GetAtt APILogGroup.Arn 
-        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": "$context.status" }'      
-
-  APILogGroup:
-      Type: AWS::Logs::LogGroup
-      Properties:
-        LogGroupName: !Sub /aws/apigateway/LambdaDynamoDBFunction
-        RetentionInDays: 1
+            ApiId: !Ref HTTPApiGWArn
 
 Outputs:
   LambdaDynamoDBFunctionArn:
     Description: Arn of Lambda function.
     Value: !GetAtt LambdaDynamoDBFunction.Arn
-  LambdaDynamoDBFunctionUrl:
-    Description: "URL of the HTTP API"
-    Value: !Sub https://${LambdaApi}.execute-api.${AWS::Region}.amazonaws.com 
+
 
   
 

@@ -5,6 +5,8 @@ Description: The template used for GraphQL API.
 Parameters:
   ProjectName:
     Type: String
+  HTTPApiGWArn:
+    Type: String
 
 Resources:
   GraphQLApi:
@@ -58,3 +60,19 @@ Resources:
           query: Query
           mutation: Mutation
         }
+
+  ApiGatewayGraphQLIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HTTPApiGWArn
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: POST
+      IntegrationUri: !GetAtt GraphQLApi.GraphQLUrl
+      PayloadFormatVersion: '1.0'
+      Description: "API GW Integration with AppSync GraphQL API"
+
+
+Outputs:
+  GraphQLAPIURL:
+    Description: URL of the GraphQL API
+    Value: !GetAtt GraphQLApi.GraphQLUrl
