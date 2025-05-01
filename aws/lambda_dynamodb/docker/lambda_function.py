@@ -11,7 +11,9 @@ from entity import UsersDAO
 from entity.UsersDAO import User
 from util.auth import get_current_user, login_for_access_token
 
-logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
+log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
+log_level = getattr(logging, log_level_str)
+logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 class CreateUserRequest(BaseModel):
@@ -108,7 +110,6 @@ def lambda_handler(event, context):
     logger.error("This is an error message.")
     logger.critical("This is a critical message.")
 
-
     # Get the effective log level
     effective_level = logger.getEffectiveLevel()
     print(f"Effective log level (using logger.getEffectiveLevel()): {effective_level}")
@@ -120,10 +121,7 @@ def lambda_handler(event, context):
 
     print(f'{event=} {context=}')
     
-    event_type = event.get('rawPath',...)
-    if event_type is Ellipsis:
-        print('No rawPath')
-        print(f'{event.get('info', ...)=}')
+    event_type = event.get('rawPath',event['info']['parentTypeName'])
     
     match event_type:
         case '/health_check':
@@ -134,8 +132,8 @@ def lambda_handler(event, context):
             return create_user(event)
         case '/get_user':
             return get_user(event)
+        case 'Query':
+            logger.info(f'{event['info']=}')
+            return {'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
         case _:
             return {'statusCode': 400, 'body': f'Invalid request: {event_type}.'}
-
-
-
