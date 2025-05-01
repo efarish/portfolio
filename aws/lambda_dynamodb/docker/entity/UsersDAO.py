@@ -1,3 +1,4 @@
+import os
 from dataclasses import asdict, dataclass
 from typing import Optional
 
@@ -6,7 +7,7 @@ from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 from util import auth
 
-USER_TABLE = "DeviceTracker_User"
+USER_TABLE = os.environ.get('USER_TABLE')
 
 @dataclass
 class User:
@@ -18,7 +19,6 @@ class User:
         return asdict(self)
     
 def get_client():
-    #return boto3.client("dynamodb")
     return boto3.resource('dynamodb')
 
 def create_user(user_name: str, role: str, password: str) -> User:

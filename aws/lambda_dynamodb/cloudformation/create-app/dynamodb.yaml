@@ -13,7 +13,7 @@ Resources:
     Type: "AWS::DynamoDB::Table"
     DeletionPolicy: "Delete"
     Properties:
-      TableName: !Sub "${ProjectName}_User"
+      TableName: !Sub "${ProjectName}_user"
       AttributeDefinitions:
       - AttributeType: "S"
         AttributeName: "user_name"
