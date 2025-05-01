@@ -102,16 +102,28 @@ def get_user(event):
 def lambda_handler(event, context):
 
 
+    logger.debug("This is a debug message.")
+    logger.info("This is an info message.")
+    logger.warning("This is a warning message.")
+    logger.error("This is an error message.")
+    logger.critical("This is a critical message.")
+
+
     # Get the effective log level
     effective_level = logger.getEffectiveLevel()
     print(f"Effective log level (using logger.getEffectiveLevel()): {effective_level}")
+    level = logger.level
+    print(f"log level (using logger.getEffectiveLevel()): {level}")
 
     logger.info(f'{event=}')
     logger.info(f'{context=}')
 
     print(f'{event=} {context=}')
     
-    event_type = event['rawPath']
+    event_type = event.get('rawPath',...)
+    if event_type is Ellipsis:
+        print('No rawPath')
+        print(f'{event.get('info', ...)=}')
     
     match event_type:
         case '/health_check':
