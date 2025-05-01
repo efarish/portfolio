@@ -38,7 +38,7 @@ Resources:
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
 
-  ChatAppSchema:
+  AppSchema:
     Type: AWS::AppSync::GraphQLSchema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -86,7 +86,7 @@ Resources:
                 Resource: 
                   - !Ref LambdaFunctionArn
 
-  PresignedUrlLambdaDataSource:
+  LambdaDataSource:
     Type: AWS::AppSync::DataSource
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -96,6 +96,14 @@ Resources:
       LambdaConfig:
         LambdaFunctionArn: !Ref LambdaFunctionArn
 
+  GetPresignedUrlResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getUser
+      DataSourceName: !GetAtt LambdaDataSource.Name
 
   ApiGatewayGraphQLIntegration:
     Type: AWS::ApiGatewayV2::Integration
