@@ -101,8 +101,15 @@ def get_user(event):
 
 def lambda_handler(event, context):
 
+
+    # Get the effective log level
+    effective_level = logger.getEffectiveLevel()
+    print(f"Effective log level (using logger.getEffectiveLevel()): {effective_level}")
+
     logger.info(f'{event=}')
     logger.info(f'{context=}')
+
+    print(f'{event=} {context=}')
     
     event_type = event['rawPath']
     
