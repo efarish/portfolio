@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from entity import UsersDAO
-from jose import JWTError, jwt
+from jose import ExpiredSignatureError, JWTError, jwt
 
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY') 
 BCRYPT_SALT = os.getenv('BCRYPT_SALT').encode('UTF-8') 
@@ -21,6 +21,8 @@ def get_current_user(token):
         if username is None:
             raise ValueError('Could not validate user.')
         return {'user_name': username, 'role': user_role}
+    except ExpiredSignatureError:
+        raise ValueError('Login has expired.')
     except JWTError:
         raise ValueError('Error occurred validating user.')
     

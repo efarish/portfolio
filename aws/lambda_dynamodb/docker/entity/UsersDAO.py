@@ -31,6 +31,7 @@ def create_user(user_name: str, role: str, password: str) -> User:
     except ClientError as e:  
         if e.response['Error']['Code']=='ConditionalCheckFailedException':  
             raise ValueError("User already exists") from e
+        else: raise
     return User(**user)
 
 
