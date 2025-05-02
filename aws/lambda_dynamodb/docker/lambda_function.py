@@ -11,11 +11,10 @@ import entity
 from entity.user import User
 from util.auth import get_current_user, login_for_access_token
 
-log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
+log_level_str = os.environ.get('LOG_LEVEL', 'INFO')
 log_level = getattr(logging, log_level_str)
-print(f'{log_level_str=} {log_level=}')
-logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
+logger.setLevel(log_level)
 
 class CreateUserRequest(BaseModel):
     user_name: str
@@ -83,6 +82,8 @@ def create_user(event):
 
 def get_user(event):
 
+    return {'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
+
     user = check_logged_in(event)
     if not user:
         return {'statusCode': 401, 'body': 'Unauthorized.'}
@@ -104,28 +105,29 @@ def get_user(event):
 
 def lambda_handler(event, context):
 
-
     logger.debug("This is a debug message.")
     logger.info("This is an info message.")
     logger.warning("This is a warning message.")
     logger.error("This is an error message.")
     logger.critical("This is a critical message.")
 
-    # Get the effective log level
-    effective_level = logger.getEffectiveLevel()
-    print(f"Effective log level (using logger.getEffectiveLevel()): {effective_level}")
-    level = logger.level
-    print(f"log level (using logger.getEffectiveLevel()): {level}")
-
-    logger.info(f'{event=}')
-    logger.info(f'{context=}')
-
     print(f'{event=} {context=}')
     
+    """
     event_type = event.get('rawPath',...)
     if event_type is Ellipsis:
         event_type = event['info']['parentTypeName']
+    """
+
+    info = event['info']['parentTypeName']
     
+    match info:
+        case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
+            return get_user(info['variables'], info['selectionSetList'])
+        case _:
+            return {'statusCode': 400, 'body': f'Invalid request.'}    
+    
+    """    
     match event_type:
         case '/health_check':
             return health_check()
@@ -140,3 +142,4 @@ def lambda_handler(event, context):
             return {'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
         case _:
             return {'statusCode': 400, 'body': f'Invalid request: {event_type}.'}
+    """
