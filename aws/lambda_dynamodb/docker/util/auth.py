@@ -2,7 +2,6 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
-from entity.user import User, get_user
 from jose import ExpiredSignatureError, JWTError, jwt
 
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY') 
@@ -30,25 +29,6 @@ def create_pwd_hash(password):
     pwd = bcrypt.hashpw(password=password.encode('UTF-8'), salt=BCRYPT_SALT)
     return pwd
 
-def check_user_name(username: str):
-
-    try:
-        user: User = get_user(username,True)
-    except ValueError:
-        return None
-    
-    return user 
-
-def authenticate_user(username: str, password: str):
-    user = check_user_name(username) 
-    if not user:
-        return False
-    #check = bcrypt.checkpw(password=password.encode('UTF-8'), hashed_password=user.password)
-    check = create_pwd_hash(password).decode('UTF-8') == user.password
-    if not check:
-        return False
-    return user
-
 def create_access_token(username: str, role: str, expires_delta: timedelta):
     """
     Create a JSON web token.
@@ -58,13 +38,3 @@ def create_access_token(username: str, role: str, expires_delta: timedelta):
     encode.update({'exp': expires})
     return jwt.encode(encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
 
-def login_for_access_token(username, password):
-    """
-    Authenticate user, generate and return JWT.
-    """
-    user = authenticate_user(username, password)
-    if not user:
-        raise ValueError('Could not validate user.')
-    token = create_access_token(user.user_name, user.role, timedelta(minutes=1440))
-
-    return token

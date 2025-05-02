@@ -7,8 +7,8 @@ from pydantic import BaseModel, ValidationError
 
 load_dotenv()
 
-from entity.user import User, create_user
-from util.auth import get_current_user, login_for_access_token
+from entity.user import User
+from util.auth import get_current_user
 
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO')
 log_level = getattr(logging, log_level_str)

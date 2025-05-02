@@ -1,5 +1,6 @@
 import os
 from dataclasses import asdict, dataclass
+from datetime import timedelta
 from typing import Optional
 
 import boto3
@@ -20,6 +21,35 @@ class User:
     
 def get_client():
     return boto3.resource('dynamodb')
+
+def check_user_name(username: str):
+
+    try:
+        user: User = get_user(username,True)
+    except ValueError:
+        return None
+    
+    return user 
+
+def authenticate_user(username: str, password: str):
+    user = check_user_name(username) 
+    if not user:
+        return False
+    check = auth.create_pwd_hash(password).decode('UTF-8') == user.password
+    if not check:
+        return False
+    return user
+
+def login_for_access_token(username, password):
+    """
+    Authenticate user, generate and return JWT.
+    """
+    user = authenticate_user(username, password)
+    if not user:
+        raise ValueError('Could not validate user.')
+    token = auth.create_access_token(user.user_name, user.role, timedelta(minutes=1440))
+
+    return token
 
 def create_user(user_name: str, role: str, password: str) -> User:
     client = get_client()
