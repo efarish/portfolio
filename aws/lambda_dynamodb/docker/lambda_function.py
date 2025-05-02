@@ -7,8 +7,8 @@ from pydantic import BaseModel, ValidationError
 
 load_dotenv()
 
-from entity import UsersDAO
-from entity.UsersDAO import User
+import entity
+from entity.user import User
 from util.auth import get_current_user, login_for_access_token
 
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
@@ -69,7 +69,7 @@ def create_user(event):
     body = event['body']
     try:
         user = CreateUserRequest.model_validate_json(body)
-        UsersDAO.create_user(**user.model_dump())
+        entity.user.create_user(**user.model_dump())
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': 'Validation error.'}
@@ -91,7 +91,7 @@ def get_user(event):
 
     try:
         user = GetUserRequest.model_validate_json(body)
-        model_user = UsersDAO.get_user(**user.model_dump())
+        model_user = entity.user.get_user(**user.model_dump())
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': f'Validation error.'}

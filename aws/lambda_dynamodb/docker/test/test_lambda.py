@@ -17,7 +17,7 @@ def test_health_check():
                      [({'user_name': 'a_user', 'role': 'user', 'password': 'a_password'},(201, 'User a_user added.')),
                       ({'user_name': 'a_user',                 'password': 'a_password'},(400, 'Validation error.')), 
                       ])
-@mock.patch('lambda_function.UsersDAO.get_client')
+@mock.patch('entity.user.get_client')
 def test_create_user(mock_dao, user, expected):
 
     if len(user) == 3:
@@ -38,7 +38,7 @@ def test_create_user(mock_dao, user, expected):
                       ])
 
 @mock.patch('lambda_function.get_current_user')
-@mock.patch('lambda_function.UsersDAO.get_client')
+@mock.patch('entity.user.get_client')
 def test_get_user(mock_dao, mock_user, user_request, user_response, expected_status):
 
     mt = MockTable(query_result=[user_response])

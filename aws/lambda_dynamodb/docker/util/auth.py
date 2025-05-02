@@ -2,7 +2,8 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
-from entity import UsersDAO
+import entity
+from entity.user import User
 from jose import ExpiredSignatureError, JWTError, jwt
 
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY') 
@@ -33,7 +34,7 @@ def create_pwd_hash(password):
 def check_user_name(username: str):
 
     try:
-        user: UsersDAO.User = UsersDAO.get_user(username,True)
+        user: User = entity.user.get_user(username,True)
     except ValueError:
         return None
     
