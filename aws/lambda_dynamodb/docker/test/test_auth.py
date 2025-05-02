@@ -8,7 +8,7 @@ from util import auth
 @pt.mark.parametrize('user_request, user_response', 
                      [({'user_name': 'a_user', 'password':'a_password'},
                        {'user_name':'a_user', 'role':'user', 'password':auth.create_pwd_hash('a_password').decode('UTF-8')})] )
-@mock.patch('auth.entity.user.get_client')
+@mock.patch('entity.user.get_client')
 def test_login(mock_dao, user_request, user_response):
     mt = MockTable(query_result=[user_response])
     mb = MockBoto3(mockTable=mt)

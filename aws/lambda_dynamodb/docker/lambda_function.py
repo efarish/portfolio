@@ -7,8 +7,7 @@ from pydantic import BaseModel, ValidationError
 
 load_dotenv()
 
-import entity
-from entity.user import User
+from entity.user import User, create_user
 from util.auth import get_current_user, login_for_access_token
 
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO')
@@ -44,10 +43,11 @@ def check_logged_in(event) -> User | None:
   
     return user
 
-
+"""
 def health_check():
     return {'statusCode': 200, 'body': 'Service is up!'}
-
+"""
+"""
 def login(event):
     body = event['body']
     try:
@@ -63,12 +63,13 @@ def login(event):
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Unexpected login failure.'}
     return {'statusCode': 200, 'body': json.dumps({"access_token": token, "token_type": "bearer"})}
-
-def create_user(event):
+"""
+"""
+def create_user_handler(event):
     body = event['body']
     try:
         user = CreateUserRequest.model_validate_json(body)
-        entity.user.create_user(**user.model_dump())
+        create_user(**user.model_dump())
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': 'Validation error.'}
@@ -79,6 +80,7 @@ def create_user(event):
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Failed to create user.'}
     return {'statusCode': 201, 'body': f'User {user.user_name} added.'}
+"""
 
 def get_user(variables, selection_list):
 
@@ -123,7 +125,7 @@ def lambda_handler(event, context):
         event_type = event['info']['parentTypeName']
     """
 
-    info = event['info']['parentTypeName']
+    info = event['info']
     
     match info:
         case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
@@ -138,7 +140,7 @@ def lambda_handler(event, context):
         case '/login':
             return login(event)
         case '/create_user':
-            return create_user(event)
+            return create_user_handler(event)
         case '/get_user':
             return get_user(event)
         case 'Query':
