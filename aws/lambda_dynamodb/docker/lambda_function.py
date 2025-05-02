@@ -80,9 +80,13 @@ def create_user(event):
         return {'statusCode': 500, 'body': f'Failed to create user.'}
     return {'statusCode': 201, 'body': f'User {user.user_name} added.'}
 
-def get_user(event):
+def get_user(variables, selection_list):
 
-    return {'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
+    user_name = variables.get('user_name')
+
+    if user_name == 'a_user':
+        return {'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
+    else: return None
 
     user = check_logged_in(event)
     if not user:
