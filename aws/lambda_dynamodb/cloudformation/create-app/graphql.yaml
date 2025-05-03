@@ -43,16 +43,9 @@ Resources:
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       Definition: |
-        type ErrorResponse {
-          error_type: String!
-          error_message: String!
-        }
-
-        union QResponse = User | ErrorResponse 
-
         type User {
-          user_name: ID!
-          role: String!
+          user_name: ID
+          role: String
           password: String
         }
 
@@ -62,7 +55,7 @@ Resources:
 
         type Query {
           # Get a single value of type 'Post' by primary key.
-          getUser(user_name: ID!): QResponse
+          getUser(user_name: ID!): User
         }
 
         schema {
