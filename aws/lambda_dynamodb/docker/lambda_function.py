@@ -1,145 +1,50 @@
 import json
 import logging
 import os
+from functools import wraps
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
 load_dotenv()
 
-from entity.user import User
-from util.auth import get_current_user
+from entity.user import User, get_user
 
-log_level_str = os.environ.get('LOG_LEVEL', 'INFO')
-log_level = getattr(logging, log_level_str)
 logger = logging.getLogger(__name__)
-logger.setLevel(log_level)
+logger.setLevel(getattr(logging, os.environ.get('LOG_LEVEL', 'INFO')))
 
-class CreateUserRequest(BaseModel):
-    user_name: str
-    password: str
-    role: str
+def appsync_decorator(type_name: str):
+    def appsync_wrapper(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs) -> dict:
+            info = args[0]
+            selectionSetList = info['selectionSetList']
+            try:
+                result = func(*args, **kwargs)
+            except ValueError as ve:
+                return {'__typename': 'ErrorResponse','error_type': '400', 'error_message' : f'{ve}'}
+            except Exception as e:
+                logger.error(f'{e=}')
+                return {'__typename': 'ErrorResponse','error_type': '500', 'error_message' : f'Failed to get user'}
+            user = result.model_dump()
+            response = {key: user[key] for key in selectionSetList} 
+            response['__typename'] = type_name               
+            return response
+        return wrapper
+    return appsync_wrapper
 
-class LoginRequest(BaseModel):
-    user_name: str
-    password: str
-
-class GetUserRequest(BaseModel):
-    user_name: str
-
-
-def check_logged_in(event) -> User | None:
-
-    headers = event['headers']
-    if('authorization' not in headers):
-        print('No Authorization header')
-        return None
-
-    user: User | None = None
-    try:
-        user = get_current_user(headers['authorization'])
-    except ValueError as e:
-        logger.warning(f'{e=}')
-  
-    return user
-
-"""
-def health_check():
-    return {'statusCode': 200, 'body': 'Service is up!'}
-"""
-"""
-def login(event):
-    body = event['body']
-    try:
-        user = LoginRequest.model_validate_json(body)
-        token = login_for_access_token(user.user_name, user.password)
-    except ValidationError as ve:
-        logger.error(f'{ve=}')
-        return {'statusCode': 400, 'body': 'Validation error.'}
-    except ValueError as ve:
-        logger.error(f'{ve=}')
-        return {'statusCode': 403, 'body': 'Failed login.'}
-    except Exception as e:
-        logger.error(f'{e=}')
-        return {'statusCode': 500, 'body': f'Unexpected login failure.'}
-    return {'statusCode': 200, 'body': json.dumps({"access_token": token, "token_type": "bearer"})}
-"""
-"""
-def create_user_handler(event):
-    body = event['body']
-    try:
-        user = CreateUserRequest.model_validate_json(body)
-        create_user(**user.model_dump())
-    except ValidationError as ve:
-        logger.error(f'{ve=}')
-        return {'statusCode': 400, 'body': 'Validation error.'}
-    except ValueError as ve:
-        logger.error(f'{ve=}')
-        return {'statusCode': 403, 'body': 'User already exists.'}
-    except Exception as e:
-        logger.error(f'{e=}')
-        return {'statusCode': 500, 'body': f'Failed to create user.'}
-    return {'statusCode': 201, 'body': f'User {user.user_name} added.'}
-"""
-
-def get_user(variables, selection_list):
-
-    user_name = variables.get('user_name')
-
-    if user_name == 'a_user':
-        return {'__typename': 'User', 'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
-    else: return {'__typename': 'ErrorResponse','error_type': '404', 'error_message' : f'User {user_name} not found'}
-
-    user = check_logged_in(event)
-    if not user:
-        return {'statusCode': 401, 'body': 'Unauthorized.'}
-
-    body = event['body']
-
-    try:
-        user = GetUserRequest.model_validate_json(body)
-        model_user = entity.user.get_user(**user.model_dump())
-    except ValidationError as ve:
-        logger.error(f'{ve=}')
-        return {'statusCode': 400, 'body': f'Validation error.'}
-    except ValueError as ve:
-        return {'statusCode': 404, 'body': f'User not found.'}
-    except Exception as e:
-        logger.error(f'{e=}')
-        return {'statusCode': 500, 'body': f'Failed to get user.'}
-    return {'statusCode': 200, 'body': f'{json.dumps(model_user.model_dump())}'}
+@appsync_decorator("User")
+def get_user_handler(info: dict, /) -> User:
+    user_name = info['variables'].get('user_name')
+    response: User = get_user(user_name)
+    return response
 
 def lambda_handler(event, context):
-
-    logger.info(f'{event=} {context=}')
-    
-    """
-    event_type = event.get('rawPath',...)
-    if event_type is Ellipsis:
-        event_type = event['info']['parentTypeName']
-    """
-
+    logger.debug(f'{event=} {context=}')
     info = event['info']
-    
     match info:
         case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
-            return get_user(info['variables'], info['selectionSetList'])
+            return get_user_handler(info)
         case _:
-            return {'statusCode': 400, 'body': f'Invalid request.'}    
+            return {'__typename': 'ErrorResponse','error_type': '500', 'error_message' : f'Unknown request.'}
     
-    """    
-    match event_type:
-        case '/health_check':
-            return health_check()
-        case '/login':
-            return login(event)
-        case '/create_user':
-            return create_user_handler(event)
-        case '/get_user':
-            return get_user(event)
-        case 'Query':
-            logger.info(f'{event['info']=}')
-            return {'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
-        case _:
-            return {'statusCode': 400, 'body': f'Invalid request: {event_type}.'}
-    """
