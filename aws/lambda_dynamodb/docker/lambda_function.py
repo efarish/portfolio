@@ -87,8 +87,8 @@ def get_user(variables, selection_list):
     user_name = variables.get('user_name')
 
     if user_name == 'a_user':
-        return {'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
-    else: return None
+        return {'__typename': 'User', 'user_name': 'a_user', 'role': 'user', 'password': 'a_password'}
+    else: return {'__typename': 'ErrorResponse','error_type': '404', 'error_message' : f'User {user_name} not found'}
 
     user = check_logged_in(event)
     if not user:
@@ -111,13 +111,7 @@ def get_user(variables, selection_list):
 
 def lambda_handler(event, context):
 
-    logger.debug("This is a debug message.")
-    logger.info("This is an info message.")
-    logger.warning("This is a warning message.")
-    logger.error("This is an error message.")
-    logger.critical("This is a critical message.")
-
-    print(f'{event=} {context=}')
+    logger.info(f'{event=} {context=}')
     
     """
     event_type = event.get('rawPath',...)
