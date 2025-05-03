@@ -44,7 +44,10 @@ def lambda_handler(event, context):
     info = event['info']
     match info:
         case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
-            return get_user_handler(info)
+            logger.info('Running get user...')
+            response = get_user_handler(info)
+            logger.info(f'Got: {type(response)=} {response=}')
+            return response
         case _:
             return {'__typename': 'ErrorResponse','error_type': '500', 'error_message' : f'Unknown request.'}
     
