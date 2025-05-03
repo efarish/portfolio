@@ -94,13 +94,22 @@ Resources:
       LambdaConfig:
         LambdaFunctionArn: !Ref LambdaFunctionArn
 
-  GetPresignedUrlResolver:
+  GetUserUrlResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: AppSchema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getUser
+      DataSourceName: !GetAtt LambdaDataSource.Name
+
+  CreateUserResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: createUser
       DataSourceName: !GetAtt LambdaDataSource.Name
 
   ApiGatewayGraphQLIntegration:
@@ -113,11 +122,21 @@ Resources:
       PayloadFormatVersion: '1.0'
       Description: "API GW Integration with AppSync GraphQL API"
 
-  APIRouteGraphQL:
+  GetUserRouteGraphQL:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HTTPApiGWAppId
-      RouteKey: 'POST /get_user_gql'
+      RouteKey: 'POST /get_user'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref ApiGatewayGraphQLIntegration
+
+  CreateUserRouteGraphQL:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HTTPApiGWAppId
+      RouteKey: 'POST /create_user'
       Target: !Join
         - /
         - - integrations

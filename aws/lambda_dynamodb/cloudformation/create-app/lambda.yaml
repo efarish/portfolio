@@ -42,24 +42,6 @@ Resources:
         Api1:
           Type: HttpApi
           Properties:
-            Path: /health_check
-            Method: get
-            ApiId: !Ref HTTPApiGW 
-        Api2:
-          Type: HttpApi
-          Properties:
-            Path: /create_user
-            Method: post
-            ApiId: !Ref HTTPApiGW
-        Api3:
-          Type: HttpApi
-          Properties:
-            Path: /get_user
-            Method: post
-            ApiId: !Ref HTTPApiGW
-        Api4:
-          Type: HttpApi
-          Properties:
             Path: /login
             Method: post
             ApiId: !Ref HTTPApiGW

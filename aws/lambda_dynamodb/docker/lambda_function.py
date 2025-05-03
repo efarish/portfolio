@@ -1,14 +1,12 @@
-import json
 import logging
 import os
 from functools import wraps
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, ValidationError
 
-load_dotenv()
+load_dotenv() #Need to load environment variables below reference entities.
 
-from entity.user import User, get_user
+from entity.user import User, create_user, get_user
 
 logger = logging.getLogger(__name__)
 logger.setLevel(getattr(logging, os.environ.get('LOG_LEVEL', 'INFO')))
@@ -23,21 +21,24 @@ def appsync_decorator(op_name: str):
                 result = func(*args, **kwargs)
             except ValueError as ve:
                 raise
-                #return {'__typename': 'ErrorResponse','error_type': '400', 'error_message' : f'{ve}'}
             except Exception as e:
                 logger.error(f'{e=}')
                 raise Exception(f'Unexpected error occurred for [{op_name}]') from e
-                #return {'__typename': 'ErrorResponse','error_type': '500', 'error_message' : f'Failed to get user'}
             user: dict = result.model_dump()
             response = {key: user[key] for key in selectionSetList} 
-            #response['__typename'] = type_name               
             return response
         return wrapper
     return appsync_wrapper
 
+@appsync_decorator("Create User")
+def create_user_handler(info: dict, /) -> User:
+    input: dict = info['variables']
+    response: User = create_user(**input) 
+    return response
+
 @appsync_decorator("Get User")
 def get_user_handler(info: dict, /) -> User:
-    user_name = info['variables'].get('user_name')
+    user_name: str = info['variables'].get('user_name')
     response: User = get_user(user_name) 
     return response
 
@@ -45,11 +46,12 @@ def lambda_handler(event, context):
     logger.debug(f'{event=} {context=}')
     info = event['info']
     match info:
+        case {'parentTypeName': 'Mutation', 'fieldName': 'createUser'}:
+            response = create_user_handler(info)
+            return response                
         case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
-            logger.info('Running get user...')
             response = get_user_handler(info)
-            logger.info(f'Got: {type(response)=} {response=}')
             return response
         case _:
-            return {'__typename': 'ErrorResponse','error_type': '500', 'error_message' : f'Unknown request.'}
+            raise Exception(f'Unknown operation: {info['parentTypeName']}:{info['fieldName']}')
     
