@@ -9,6 +9,7 @@ from pydantic import BaseModel, ValidationError
 load_dotenv() #Need to load environment variables below reference entities.
 
 from entity.user import User, create_user, get_user, login_for_access_token
+from util import auth
 
 logger = logging.getLogger(__name__)
 logger.setLevel(getattr(logging, os.environ.get('LOG_LEVEL', 'INFO')))
@@ -32,6 +33,13 @@ def login_handler(event):
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Unexpected login failure.'}
     return {'statusCode': 200, 'body': json.dumps({"access_token": token, "token_type": "bearer"})}
+
+def authorize_handler(event):
+    headers = event['headers']
+    if('authorization' not in headers):
+        return {"isAuthorized": False}
+    user = auth.get_current_user(headers['authorization'])
+    return {"isAuthorized": bool(user)}
 
 
 def appsync_decorator(op_name: str):
@@ -79,6 +87,9 @@ def lambda_handler(event, context):
             match rawPath:
                 case '/login':
                     response = login_handler(event)
+                    return response
+                case '/authorize':
+                    response = authorize_handler(event)
                     return response
                 case _:
                     return {'statusCode': 400, 'body': f'Invalid request: {rawPath}.'}

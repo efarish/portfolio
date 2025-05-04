@@ -1,3 +1,4 @@
+import json
 from unittest import mock
 
 import lambda_function
@@ -9,7 +10,7 @@ from util.auth import create_pwd_hash
 @pt.mark.parametrize('user_request', 
                      [({'user_name': 'a_user', 'role': 'user', 'password': create_pwd_hash('a_password').decode('UTF-8')}),])
 @mock.patch('entity.user.get_client')
-def test_login_handler(mock_dynamodb_client, user_request):
+def test_login_auth_handlers(mock_dynamodb_client, user_request):
     
     mt = MockTable(query_result=[user_request])
     mb = MockBoto3(mockTable=mt)
@@ -20,7 +21,12 @@ def test_login_handler(mock_dynamodb_client, user_request):
     result = lambda_function.lambda_handler(mock_event, None)
     assert isinstance(result, dict)
     assert result['statusCode'] == 200
-    
+    token = json.loads(result['body'])['access_token']
+    assert token
+
+    mock_event = {'rawPath': '/authorize',
+                  'headers': {"authorization": token } }
+    assert lambda_function.lambda_handler(mock_event, None)['isAuthorized'] == True
 
 @pt.mark.parametrize('user_request, selection_list', 
                      [({'user_name': 'a_user', 'role': 'user', 'password': 'password'},

@@ -16,7 +16,7 @@ Resources:
     Properties:
       FunctionName: 'LambdaDynamoDBFunction'
       CodeUri: .
-      Description: 'A Lambda To Test Connecting to Dynamodb.'
+      Description: 'A Lambda expose non-GraphQL endpoints.'
       MemorySize: 128
       Timeout: 10
       Architectures:
@@ -43,6 +43,12 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /login
+            Method: post
+            ApiId: !Ref HTTPApiGW
+        Api2:
+          Type: HttpApi
+          Properties:
+            Path: /authorize
             Method: post
             ApiId: !Ref HTTPApiGW
 
