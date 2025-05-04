@@ -7,7 +7,7 @@ Parameters:
     Type: String
   ImageUrl:
     Type: String
-    Description: The url of a docker image that contains the task application.
+    Description: The ECR url of the Docker image that contains application entry point.
 
 Resources:
 
