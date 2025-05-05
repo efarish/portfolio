@@ -17,14 +17,24 @@ Resources:
     Type: AWS::AppSync::GraphQLApi
     Properties:
       Name: !Sub "${ProjectName}_GraphQL"
-      AuthenticationType: API_KEY
-      #AuthenticationType: AWS_LAMBDA
-      #LambdaAuthorizerConfig:
-      #  AuthorizerUri: !Ref LambdaAuthFunctionArn
+      #AuthenticationType: API_KEY
+      AuthenticationType: AWS_LAMBDA
+      LambdaAuthorizerConfig:
+        AuthorizerUri: !Ref LambdaAuthFunctionArn
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
         FieldLogLevel: INFO
         
+  GraphQlApiToLambdaConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: GraphQLApi
+      Destination:
+        Arn: !Ref LambdaAuthFunctionArn
+      Permissions:
+      - Write
+
   AppSyncLoggingServiceRole:
     Type: AWS::IAM::Role
     Properties:
