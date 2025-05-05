@@ -192,7 +192,7 @@ Resources:
       ApiId: !GetAtt GraphQLApiUnAuthorized.ApiId
       TypeName: Mutation
       FieldName: createUser
-      DataSourceName: !GetAtt LambdaDataSource.Name
+      DataSourceName: !GetAtt LambdaUnAuthorizedDataSource.Name
 
   CreateUserResolver:
     Type: AWS::AppSync::Resolver
@@ -201,7 +201,7 @@ Resources:
       ApiId: !GetAtt GraphQLApiUnAuthorized.ApiId
       TypeName: Query
       FieldName: login
-      DataSourceName: !GetAtt LambdaDataSource.Name
+      DataSourceName: !GetAtt LambdaUnAuthorizedDataSource.Name
 
   CreateUserRouteGraphQL:
     Type: AWS::ApiGatewayV2::Route
