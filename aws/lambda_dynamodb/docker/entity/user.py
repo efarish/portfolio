@@ -15,7 +15,13 @@ class User:
     user_name: str
     role: str
     password: Optional[str]= None
-
+    def model_dump(self):
+        return asdict(self)
+    
+@dataclass
+class UserToken:
+    user_name: str
+    token: str
     def model_dump(self):
         return asdict(self)
     
@@ -23,12 +29,10 @@ def get_client():
     return boto3.resource('dynamodb')
 
 def check_user_name(username: str):
-
     try:
         user: User = get_user(username,True)
     except ValueError:
         return None
-    
     return user 
 
 def authenticate_user(username: str, password: str):
@@ -40,16 +44,15 @@ def authenticate_user(username: str, password: str):
         return False
     return user
 
-def login_for_access_token(username, password):
+def login_for_access_token(user_name, password):
     """
     Authenticate user, generate and return JWT.
     """
-    user = authenticate_user(username, password)
+    user = authenticate_user(user_name, password)
     if not user:
         raise ValueError('Could not validate user.')
     token = auth.create_access_token(user.user_name, user.role, timedelta(minutes=1440))
-
-    return token
+    return UserToken(user.user_name,token)
 
 def create_user(user_name: str, role: str, password: str) -> User:
     client = get_client()

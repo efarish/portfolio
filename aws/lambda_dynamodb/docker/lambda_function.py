@@ -8,7 +8,7 @@ from pydantic import BaseModel, ValidationError
 
 load_dotenv() #Need to load environment variables below reference entities.
 
-from entity.user import User, create_user, get_user, login_for_access_token
+from entity.user import User, UserToken, create_user, get_user, login_for_access_token
 from util import auth
 
 logger = logging.getLogger(__name__)
@@ -18,11 +18,11 @@ class LoginRequest(BaseModel):
     user_name: str
     password: str
 
-def login_handler(event):
+def login_handler(event) -> dict:
     body = event['body']
     try:
         user = LoginRequest.model_validate_json(body)
-        token = login_for_access_token(user.user_name, user.password)
+        user_token: UserToken = login_for_access_token(user.user_name, user.password)
     except ValidationError as ve:
         logger.error(f'{ve=}')
         return {'statusCode': 400, 'body': 'Validation error.'}
@@ -32,8 +32,7 @@ def login_handler(event):
     except Exception as e:
         logger.error(f'{e=}')
         return {'statusCode': 500, 'body': f'Unexpected login failure.'}
-    return {'statusCode': 200, 'body': json.dumps({"access_token": token, "token_type": "bearer"})}
-
+    return {'statusCode': 200, 'body': json.dumps({"access_token": user_token.token, "token_type": "bearer"})}
 
 def appsync_decorator(op_name: str):
     def appsync_wrapper(func):
@@ -54,6 +53,15 @@ def appsync_decorator(op_name: str):
         return wrapper
     return appsync_wrapper
 
+@appsync_decorator("Login")
+def login_handler_appsync(info) -> UserToken:
+    """
+    Handler for creating user login.
+    """
+    input: dict = info['variables']
+    response: UserToken = login_for_access_token(**input)
+    return response
+    
 @appsync_decorator("Create User")
 def create_user_handler(info: dict, /) -> User:
     """
@@ -73,12 +81,22 @@ def get_user_handler(info: dict, /) -> User:
     return response
 
 def lambda_handler_auth(event, context):
-    logger.debug(f'{event=} {context=}')
+    """
+    Used to authorize API GW and AppSync endpoint access.
+    This checks if use token is present and valid.
+    """
     headers = event['headers']
     if('authorization' not in headers):
         return {"isAuthorized": False}
     user = auth.get_current_user(headers['authorization'])
     return {"isAuthorized": bool(user)}
+
+def lambda_handler_auth_always(event, context):
+    """
+    Used to authorize API GW and AppSync endpoint access.
+    This handler always authorizes access.
+    """
+    return {"isAuthorized": True}
 
 def lambda_handler(event, context):
     logger.debug(f'{event=} {context=}')
@@ -101,6 +119,9 @@ def lambda_handler(event, context):
                     return response                
                 case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
                     response = get_user_handler(info)
+                    return response
+                case {'parentTypeName': 'Query', 'fieldName': 'login'}:
+                    response = login_handler_appsync(info)
                     return response
                 case _:
                     raise Exception(f'Unknown operation: {info['parentTypeName']}:{info['fieldName']}')

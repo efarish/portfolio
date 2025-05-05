@@ -28,6 +28,29 @@ def test_login_auth_handlers(mock_dynamodb_client, user_request):
                   'headers': {"authorization": token } }
     assert lambda_function.lambda_handler(mock_event, None)['isAuthorized'] == True
 
+
+@pt.mark.parametrize('get_user, user_request, selection_list', 
+                     [({'user_name': 'a_user', 'role':'user', 'password': create_pwd_hash('password').decode('UTF-8')},
+                       {'user_name': 'a_user', 'password': 'password'},
+                       ['user_name', 'token']),])
+@mock.patch('entity.user.get_client')
+def test_login_handler_appsync(mock_dynamodb_client, get_user, user_request, selection_list):
+    
+    mt = MockTable(query_result=[get_user])
+    mb = MockBoto3(mockTable=mt)
+    mock_dynamodb_client.return_value = mb
+ 
+    event = {'info': {'parentTypeName': 'Query', 
+                      'fieldName': 'login', 
+                      'variables':user_request,
+                      'selectionSetList': selection_list
+                    }
+            }
+             
+    result = lambda_function.lambda_handler(event, None)
+    assert result['user_name'] == 'a_user'
+    assert result['token']
+
 @pt.mark.parametrize('user_request, selection_list', 
                      [({'user_name': 'a_user', 'role': 'user', 'password': 'password'},
                        ['user_name', 'role', 'password']),])
