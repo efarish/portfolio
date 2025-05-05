@@ -16,6 +16,7 @@ Parameters:
 
 Resources:
 
+  # Role Definitions ################################################
   AppSyncLoggingServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -52,11 +53,13 @@ Resources:
                   - !Ref LambdaAuthArn
                   - !Ref LambdaAuthAlwaysArn
 
+###################################################################
+
 # APIs THAT REQUIRE AUTHORIZATION #################################
   GraphQLApiAuthorized:
     Type: AWS::AppSync::GraphQLApi
     Properties:
-      Name: !Sub "${ProjectName}_GraphQLAuth"
+      Name: !Sub "${ProjectName}_GraphQL_Auth"
       AuthenticationType: AWS_LAMBDA
       LambdaAuthorizerConfig:
         AuthorizerUri: !Ref LambdaAuthArn
@@ -128,7 +131,7 @@ Resources:
   GraphQLApiUnAuthorized:
     Type: AWS::AppSync::GraphQLApi
     Properties:
-      Name: !Sub "${ProjectName}_GraphQL_AuthAlways"
+      Name: !Sub "${ProjectName}_GraphQL_No_Auth"
       AuthenticationType: AWS_LAMBDA
       LambdaAuthorizerConfig:
         AuthorizerUri: !Ref LambdaAuthAlwaysArn
@@ -194,7 +197,7 @@ Resources:
       FieldName: createUser
       DataSourceName: !GetAtt LambdaUnAuthorizedDataSource.Name
 
-  CreateUserResolver:
+  UserLoginResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: AppSchemaUnAuthorized
     Properties:
