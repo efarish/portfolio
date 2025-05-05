@@ -33,7 +33,7 @@ Resources:
       Destination:
         Arn: !Ref LambdaAuthFunctionArn
       Permissions:
-      - Write
+        - Write
 
   AppSyncLoggingServiceRole:
     Type: AWS::IAM::Role
