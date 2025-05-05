@@ -23,7 +23,7 @@ Resources:
       #  AuthorizerUri: !Ref LambdaAuthFunctionArn
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
-        FieldLogLevel: 
+        FieldLogLevel: INFO
         
   AppSyncLoggingServiceRole:
     Type: AWS::IAM::Role
