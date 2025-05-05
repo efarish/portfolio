@@ -47,11 +47,13 @@ Resources:
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs'
-  
+
+  """
   GraphQLApiKey:
     Type: AWS::AppSync::ApiKey
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
+  """
 
   AppSchema:
     Type: AWS::AppSync::GraphQLSchema
