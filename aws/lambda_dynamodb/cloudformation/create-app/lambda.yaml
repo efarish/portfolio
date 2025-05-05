@@ -11,6 +11,36 @@ Parameters:
 
 Resources:
 
+  LambdaAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'LambdaAuth'
+      CodeUri: .
+      Description: 'A Lambda Authorizer for API GateWay.'
+      MemorySize: 128
+      Timeout: 3
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lambda_function.lambda_handler_auth
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ec2:*
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+
   LambdaDynamoDBFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -74,6 +104,9 @@ Outputs:
   LambdaFunctionArn:
     Description: Arn of Lambda function.
     Value: !GetAtt LambdaDynamoDBFunction.Arn
+  LambdaAuthFunctionArn:
+    Description: Arn of Lambda Authorizer function.
+    Value: !GetAtt LambdaAuth.Arn
   HTTPApiGWAppId:
     Description: "AppId of API GW."
     Value: !Ref HTTPApiGW

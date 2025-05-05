@@ -35,6 +35,7 @@ Resources:
         ProjectName: !Ref ProjectName
         HTTPApiGWAppId: !GetAtt LambdaStack.Outputs.HTTPApiGWAppId
         LambdaFunctionArn: !GetAtt LambdaStack.Outputs.LambdaFunctionArn
+        LambdaAuthFunctionArn: !GetAtt LambdaStack.Outputs.LambdaAuthFunctionArn
 
 # -------------------------------------------------------------------------
 # Information about the stack.

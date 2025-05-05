@@ -9,16 +9,31 @@ Parameters:
     Type: String
   LambdaFunctionArn:
     Type: String
+  LambdaAuthFunctionArn:
+    Type: String
 
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
     Properties:
       Name: !Sub "${ProjectName}_GraphQL"
-      AuthenticationType: API_KEY
+      #AuthenticationType: API_KEY
+      AuthenticationType: AWS_LAMBDA
+      LambdaAuthorizerConfig:
+        AuthorizerUri: !Ref LambdaAuthFunctionArn
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
-        FieldLogLevel: INFO
+        FieldLogLevel: 
+        
+  GraphQlApiToLambdaConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: GraphQLApi
+      Destination:
+        Arn: !Ref LambdaAuthFunctionArn
+      Permissions:
+      - Write
 
   AppSyncLoggingServiceRole:
     Type: AWS::IAM::Role
@@ -32,11 +47,11 @@ Resources:
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs'
-
-  GraphQLApiKey:
-    Type: AWS::AppSync::ApiKey
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
+  
+  #GraphQLApiKey:
+  #  Type: AWS::AppSync::ApiKey
+  #  Properties:
+  #    ApiId: !GetAtt GraphQLApi.ApiId
 
   AppSchema:
     Type: AWS::AppSync::GraphQLSchema

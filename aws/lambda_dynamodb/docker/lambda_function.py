@@ -34,13 +34,6 @@ def login_handler(event):
         return {'statusCode': 500, 'body': f'Unexpected login failure.'}
     return {'statusCode': 200, 'body': json.dumps({"access_token": token, "token_type": "bearer"})}
 
-def authorize_handler(event):
-    headers = event['headers']
-    if('authorization' not in headers):
-        return {"isAuthorized": False}
-    user = auth.get_current_user(headers['authorization'])
-    return {"isAuthorized": bool(user)}
-
 
 def appsync_decorator(op_name: str):
     def appsync_wrapper(func):
@@ -79,6 +72,14 @@ def get_user_handler(info: dict, /) -> User:
     response: User = get_user(user_name) 
     return response
 
+def lambda_handler_auth(event, context):
+    logger.debug(f'{event=} {context=}')
+    headers = event['headers']
+    if('authorization' not in headers):
+        return {"isAuthorized": False}
+    user = auth.get_current_user(headers['authorization'])
+    return {"isAuthorized": bool(user)}
+
 def lambda_handler(event, context):
     logger.debug(f'{event=} {context=}')
     
@@ -89,7 +90,7 @@ def lambda_handler(event, context):
                     response = login_handler(event)
                     return response
                 case '/authorize':
-                    response = authorize_handler(event)
+                    response = lambda_handler_auth(event, context)
                     return response
                 case _:
                     return {'statusCode': 400, 'body': f'Invalid request: {rawPath}.'}
