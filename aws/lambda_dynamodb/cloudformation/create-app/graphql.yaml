@@ -7,35 +7,14 @@ Parameters:
     Type: String
   HTTPApiGWAppId:
     Type: String
-  LambdaFunctionArn:
+  AppFunctionsArn:
     Type: String
-  LambdaAuthFunctionArn:
+  LambdaAuthArn: 
     Type: String
-  LambdaAuthFunctionId:
-    Type: String
+  LambdaAuthAlwaysArn: 
+    Type: String 
 
 Resources:
-  GraphQLApi:
-    Type: AWS::AppSync::GraphQLApi
-    Properties:
-      Name: !Sub "${ProjectName}_GraphQL"
-      #AuthenticationType: API_KEY
-      AuthenticationType: AWS_LAMBDA
-      LambdaAuthorizerConfig:
-        AuthorizerUri: !Ref LambdaAuthFunctionArn
-      LogConfig:
-        CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
-        FieldLogLevel: INFO
-        
-  #GraphQlApiToLambdaConnector:
-  #  Type: AWS::Serverless::Connector
-  #  Properties:
-  #    Source:
-  #      Id: GraphQLApi
-  #    Destination:
-  #      Id: LambdaAuthFunctionId
-  #    Permissions:
-  #      - Write
 
   AppSyncLoggingServiceRole:
     Type: AWS::IAM::Role
@@ -49,36 +28,6 @@ Resources:
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs'
-
-  #GraphQLApiKey:
-  #  Type: AWS::AppSync::ApiKey
-  #  Properties:
-  #    ApiId: !GetAtt GraphQLApi.ApiId
-
-  AppSchema:
-    Type: AWS::AppSync::GraphQLSchema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      Definition: |
-        type User {
-          user_name: ID
-          role: String
-          password: String
-        }
-
-        type Mutation {
-          createUser(user_name: ID!, role: String!, password: String!): User
-        }
-
-        type Query {
-          # Get a single value of type 'Post' by primary key.
-          getUser(user_name: ID!): User
-        }
-
-        schema {
-          query: Query
-          mutation: Mutation
-        }
 
   AppSyncLambdaServiceRole:
     Type: AWS::IAM::Role
@@ -99,45 +48,70 @@ Resources:
                 Action:
                   - 'lambda:InvokeFunction'
                 Resource: 
-                  - !Ref LambdaFunctionArn
+                  - !Ref AppFunctionsArn
+                  - !Ref LambdaAuthArn
+                  - !Ref LambdaAuthAlwaysArn
 
-  LambdaDataSource:
+# APIs THAT REQUIRE AUTHORIZATION #################################
+  GraphQLApiAuthorized:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: !Sub "${ProjectName}_GraphQLAuth"
+      AuthenticationType: AWS_LAMBDA
+      LambdaAuthorizerConfig:
+        AuthorizerUri: !Ref LambdaAuthArn
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
+        FieldLogLevel: INFO
+        
+  AppSchema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApiAuthorized.ApiId
+      Definition: |
+        type User {
+          user_name: ID
+          role: String
+          password: String
+        }
+
+        type Query {
+          # Get a single value of type 'Post' by primary key.
+          getUser(user_name: ID!): User
+        }
+
+        schema {
+          query: Query
+        }
+
+  LambdaAuthorizedDataSource:
     Type: AWS::AppSync::DataSource
     Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub ${ProjectName}_LambdaDataSource
+      ApiId: !GetAtt GraphQLApiAuthorized.ApiId
+      Name: !Sub ${ProjectName}_LambdaAuthDataSource
       Type: AWS_LAMBDA
       ServiceRoleArn: !GetAtt AppSyncLambdaServiceRole.Arn
       LambdaConfig:
-        LambdaFunctionArn: !Ref LambdaFunctionArn
+        LambdaFunctionArn: !Ref AppFunctionsArn
 
   GetUserUrlResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: AppSchema
     Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
+      ApiId: !GetAtt GraphQLApiAuthorized.ApiId
       TypeName: Query
       FieldName: getUser
-      DataSourceName: !GetAtt LambdaDataSource.Name
+      DataSourceName: !GetAtt LambdaAuthorizedDataSource.Name
 
-  CreateUserResolver:
-    Type: AWS::AppSync::Resolver
-    DependsOn: AppSchema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Mutation
-      FieldName: createUser
-      DataSourceName: !GetAtt LambdaDataSource.Name
-
-  ApiGatewayGraphQLIntegration:
+  ApiGatewayGraphQLAuthorizedIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
       ApiId: !Ref HTTPApiGWAppId
       IntegrationType: HTTP_PROXY
       IntegrationMethod: POST
-      IntegrationUri: !GetAtt GraphQLApi.GraphQLUrl
+      IntegrationUri: !GetAtt GraphQLApiAuthorized.GraphQLUrl
       PayloadFormatVersion: '1.0'
-      Description: "API GW Integration with AppSync GraphQL API"
+      Description: "API GW Integration with AppSync GraphQL APIs that require authorization."
 
   GetUserRouteGraphQL:
     Type: AWS::ApiGatewayV2::Route
@@ -147,7 +121,87 @@ Resources:
       Target: !Join
         - /
         - - integrations
-          - !Ref ApiGatewayGraphQLIntegration
+          - !Ref ApiGatewayGraphQLAuthorizedIntegration
+  ###################################################################
+
+  # APIs THAT DO NOT REQUIRE AUTHORIZATION ##########################
+  GraphQLApiUnAuthorized:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: !Sub "${ProjectName}_GraphQL_AuthAlways"
+      AuthenticationType: AWS_LAMBDA
+      LambdaAuthorizerConfig:
+        AuthorizerUri: !Ref LambdaAuthAlwaysArn
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
+        FieldLogLevel: INFO
+
+  AppSchemaUnAuthorized:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApiUnAuthorized.ApiId
+      Definition: |
+        type User {
+          user_name: ID
+          role: String
+          password: String
+        }
+
+        type UserToken {
+          user_name: ID
+          token: String
+        }
+
+        type Mutation {
+          createUser(user_name: ID!, role: String!, password: String!): User
+        }
+
+        type Query {
+          login(user_name: ID!, password: String!): UserToken
+        }
+
+        schema {
+          query: Query
+          mutation: Mutation
+        }
+
+  LambdaUnAuthorizedDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt GraphQLApiUnAuthorized.ApiId
+      Name: !Sub ${ProjectName}_LambdaUnAuthDataSource
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaServiceRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref AppFunctionsArn
+
+  ApiGatewayGraphQLUnAuthorizedIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HTTPApiGWAppId
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: POST
+      IntegrationUri: !GetAtt GraphQLApiUnAuthorized.GraphQLUrl
+      PayloadFormatVersion: '1.0'
+      Description: "API GW Integration with AppSync GraphQL APIs that don't require authorization."
+
+  CreateUserResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSchemaUnAuthorized
+    Properties:
+      ApiId: !GetAtt GraphQLApiUnAuthorized.ApiId
+      TypeName: Mutation
+      FieldName: createUser
+      DataSourceName: !GetAtt LambdaDataSource.Name
+
+  CreateUserResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSchemaUnAuthorized
+    Properties:
+      ApiId: !GetAtt GraphQLApiUnAuthorized.ApiId
+      TypeName: Query
+      FieldName: login
+      DataSourceName: !GetAtt LambdaDataSource.Name
 
   CreateUserRouteGraphQL:
     Type: AWS::ApiGatewayV2::Route
@@ -157,9 +211,13 @@ Resources:
       Target: !Join
         - /
         - - integrations
-          - !Ref ApiGatewayGraphQLIntegration
-          
+          - !Ref ApiGatewayGraphQLUnAuthorizedIntegration
+  ###################################################################
+
 Outputs:
-  GraphQLAPIURL:
-    Description: URL of the GraphQL API
-    Value: !GetAtt GraphQLApi.GraphQLUrl
+  GraphQLApiWithAuth:
+    Description: URL of the GraphQL APIs that require authorization.
+    Value: !GetAtt GraphQLApiAuthorized.GraphQLUrl
+  GraphQLApiWithoutAuth:
+    Description: URL of the GraphQL API that do not require authorization.
+    Value: !GetAtt GraphQLApiUnAuthorized.GraphQLUrl
