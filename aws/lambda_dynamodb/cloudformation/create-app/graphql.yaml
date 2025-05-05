@@ -37,16 +37,6 @@ Resources:
   #    Permissions:
   #      - Write
 
-  TopicToFunctionConnector:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source: 
-        Id: Topic
-      Destination: 
-        Id: Function
-      Permissions:
-        - Write
-
   AppSyncLoggingServiceRole:
     Type: AWS::IAM::Role
     Properties:
