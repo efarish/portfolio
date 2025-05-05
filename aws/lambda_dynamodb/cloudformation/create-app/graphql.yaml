@@ -33,7 +33,7 @@ Resources:
       Source:
         Id: GraphQLApi
       Destination:
-        Id: !Ref LambdaAuthFunctionId
+        Id: LambdaAuthFunctionId
       Permissions:
         - Write
 
