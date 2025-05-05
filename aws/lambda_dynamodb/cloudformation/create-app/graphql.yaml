@@ -11,6 +11,8 @@ Parameters:
     Type: String
   LambdaAuthFunctionArn:
     Type: String
+  LambdaAuthFunctionId:
+    Type: String
 
 Resources:
   GraphQLApi:
@@ -31,7 +33,17 @@ Resources:
       Source:
         Id: GraphQLApi
       Destination:
-        Arn: !Ref LambdaAuthFunctionArn
+        Id: !Ref LambdaAuthFunctionId
+      Permissions:
+        - Write
+
+  TopicToFunctionConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: Topic
+      Destination: 
+        Id: Function
       Permissions:
         - Write
 

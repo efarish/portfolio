@@ -107,6 +107,9 @@ Outputs:
   LambdaAuthFunctionArn:
     Description: Arn of Lambda Authorizer function.
     Value: !GetAtt LambdaAuth.Arn
+  LambdaAuthFunctionId:
+    Description: Id of Lambda Authorizer function.
+    Value: !Ref LambdaAuth
   HTTPApiGWAppId:
     Description: "AppId of API GW."
     Value: !Ref HTTPApiGW

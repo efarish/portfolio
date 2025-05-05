@@ -36,6 +36,7 @@ Resources:
         HTTPApiGWAppId: !GetAtt LambdaStack.Outputs.HTTPApiGWAppId
         LambdaFunctionArn: !GetAtt LambdaStack.Outputs.LambdaFunctionArn
         LambdaAuthFunctionArn: !GetAtt LambdaStack.Outputs.LambdaAuthFunctionArn
+        LambdaAuthFunctionId: !GetAtt LambdaStack.Outputs.LambdaAuthFunctionId
 
 # -------------------------------------------------------------------------
 # Information about the stack.
