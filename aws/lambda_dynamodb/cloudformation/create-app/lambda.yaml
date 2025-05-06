@@ -45,39 +45,39 @@ Resources:
               - lambda:Invoke
             Resource: 'arn:aws:appsync:*:*:*'  
 
-  #LambdaAuthAlways:
-  #  Type: AWS::Serverless::Function
-  #  Properties:
-  #    FunctionName: !Sub '${ProjectName}_LambdaAuthAlways'
-  #    CodeUri: .
-  #    Description: 'A Lambda Authorizer that always authorizes.'
-  #    MemorySize: 128
-  #    Timeout: 3
-  #    Architectures:
-  #      - x86_64
-  #    EphemeralStorage:
-  #      Size: 512
-  #    EventInvokeConfig:
-  #      MaximumEventAgeInSeconds: 21600
-  #      MaximumRetryAttempts: 2
-  #    ImageUri: !Ref ImageUrl
-  #    ImageConfig:
-  #      Command:
-  #        - lambda_function.lambda_handler_auth_always
-  #    PackageType: Image
-  #    Policies:
-  #      - Statement:
-  #          - Effect: Allow
-  #            Action:
-  #              - logs:CreateLogGroup
-  #              - logs:CreateLogStream
-  #              - logs:PutLogEvents
-  #            Resource: '*'
-  #      - Statement:
-  #        - Effect: Allow
-  #          Action:
-  #            - lambda:Invoke
-  #          Resource: 'arn:aws:appsync:*:*:*'  
+  LambdaAuthAlways:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}_LambdaAuthAlways'
+      CodeUri: .
+      Description: 'A Lambda Authorizer that always authorizes.'
+      MemorySize: 128
+      Timeout: 3
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lambda_function.lambda_handler_auth_always
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:Invoke
+            Resource: 'arn:aws:appsync:*:*:*'  
 
   AppFunctions:
     Type: AWS::Serverless::Function
