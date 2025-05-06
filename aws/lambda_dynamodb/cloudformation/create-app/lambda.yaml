@@ -26,12 +26,7 @@ Resources:
           - Effect: Allow
             Action:
               - ecr:*
-            Resource: '*'
-        - Statement:
-          - Effect: Allow
-            Action:
-              - lambda:Invoke
-            Resource: 'arn:aws:appsync:*:*:*'  
+            Resource: '*'  
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
