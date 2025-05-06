@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CodePipeline Update for Lambda. 
+
+Parameters:
+  PipeLineName:
+    Type: String
+    Description: Specifies the ECS Cluster Name with which the resources would be associated.
+    Default: lambda-dynamodb-update-pipeline
+  SourceRepository:
+    Type: String
+    Description: Specifies a GitHub repository to use as the source repository.
+    Default: efarish/portfolio
+  GitHubConnectionArn:
+    Type: String
+    Description: Specifies the ARN of the GitHub Connection.
+    Default: arn:aws:codeconnections:<YOUR CODE CONNECTION HERE>
+  S3ArtifactBucket:
+    Type: String
+    Description: Specifies the S3 Bucket that will used by CodePipeLine.
+    Default: a-unique-artifact-bucket-name
+  ProjectBuildSpec: 
+    Type: String
+    Description: Specifies the Source Project Name.
+    Default: aws/lambda_dynamodb/cloudformation/update-lambda-pipeline/buildspec.yml
+
+Resources:
+
+  CodePipeLineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: IAM role used by CodePipeline for the deploys.
+      AssumeRolePolicyDocument:
+        Statement:        
+        - Effect: Allow
+          Principal:
+            Service: 
+              - codepipeline.amazonaws.com
+              - codedeploy.amazonaws.com
+              - codebuild.amazonaws.com
+              - ecs-tasks.amazonaws.com
+              - ecs.amazonaws.com
+              - ec2.amazonaws.com
+              - cloudformation.amazonaws.com
+          Action: ['sts:AssumeRole']
+      Policies:
+        - PolicyName: !Sub ${PipeLineName}-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuildBatches
+                  - codebuild:StartBuildBatch
+                  - apigateway:*
+                  - cloudformation:*
+                  - cloudwatch:*
+                  - ec2:*
+                  - ecs:*
+                  - ecr:*
+                  - logs:*
+                  - s3:*
+                  - lambda:*
+                  - iam:*
+                Resource:
+                  - '*'
+      Path: /
+
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${PipeLineName}-build
+      ServiceRole: !GetAtt CodePipeLineRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+        Name: !Sub ${PipeLineName}-build
+        Packaging: NONE
+        EncryptionDisabled: false
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: AWS_ACCT
+            Value: !Sub ${AWS::AccountId}
+        PrivilegedMode: true
+        ImagePullCredentialsType: CODEBUILD
+      TimeoutInMinutes: 5
+      QueuedTimeoutInMinutes: 10
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+        S3Logs:
+          Status: DISABLED
+          EncryptionDisabled: false
+      Visibility: PRIVATE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Ref ProjectBuildSpec
+        InsecureSsl: false
+
+  CodePipeline1:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      RoleArn: !GetAtt CodePipeLineRole.Arn
+      ExecutionMode: QUEUED
+      PipelineType: V2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3ArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              RunOrder: 1
+              Configuration:
+                BranchName: main
+                ConnectionArn: !Ref GitHubConnectionArn
+                DetectChanges: 'false'
+                FullRepositoryId: !Ref SourceRepository
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: !Ref AWS::Region
+              Namespace: SourceVariables
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              RunOrder: 1
+              Configuration:
+                ProjectName: !Sub ${PipeLineName}-build
+              InputArtifacts:
+                - Name: SourceArtifact
+              Region: !Ref AWS::Region
+              Namespace: BuildVariables
