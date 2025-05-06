@@ -6,7 +6,7 @@ Parameters:
   ProjectName:
     Type: String
     Description: Name of the project.
-    Default: lambda_dynamodb
+    Default: DeviceTracker
 
 Resources:
 
