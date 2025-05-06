@@ -29,7 +29,7 @@ Resources:
   LambdaAuth:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: $Sub '${ProjectName}_LambdaAuth'
+      FunctionName: $Sub ${ProjectName}-LambdaAuth
       Role: !GetAtt LambdaExecutionRole.Arn
       PackageType: Image
       Code:
@@ -47,7 +47,7 @@ Resources:
   LambdaAuthAlways:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: $Sub '${ProjectName}_LambdaAuthAlways'
+      FunctionName: $Sub ${ProjectName}-LambdaAuthAlways
       Role: !GetAtt LambdaExecutionRole.Arn
       PackageType: Image
       Code:
