@@ -39,6 +39,11 @@ Resources:
                 - logs:CreateLogStream
                 - logs:PutLogEvents
               Resource: '*'
+        - Statement:
+          - Effect: Allow
+            Action:
+              - execute-api:Invoke
+            Resource: 'arn:aws:appsync:*:*:*'  
 
   LambdaAuthAlways:
     Type: AWS::Serverless::Function
@@ -68,6 +73,11 @@ Resources:
                 - logs:CreateLogStream
                 - logs:PutLogEvents
               Resource: '*'
+        - Statement:
+          - Effect: Allow
+            Action:
+              - execute-api:Invoke
+            Resource: 'arn:aws:appsync:*:*:*'  
 
   AppFunctions:
     Type: AWS::Serverless::Function
