@@ -5,6 +5,7 @@ phases:
   pre_build:
     commands:
       - PROJECT_NAME=DeviceTracker     # Used build path to source files in a Git repository.
+      - PROJECT_DIR=device_tracker
       - ECR_REPO=ecs1                     # Name of ECR image repository.
       - DOCKER_IMAGE_NAME=${PROJECT_NAME} # Name of Tracker Docker image.
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
@@ -13,8 +14,8 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
-      - docker build --platform linux/amd64 -t ${ECR_IMG_NAME} ./aws/${PROJECT_NAME}/docker  
-      - aws cloudformation package --template ./aws/${PROJECT_NAME}/cloudformation/create-app/template.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
+      - docker build --platform linux/amd64 -t ${ECR_IMG_NAME} ./aws/${PROJECT_DIR}/docker  
+      - aws cloudformation package --template ./aws/${PROJECT_DIR}/cloudformation/create-app/template.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
   post_build:
     commands:
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
