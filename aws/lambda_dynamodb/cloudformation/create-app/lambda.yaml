@@ -42,9 +42,10 @@ Resources:
         - Statement:
           - Effect: Allow
             Action:
-              - execute-api:Invoke
+              - lambda:Invoke
             Resource: 'arn:aws:appsync:*:*:*'  
 
+  """
   LambdaAuthAlways:
     Type: AWS::Serverless::Function
     Properties:
@@ -76,8 +77,40 @@ Resources:
         - Statement:
           - Effect: Allow
             Action:
-              - execute-api:Invoke
+              - lambda:Invoke
             Resource: 'arn:aws:appsync:*:*:*'  
+  """
+
+  LambdaAuthAlways:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: $Sub '${ProjectName}_LambdaAuthAlways'
+      Role: !GetAtt LambdaAuthorizerRole.Arn
+      PackageType: Image
+      Code:
+        ImageUri: !Ref ImageUrl
+      Timeout: 30
+
+  LambdaAuthorizerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaAuthAlways
+      Principal: appsync.amazonaws.com
+
 
   AppFunctions:
     Type: AWS::Serverless::Function

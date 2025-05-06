@@ -63,6 +63,7 @@ Resources:
       AuthenticationType: AWS_LAMBDA
       LambdaAuthorizerConfig:
         AuthorizerUri: !Ref LambdaAuthArn
+        AuthorizerResultTtlInSeconds: 300
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
         FieldLogLevel: INFO
@@ -143,6 +144,7 @@ Resources:
       AuthenticationType: AWS_LAMBDA
       LambdaAuthorizerConfig:
         AuthorizerUri: !Ref LambdaAuthAlwaysArn
+        AuthorizerResultTtlInSeconds: 300
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
         FieldLogLevel: INFO
