@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "lambda-dynamodb-create-pipeline"
+stack_name = "DeviceTracker-CreatePipeline"
 
 [default.build.parameters]
 parallel = true

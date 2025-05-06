@@ -14,7 +14,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      Description: IAM role by Lambdas.
+      Description: IAM role for Lambdas.
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
@@ -29,7 +29,7 @@ Resources:
   LambdaAuth:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: $Sub ${ProjectName}-LambdaAuth
+      FunctionName: "DTLambdaAuth"
       Role: !GetAtt LambdaExecutionRole.Arn
       PackageType: Image
       Code:
@@ -47,7 +47,7 @@ Resources:
   LambdaAuthAlways:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: $Sub ${ProjectName}-LambdaAuthAlways
+      FunctionName: "DTLambdaAuthAlways"
       Role: !GetAtt LambdaExecutionRole.Arn
       PackageType: Image
       Code:

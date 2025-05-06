@@ -14,7 +14,7 @@ Resources:
   AppFunctions:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub '${ProjectName}_LambdaFunctions'
+      FunctionName: 'DTLambdaFunctions'
       CodeUri: .
       Description: 'Entry point for application.'
       MemorySize: 128

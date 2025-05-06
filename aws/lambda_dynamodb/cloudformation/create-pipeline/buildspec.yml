@@ -4,7 +4,7 @@ env:
 phases:
   pre_build:
     commands:
-      - PROJECT_NAME=lambda_dynamodb      # Used build path to source files in a Git repository.
+      - PROJECT_NAME=DeviceTracker     # Used build path to source files in a Git repository.
       - ECR_REPO=ecs1                     # Name of ECR image repository.
       - DOCKER_IMAGE_NAME=${PROJECT_NAME} # Name of Tracker Docker image.
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
