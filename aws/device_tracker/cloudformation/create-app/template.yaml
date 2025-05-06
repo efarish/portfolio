@@ -53,6 +53,6 @@ Outputs:
 
   LambdaStackUrl:
     Description: URL of API GW.
-    Value: !GetAtt LambdaStack.Outputs.HTTPApiGWUrl
+    Value: !GetAtt ApiGwStack.Outputs.HTTPApiGWUrl
 
     
