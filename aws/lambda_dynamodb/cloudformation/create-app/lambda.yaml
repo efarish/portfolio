@@ -11,6 +11,30 @@ Parameters:
 
 Resources:
 
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - ecr:*
+            Resource: '*'
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:Invoke
+            Resource: 'arn:aws:appsync:*:*:*'  
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
   LambdaAuth:
     Type: AWS::Serverless::Function
     Properties:
@@ -49,7 +73,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: $Sub '${ProjectName}_LambdaAuthAlways'
-      #Role: !GetAtt LambdaUnAuthorizerRole.Arn
+      Role: !GetAtt LambdaExecutionRole.Arn
       PackageType: Image
       Code:
         ImageUri: !Ref ImageUrl
