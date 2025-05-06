@@ -70,45 +70,6 @@ Resources:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
         FieldLogLevel: INFO
 
-  LambdaAuthAlways:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: GQLLambdaAuthAlways
-      CodeUri: .
-      Description: 'A Lambda Authorizer that always authorizes.'
-      MemorySize: 128
-      Timeout: 3
-      Architectures:
-        - x86_64
-      EphemeralStorage:
-        Size: 512
-      EventInvokeConfig:
-        MaximumEventAgeInSeconds: 200
-        MaximumRetryAttempts: 2
-      ImageUri: !Ref ImageUrl
-      ImageConfig:
-        Command:
-          - lambda_function.lambda_handler_auth_always
-      PackageType: Image
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
-              Resource: '*'
-
-  GraphQlApiToLambdaConnector:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: GraphQLApiAuthorized
-      Destination:
-        Id: LambdaAuthAlways
-      Permissions:
-      - Write
-
   LambdaAuthInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -184,17 +145,56 @@ Resources:
       Name: !Sub "${ProjectName}_GraphQL_No_Auth"
       AuthenticationType: AWS_LAMBDA
       LambdaAuthorizerConfig:
-        AuthorizerUri: !Ref LambdaAuthAlwaysArn
+        AuthorizerUri: !GetAtt LambdaAuthAlways.Arn
         AuthorizerResultTtlInSeconds: 300
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
         FieldLogLevel: INFO
 
+  LambdaAuthAlways:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GQLLambdaAuthAlways
+      CodeUri: .
+      Description: 'A Lambda Authorizer that always authorizes.'
+      MemorySize: 128
+      Timeout: 3
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 200
+        MaximumRetryAttempts: 2
+      ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lambda_function.lambda_handler_auth_always
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+
+  GraphQlApiToLambdaConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: GraphQLApiUnAuthorized
+      Destination:
+        Id: LambdaAuthAlways
+      Permissions:
+      - Write
+
   LambdaUnAuthInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref LambdaAuthAlwaysArn
+      FunctionName: !GetAtt LambdaAuthAlways.Arn
       Principal: appsync.amazonaws.com
       SourceArn: !GetAtt GraphQLApiUnAuthorized.Arn
 
