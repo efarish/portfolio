@@ -83,13 +83,22 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: $Sub '${ProjectName}_LambdaAuthAlways'
-      Role: !GetAtt LambdaAuthorizerRole.Arn
+      Role: !GetAtt LambdaUnAuthorizerRole.Arn
       PackageType: Image
       Code:
         ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lambda_function.lambda_handler_auth_always
       Timeout: 30
+      MemorySize: 128
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
 
-  LambdaAuthorizerRole:
+
+  LambdaUnAuthorizerRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
