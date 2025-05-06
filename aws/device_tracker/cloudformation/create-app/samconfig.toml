@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "lambda-dynamodb-stack"
+stack_name = "device-tracker-stack"
 
 [default.build.parameters]
 parallel = true

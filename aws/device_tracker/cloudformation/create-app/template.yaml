@@ -45,6 +45,7 @@ Resources:
         AppFunctionsArn: !GetAtt ApiGwStack.Outputs.AppFunctionsArn
         LambdaAuthArn: !GetAtt LambdaStack.Outputs.LambdaAuthArn
         LambdaAuthAlwaysArn: !GetAtt LambdaStack.Outputs.LambdaAuthAlwaysArn
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
 
 # -------------------------------------------------------------------------
 # Information about the stack.
