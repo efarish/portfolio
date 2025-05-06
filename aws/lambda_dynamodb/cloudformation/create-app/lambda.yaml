@@ -9,26 +9,35 @@ Parameters:
     Type: String
     Description: The ECR url of the Docker image that contains application entry point.
 
-Resources:
+Resources: 
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      Description: IAM role by Lambdas.
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
       Policies:
-        - Statement:
+      - PolicyName: !Sub ${ProjectName}_Lambda_Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
           - Effect: Allow
             Action:
-              - ecr:*
-            Resource: '*'  
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+            - ec2:*
+            - ecr:*
+            - logs:*
+            - lambda:*
+            - iam:*
+            Resource:
+            - '*'
+      Path: /
 
   LambdaAuth:
     Type: AWS::Serverless::Function
