@@ -79,46 +79,6 @@ Resources:
   #            - lambda:Invoke
   #          Resource: 'arn:aws:appsync:*:*:*'  
 
-  LambdaAuthAlways:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: $Sub '${ProjectName}_LambdaAuthAlways'
-      Role: !GetAtt LambdaUnAuthorizerRole.Arn
-      PackageType: Image
-      Code:
-        ImageUri: !Ref ImageUrl
-      ImageConfig:
-        Command:
-          - lambda_function.lambda_handler_auth_always
-      Timeout: 30
-      MemorySize: 128
-      Architectures:
-        - x86_64
-      EphemeralStorage:
-        Size: 512
-
-
-  LambdaUnAuthorizerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-
-  LambdaInvokePermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref LambdaAuthAlways
-      Principal: appsync.amazonaws.com
-
-
   AppFunctions:
     Type: AWS::Serverless::Function
     Properties:
@@ -184,9 +144,9 @@ Outputs:
   LambdaAuthArn:
     Description: Arn of Lambda authorizer.
     Value: !GetAtt LambdaAuth.Arn
-  LambdaAuthAlwaysArn:
-    Description: Arn of Lambda authorizer.
-    Value: !GetAtt LambdaAuthAlways.Arn
+  #LambdaAuthAlwaysArn:
+  #  Description: Arn of Lambda authorizer.
+  #  Value: !GetAtt LambdaAuthAlways.Arn
   HTTPApiGWAppId:
     Description: "AppId of API GW."
     Value: !Ref HTTPApiGW
