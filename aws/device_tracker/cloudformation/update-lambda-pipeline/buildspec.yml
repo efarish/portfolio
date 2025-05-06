@@ -5,6 +5,7 @@ phases:
   pre_build:
     commands:
       - PROJECT_NAME=DeviceTracker  # Used build path to source files.
+      - PROJECT_DIR=device_tracker
       - ECR_REPO=ecs1                 # Name of ECR image repository.
       - LAMBDA_FUNC_NAME=LambdaDynamoDBFunction
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
@@ -14,7 +15,7 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
-      - docker build -t ${ECR_IMG_NAME} ./aws/${PROJECT_NAME}/docker
+      - docker build -t ${ECR_IMG_NAME} ./aws/${PROJECT_DIR}/docker
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
   post_build:
