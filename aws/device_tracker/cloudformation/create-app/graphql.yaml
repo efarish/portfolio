@@ -73,7 +73,7 @@ Resources:
   LambdaAuthAlways:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: GQLLambdaAuthAlways'
+      FunctionName: GQLLambdaAuthAlways
       CodeUri: .
       Description: 'A Lambda Authorizer that always authorizes.'
       MemorySize: 128
