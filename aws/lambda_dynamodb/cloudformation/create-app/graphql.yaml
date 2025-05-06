@@ -147,6 +147,14 @@ Resources:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
         FieldLogLevel: INFO
 
+  LambdaUnAuthInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaAuthAlwaysArn
+      Principal: appsync.amazonaws.com
+      SourceArn: !GetAtt GraphQLApiUnAuthorized.Arn
+
   AppSchemaUnAuthorized:
     Type: AWS::AppSync::GraphQLSchema
     Properties:
