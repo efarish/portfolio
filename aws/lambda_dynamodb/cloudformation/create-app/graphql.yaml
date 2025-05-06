@@ -67,16 +67,13 @@ Resources:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
         FieldLogLevel: INFO
 
-
-  GraphQlApiToLambdaAuthConnector:
-    Type: AWS::Serverless::Connector
+  LambdaAuthInvokePermission:
+    Type: AWS::Lambda::Permission
     Properties:
-      Source:
-        Id: GraphQLApiAuthorized
-      Destination:
-        Arn: !Ref LambdaAuthArn
-      Permissions:
-      - Write
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaAuthArn
+      Principal: appsync.amazonaws.com
+      SourceArn: !GetAtt GraphQLApiAuthorized.Arn
         
   AppSchema:
     Type: AWS::AppSync::GraphQLSchema
