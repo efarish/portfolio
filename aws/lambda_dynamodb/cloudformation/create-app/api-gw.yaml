@@ -73,12 +73,6 @@ Outputs:
   AppFunctionsArn:
     Description: Arn of applications function.
     Value: !GetAtt AppFunctions.Arn
-  LambdaAuthArn:
-    Description: Arn of Lambda authorizer.
-    Value: !GetAtt LambdaAuth.Arn
-  LambdaAuthAlwaysArn:
-    Description: Arn of Lambda authorizer.
-    Value: !GetAtt LambdaAuthAlways.Arn
   HTTPApiGWAppId:
     Description: "AppId of API GW."
     Value: !Ref HTTPApiGW
