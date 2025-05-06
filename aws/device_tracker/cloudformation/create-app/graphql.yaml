@@ -108,7 +108,6 @@ Resources:
         Id: LambdaAuthAlways
       Permissions:
       - Write
-      - Read
 
   LambdaAuthInvokePermission:
     Type: AWS::Lambda::Permission
