@@ -10,6 +10,14 @@ Parameters:
 
 Resources:
 
+  ApiGwStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./api-gw.yaml
+      Parameters:
+        ProjectName: !Ref ProjectName
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
+
   LambdaStack:
     Type: AWS::Serverless::Application
     Properties:
@@ -33,8 +41,8 @@ Resources:
       Location: ./graphql.yaml
       Parameters:
         ProjectName: !Ref ProjectName
-        HTTPApiGWAppId: !GetAtt LambdaStack.Outputs.HTTPApiGWAppId
-        AppFunctionsArn: !GetAtt LambdaStack.Outputs.AppFunctionsArn
+        HTTPApiGWAppId: !GetAtt ApiGwStack.Outputs.HTTPApiGWAppId
+        AppFunctionsArn: !GetAtt ApiGwStack.Outputs.AppFunctionsArn
         LambdaAuthArn: !GetAtt LambdaStack.Outputs.LambdaAuthArn
         LambdaAuthAlwaysArn: !GetAtt LambdaStack.Outputs.LambdaAuthAlwaysArn
 

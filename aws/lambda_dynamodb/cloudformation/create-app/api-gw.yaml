@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The template used for Lambda functions.
+
+Parameters:
+  ProjectName:
+    Type: String
+  ImageUrl:
+    Type: String
+    Description: The ECR url of the Docker image that contains application entry point.
+
+Resources: 
+
+  AppFunctions:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}_LambdaFunctions'
+      CodeUri: .
+      Description: 'Entry point for application.'
+      MemorySize: 128
+      Timeout: 10
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lambda_function.lambda_handler
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ec2:*
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - dynamodb:*
+              Resource: '*'
+      Events:
+        Api1:
+          Type: HttpApi
+          Properties:
+            Path: /login
+            Method: post
+            ApiId: !Ref HTTPApiGW
+        Api2:
+          Type: HttpApi
+          Properties:
+            Path: /authorize
+            Method: post
+            ApiId: !Ref HTTPApiGW
+
+  HTTPApiGW:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: API for user management.
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 20
+        ThrottlingRateLimit: 10
+      AccessLogSettings:
+        DestinationArn: !GetAtt APILogGroup.Arn 
+        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": "$context.status" }'      
+
+  APILogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/apigateway/${ProjectName}
+        RetentionInDays: 1
+
+Outputs:
+  AppFunctionsArn:
+    Description: Arn of applications function.
+    Value: !GetAtt AppFunctions.Arn
+  LambdaAuthArn:
+    Description: Arn of Lambda authorizer.
+    Value: !GetAtt LambdaAuth.Arn
+  LambdaAuthAlwaysArn:
+    Description: Arn of Lambda authorizer.
+    Value: !GetAtt LambdaAuthAlways.Arn
+  HTTPApiGWAppId:
+    Description: "AppId of API GW."
+    Value: !Ref HTTPApiGW
+  HTTPApiGWUrl:
+    Description: "API GW URL."
+    Value: !Sub https://${HTTPApiGW}.execute-api.${AWS::Region}.amazonaws.com 
+
+
+  
+
