@@ -20,11 +20,8 @@ The architecture diagram is below.
 
 # TODO
 
-
-Need to figure out how GraphQL handles missing data. 
-May need to specify response models. 
-And how to return missing data exception. can't just return status 500 in else condidtion.
-
+1. Add Lambda Authorizer.
+1. Subscriptions 
 
 
 
