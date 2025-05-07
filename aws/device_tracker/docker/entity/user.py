@@ -74,8 +74,6 @@ def create_user(user_name: str, role: str, password: str) -> User:
 
 def get_user(user_name, return_password=False) -> User:
 
-    logger.info(f'User table: {USER_TABLE=}')
-
     client = get_client()
     table = client.Table(USER_TABLE)
     if not return_password:
