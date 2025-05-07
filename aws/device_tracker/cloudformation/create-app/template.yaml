@@ -28,7 +28,7 @@ Resources:
   GraphQLStack:
     Type: AWS::Serverless::Application
     DependsOn:
-      - LambdaStack
+      - ApiGwStack
     Properties:
       Location: ./graphql.yaml
       Parameters:
