@@ -1,3 +1,4 @@
+import logging
 import os
 from dataclasses import asdict, dataclass
 from datetime import timedelta
@@ -8,7 +9,10 @@ from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 from util import auth
 
-USER_TABLE = os.environ.get('USER_TABLE')
+USER_TABLE =  os.environ.get('PROJECT_NAME') + '_user'
+
+logger = logging.getLogger(__name__)
+logger.setLevel(getattr(logging, os.environ.get('LOG_LEVEL', 'INFO')))
 
 @dataclass
 class User:
@@ -69,6 +73,8 @@ def create_user(user_name: str, role: str, password: str) -> User:
 
 
 def get_user(user_name, return_password=False) -> User:
+
+    logger.info(f'User table: {USER_TABLE=}')
 
     client = get_client()
     table = client.Table(USER_TABLE)
