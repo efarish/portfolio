@@ -105,19 +105,12 @@ def lambda_handler(event, context):
         case {'rawPath': rawPath}: 
             #The only event taking this path should be authorizations
             # event from API GW. 
-            logger.info(f'Authorization handler hit: {rawPath=}')
-            lambda_handler_auth(event, context)
-            """
             match rawPath:
-                case '/login':
-                    response = login_handler(event)
-                    return response
-                case '/authorize':
+                case '/get_user':
+                    logger.info(f'Authorization handler hit: {rawPath=}')
                     response = lambda_handler_auth(event, context)
-                    return response
                 case _:
                     return {'statusCode': 400, 'body': f'Invalid request: {rawPath}.'}
-            """
         case {'info': info}:
             #This path is only for GraphQL.
             match info:
