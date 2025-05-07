@@ -18,14 +18,6 @@ Resources:
         ProjectName: !Ref ProjectName
         ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
 
-  LambdaStack:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./lambda.yaml
-      Parameters:
-        ProjectName: !Ref ProjectName
-        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
-
   DynamoDBStack:
     Type: AWS::Serverless::Application
     Properties:
@@ -43,9 +35,6 @@ Resources:
         ProjectName: !Ref ProjectName
         HTTPApiGWAppId: !GetAtt ApiGwStack.Outputs.HTTPApiGWAppId
         AppFunctionsArn: !GetAtt ApiGwStack.Outputs.AppFunctionsArn
-        LambdaAuthArn: !GetAtt LambdaStack.Outputs.LambdaAuthArn
-        LambdaAuthAlwaysArn: !GetAtt LambdaStack.Outputs.LambdaAuthAlwaysArn
-        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
 
 # -------------------------------------------------------------------------
 # Information about the stack.
