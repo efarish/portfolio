@@ -7,7 +7,7 @@ phases:
       - PROJECT_NAME=DeviceTracker  # Used build path to source files.
       - PROJECT_DIR=device_tracker
       - ECR_REPO=ecs1                 # Name of ECR image repository.
-      - LAMBDA_FUNC_NAME=LambdaDynamoDBFunction
+      - LAMBDA_FUNC_NAME=DTLambdaFunctions
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - IMG_NAME=${PROJECT_NAME}
       - ECR_IMG_NAME=${ECR_REPO}:${IMG_NAME}
