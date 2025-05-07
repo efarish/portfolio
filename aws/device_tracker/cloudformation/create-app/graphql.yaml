@@ -181,6 +181,7 @@ Resources:
 
   ApiGWAuthorizer:
       Type: 'AWS::ApiGatewayV2::Authorizer'
+      DependsOn: AppFunctions
       Properties:
         Name: !Sub ${ProjectName}ApiGWAuthorizer
         ApiId: !Ref HTTPApiGWAppId
