@@ -16,7 +16,7 @@ This project implements a Query and Mutation GraphQL API using AWS services. The
 The architecture diagram is below.
 
 <p align="center">
-  <img src="./assets/img/architecture1.jpg" />
+  <img src="./assets/img/arch2.jpg" />
 </p>
 
 This app supports 2 GraphQL queries and 1 mutation:
