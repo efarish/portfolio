@@ -34,7 +34,6 @@ Resources:
       Parameters:
         ProjectName: !Ref ProjectName
         HTTPApiGWAppId: !GetAtt ApiGwStack.Outputs.HTTPApiGWAppId
-        AppFunctionsArn: !GetAtt ApiGwStack.Outputs.AppFunctionsArn
 
 # -------------------------------------------------------------------------
 # Information about the stack.

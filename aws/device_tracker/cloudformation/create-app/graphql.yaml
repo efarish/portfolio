@@ -7,8 +7,6 @@ Parameters:
     Type: String
   HTTPApiGWAppId:
     Type: String
-  AppFunctionsArn:
-    Type: String
 
 Resources:
 
@@ -44,7 +42,59 @@ Resources:
                 Action:
                   - 'lambda:InvokeFunction'
                 Resource: 
-                  - !Ref AppFunctionsArn
+                  - !GetAtt AppFunctions.Arn
+
+  ApiGWLambdaAuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-auth-iam-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - '*'
+                Sid: ''
+
+  AppFunctions:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'DTLambdaFunctions'
+      CodeUri: .
+      Description: 'Entry point for application.'
+      MemorySize: 128
+      Timeout: 10
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      ImageUri: !Ref ImageUrl
+      ImageConfig:
+        Command:
+          - lambda_function.lambda_handler
+      PackageType: Image
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ec2:*
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - dynamodb:*
+              Resource: '*'
 
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -98,7 +148,7 @@ Resources:
       Type: AWS_LAMBDA
       ServiceRoleArn: !GetAtt AppSyncLambdaServiceRole.Arn
       LambdaConfig:
-        LambdaFunctionArn: !Ref AppFunctionsArn
+        LambdaFunctionArn: !GetAtt AppFunctions.Arn
 
   CreateUserResolver:
     Type: AWS::AppSync::Resolver
@@ -126,6 +176,26 @@ Resources:
       TypeName: Query
       FieldName: getUser
       DataSourceName: !GetAtt LambdaDataSource.Name
+
+  ApiGWAuthorizer:
+      Type: 'AWS::ApiGatewayV2::Authorizer'
+      Properties:
+        Name: !Sub {ProjectName}ApiGWAuthorizer
+        ApiId: !Ref HTTPApiGWAppId
+        AuthorizerType: REQUEST
+        AuthorizerCredentialsArn: !GetAtt ApiGWLambdaAuthRole.Arn
+        AuthorizerPayloadFormatVersion: "2.0"
+        EnableSimpleResponses: true
+        AuthorizerUri: !Join 
+          - ''
+          - - 'arn:aws:apigateway:'
+            - !Ref 'AWS::Region'
+            - ':lambda:path/2015-03-31/functions/'
+            - !Ref AppFunctions 
+            - '/invocations'
+        AuthorizerResultTtlInSeconds: 30
+        IdentitySource:
+          - '$request.header.Authorization'
 
   ApiGatewayGraphQLIntegration:
     Type: AWS::ApiGatewayV2::Integration
@@ -164,6 +234,8 @@ Resources:
     Properties:
       ApiId: !Ref HTTPApiGWAppId
       RouteKey: 'POST /get_user'
+      AuthorizationType: CUSTOM
+      AuthorizerId: !GetAtt ApiGWAuthorizer.AuthorizerId
       Target: !Join
         - /
         - - integrations
