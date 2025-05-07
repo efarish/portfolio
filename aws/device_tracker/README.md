@@ -2,7 +2,7 @@
 
 A WORK-IN-PROGRESS
 
-This project implements a Query and Mutation GraphQL API using AWS service. The AWS stack was implemented using the following services and frameworks.
+This project implements a Query and Mutation GraphQL API using AWS services. The AWS stack was implemented using the following services and frameworks.
 
 * API Gateway Http API - The public face interface to the app.
 * Lambda Functions - Provides compute resources for application and API Gateway authorization.
