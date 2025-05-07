@@ -2,6 +2,7 @@
 
 These projects demonstrate developing applications using various AWS services. 
 
+- [GraphQL API](https://github.com/efarish/portfolio/tree/main/aws/device_tracker) - Implementation of GraphQL API using AWS AppSync. 
 - [AWS SAM Lambda Example](https://github.com/efarish/portfolio/tree/main/aws/sam_lambda_s3): Use AWS Serverless Application Model (SAM) to deploy a Lambda endpoint.
 - [Lambda-RDS Example](https://github.com/efarish/portfolio/tree/main/aws/lambda_rds): Example of connecting to a PostgreSQL db using SQAlchemy from Lambda.
 - [API Gateway-ECS Integration](https://github.com/efarish/portfolio/tree/main/aws/ecs_docker): Integrating API Gatweay and ECS using an ALB and Cloud Map.
