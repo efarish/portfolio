@@ -16,7 +16,6 @@ Resources:
       Location: ./api-gw.yaml
       Parameters:
         ProjectName: !Ref ProjectName
-        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
 
   DynamoDBStack:
     Type: AWS::Serverless::Application
@@ -34,6 +33,7 @@ Resources:
       Parameters:
         ProjectName: !Ref ProjectName
         HTTPApiGWAppId: !GetAtt ApiGwStack.Outputs.HTTPApiGWAppId
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/ecs1:${ProjectName}
 
 # -------------------------------------------------------------------------
 # Information about the stack.

@@ -5,9 +5,6 @@ Description: The Public API for the app.
 Parameters:
   ProjectName:
     Type: String
-  ImageUrl:
-    Type: String
-    Description: The ECR url of the Docker image that contains application entry point.
 
 Resources: 
 
