@@ -180,7 +180,7 @@ Resources:
   ApiGWAuthorizer:
       Type: 'AWS::ApiGatewayV2::Authorizer'
       Properties:
-        Name: !Sub {ProjectName}ApiGWAuthorizer
+        Name: !Sub ${ProjectName}ApiGWAuthorizer
         ApiId: !Ref HTTPApiGWAppId
         AuthorizerType: REQUEST
         AuthorizerCredentialsArn: !GetAtt ApiGWLambdaAuthRole.Arn
