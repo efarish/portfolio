@@ -1,7 +1,7 @@
 #Below is an example of subscripting to the AppSync subscription 
 #  service.
 # 
-#The AWS code for this example can be found here:
+#The code for this example can be found here:
 # https://aws.amazon.com/blogs/mobile/appsync-websockets-python/
 #
 #Usage: Running the scripts opens a WSS connection to AppSync.

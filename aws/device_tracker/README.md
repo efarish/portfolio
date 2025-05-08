@@ -1,8 +1,6 @@
 # Project: GraphQL API
 
-A WORK-IN-PROGRESS
-
-This project implements a Query and Mutation GraphQL API using AWS services. The AWS stack was implemented using the following services and frameworks.
+This project implements a Query, Mutation, and Subscription GraphQL API using AWS services. The AWS stack was implemented using the following services and frameworks.
 
 * API Gateway Http API - The public face interface to the app which forwards requests to the GraphQL API.
 * AppSync - Provides GraphQL API related services and forwards requests to Lambda functions.  
@@ -19,17 +17,18 @@ The architecture diagram is below.
   <img src="./assets/img/arch3.jpg" />
 </p>
 
-This app supports 2 GraphQL queries and 1 mutation:
+This app API supports the following:
 
-1. Create User - Creating a user.
-1. Login - Logging into the application and receiving a JWT.
-2. Get User - Using the JWT form the login, get user information.
+1. Create User - A Mutation creating a user.
+1. Login - A Query for logging into the application and receiving a JWT.
+1. Get User - A Query using the JWT form the login, get user information.
+1. Created User - A Subscription to push Create User events to AppSync WSS clients.
 
-Examples of making calling these endpoints can be found in the Jupyter notebook found in the `client` folder of this project. 
+The Query and Mutations resolvers were implemented using Lambda Functions. Examples of making calling these endpoints can be found in the Jupyter notebook found in the `client` folder of this project. 
 
-# TODO
+The only work need for the Created User Subscription was updating the schema with a subscription specification, AppSync takes care fo the rest. If more complicated processing was needed, a resolver could have been added. The `client` directory also has an example Subscription client.   
 
-1. Implement GraphQL Subscription. 
+
 
 
 
