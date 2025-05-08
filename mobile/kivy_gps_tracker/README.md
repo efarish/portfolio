@@ -2,16 +2,16 @@
 
 This project demonstrates using Python, AWS, and Kivy (a cross-platform GUI framework for Python) to implement a mobile device tracker. Highlights include:
 
-* A RESTFul API web service implemented using FastAPI running on ECS
-* IaC using CloudFormation
-* CI/CD using CodePipeline
-* HTTP and WebSocket API Gateways
-* AWS Lambda functions including an API Gateway Authorizer
-* Using Docker images for Lambda and ECS code
-* ECS integration with API Gateway
-* Using SQLAlchemy for SQLite persistence
-* A Kivy mobile app that sends GPS location info to the web service API
-* PyTest for unit testing
+* A RESTFul API web service implemented using FastAPI running on ECS.
+* IaC using CloudFormation.
+* CI/CD using CodePipeline.
+* HTTP and WebSocket API Gateways.
+* AWS Lambda functions including an API Gateway Authorizer.
+* Docker images for Lambda and ECS code.
+* AWS Cloud Map for ECS integration with API Gateway.
+* SQLAlchemy for SQLite persistence.
+* Kivy mobile app that sends and receive GPS location data.
+* PyTest for unit testing.
 
 The Kivy mobile app reports its GSP location to an application stack deployed to AWS. The mobile app uses Kivy Garden MapView to visualize the device location and any other device logged into the service.  
 
@@ -27,8 +27,7 @@ A couple of additional notes:
 * Some of the AWS services used were for self-didactic teaching. For example:
   * A Lambda Authorizer was included to experiment with securing an API Gateway. 
   * ECS and FastAPI are used to implement the endpoints instead of Lambda Functions.
-  * Using ECS led to experimenting with ways to integrate the API Gateways (HTTP and WebSockets), e.g VPC Link, Cloud Map, and Service Discovery.
-  * SQLite and SQLAlchemy are used to experiment with Python RDBMS persistence. 
+  * Using ECS led to experimenting with ways to integrate the API Gateways, e.g VPC Link, Cloud Map, and Service Discovery.
  
 A final note on costs. For small ECS clusters, the AWS cost for public IPs and VPC endpoints is less than that of NAT gateways. Furthermore, an application load balancer is more expensive than Cloud Map. For larger clusters, this is probably not true.
 
