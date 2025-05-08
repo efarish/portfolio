@@ -137,9 +137,15 @@ Resources:
           createUser(user_name: ID!, role: String!, password: String!): User
         }
 
+        type Subscription {
+          createdUser: User
+            @aws_subscribe(mutations: ["createUser"])
+        }
+
         schema {
           query: Query
           mutation: Mutation
+          subscription: Subscription
         }        
 
   LambdaDataSource:

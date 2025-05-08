@@ -1,2 +1,6 @@
 boto3
 httpx
+websocket-client
+requests
+datetime
+uuid

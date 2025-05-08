@@ -6,7 +6,7 @@ Parameters:
   PipeLineName:
     Type: String
     Description: Specifies pipeline name.
-    Default: lambda-dynamodb-create-pipeline
+    Default: device-tacker-create-pipeline
   SourceRepository:
     Type: String
     Description: Specifies a GitHub repository to use as the source repository.
@@ -98,7 +98,7 @@ Resources:
       Visibility: PRIVATE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: aws/lambda_dynamodb/cloudformation/create-pipeline/buildspec.yml
+        BuildSpec: aws/device_tracker/cloudformation/create-pipeline/buildspec.yml
         InsecureSsl: false
 
   CodePipeline1:
