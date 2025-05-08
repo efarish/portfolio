@@ -24,7 +24,7 @@ This app API supports the following:
 1. Get User - A Query using the JWT form the login, get user information.
 1. Created User - A Subscription to push Create User events to AppSync WSS clients.
 
-The Query and Mutations resolvers were implemented using Lambda Functions. Examples of making calling these endpoints can be found in the Jupyter notebook found in the `client` folder of this project. 
+The Query and Mutations resolvers were implemented using Lambda Functions. Examples of calling these endpoints can be found in the Jupyter notebook found in the `client` folder of this project. 
 
 The only work need for the Created User Subscription was updating the schema with a subscription specification, AppSync takes care fo the rest. If more complicated processing was needed, a resolver could have been added. The `client` directory also has an example Subscription client.   
 
