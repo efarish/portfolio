@@ -14,11 +14,35 @@ from base64 import b64encode, decode
 from datetime import datetime
 from uuid import uuid4
 
+import requests
 import websocket
 
 # Constants Copied from AppSync API 'Settings'
-API_URL = "https://<YOUR AppSync AppId here>.appsync-api.us-east-1.amazonaws.com/graphql"
-API_KEY = <YOUR API KEY>
+API_GW_URL = "ADD A API GW URL HERE" 
+API_URL = "ADD APP SYNC HTTP URL HERE"
+#API_KEY = "da2-mof6zr5b55ec7jsizfhtx3dwsy"
+
+
+user = {"user_name": "user_1", "password": "password"}
+graphql_stmt = """
+query UserLogin($user_name: ID!, $password: String!) {
+    login(user_name: $user_name, password: $password) {
+        user_name
+        token
+    }
+}
+"""
+variables = user
+payload = {
+    "query": graphql_stmt,
+    "variables": variables
+}
+# Request headers
+headers = {"Content-Type": "application/json"} 
+response = requests.post(API_GW_URL + '/login', data=json.dumps(payload), headers=headers)
+response.raise_for_status()
+json_response = response.json()
+token = json_response['data']['login']['token']
 
 # GraphQL subscription Registration object
 GQL_SUBSCRIPTION = json.dumps({
@@ -58,7 +82,8 @@ def reset_timer( ws ):
     timeout_timer.start()
 
 # Create API key authentication header
-api_header = {'host':HOST, 'x-api-key':API_KEY}
+#api_header = {'host':HOST, 'x-api-key':API_KEY}
+api_header = {'host':HOST, "Content-Type":"application/graphql", "Authorization": token}
 
 # Socket Event Callbacks, used in WebSocketApp Constructor
 def on_message(ws, message):
@@ -83,7 +108,8 @@ def on_message(ws, message):
                 'extensions': {
                     'authorization': {
                         'host':HOST,
-                        'x-api-key':API_KEY
+                        #'x-api-key':API_KEY
+                        'Authorization': token
                     }
                 }
             },
@@ -105,7 +131,7 @@ def on_message(ws, message):
             ws.send(end_sub)
 
     elif(message_object['type'] == 'error'):
-        print ('Error from AppSync: ' + message_object['payload'])
+        print ('Error from AppSync: ' + str(message_object['payload']))
     
 def on_error(ws, error):
     print('### error ###')
