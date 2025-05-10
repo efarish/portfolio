@@ -96,6 +96,8 @@ def lambda_handler_auth_always(event, context):
     Used to authorize API GW and AppSync endpoint access.
     This handler always authorizes access.
     """
+    logger.debug(f'{event=} {context=}')
+
     return {"isAuthorized": True}
 
 def lambda_handler(event, context):
