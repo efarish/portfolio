@@ -98,7 +98,7 @@ def lambda_handler_auth_always(event, context):
     """
     print(f'{event=} {context=}')
 
-    return {"isAuthorized": True}
+    return {"isAuthorized": False}
 
 def lambda_handler(event, context):
     logger.debug(f'{event=} {context=}')
