@@ -176,7 +176,7 @@ Resources:
           createUser(user_name: ID!, role: String!, password: String!): User
         }
 
-        type Subscription {
+        type Subscription  @aws_lambda {
           createdUser: User
             @aws_subscribe(mutations: ["createUser"])
         }
