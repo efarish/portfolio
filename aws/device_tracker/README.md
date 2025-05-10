@@ -14,7 +14,7 @@ This project implements a Query, Mutation, and Subscription GraphQL API using AW
 The architecture diagram is below.
 
 <p align="center">
-  <img src="./assets/img/arch3.jpg" />
+  <img src="./assets/img/arch4.jpg" />
 </p>
 
 This API supports the following:
@@ -30,13 +30,8 @@ The Query and Mutations requests are made through the API Gateway which then pro
 
 The only work needed for the Created User Subscription was updating the schema with a subscription specification, AppSync takes care fo the rest. If more complicated processing was needed, a resolver could have been added. The `client` directory also has an example a Subscription client.   
 
-The AppSync service uses token authentication.  For Query and Mutation requests, only the API Gateway uses the token by adding it to the request header before proxying requests to AppSync. The Get User Query has been implemented to require a JWT that can be retrieved using the Login endpoint after a user has been created.   
+The AppSync service uses token and Lambda authentication. For Query and Mutation requests, the API Gateway appends an AppSync authorization token to the request header before proxying the request to AppSync. The Get User Query has been implemented to require a JWT that can be retrieved using the Login endpoint after a user has been created. The Created User subscription uses Lambda authorization by passing the the JWT.    
 
 ### Lessons Learned
 
 Compared to using frameworks like FastAPI and Graphene, AWS AppSync provide an easier way to implement and host GraphQL APIs. In addition to providing serverless hosting, AppSyn takes care of the schema validations of RESTful messages that otherwise would have to be done using something like Pydantic. Furthermore, AppSync makes implementing a WSS push service trivial.
-
-
-
-
-
