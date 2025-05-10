@@ -141,6 +141,12 @@ Resources:
           token: String
         }
 
+        type UserLocation {
+          user_name: ID
+          latitude: Float
+          longitude: Float
+        }
+
         type Query {
           login(user_name: ID!, password: String!): UserToken
           getUser(user_name: ID!): User
@@ -148,11 +154,14 @@ Resources:
 
         type Mutation {
           createUser(user_name: ID!, role: String!, password: String!): User
+          updateUserLocation(user_name: ID!, latitude: Float!, longitude: Float!): UserLocation
         }
 
         type Subscription  @aws_lambda {
           createdUser: User
             @aws_subscribe(mutations: ["createUser"])
+          updatedUserLocation: UserLocation
+            @aws_subscribe(mutations: ["updateUserLocation"])
         }
 
         schema {
@@ -178,6 +187,15 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Mutation
       FieldName: createUser
+      DataSourceName: !GetAtt LambdaDataSource.Name
+
+  UpdateUserLocationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: AppSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: updateUserLocation
       DataSourceName: !GetAtt LambdaDataSource.Name
 
   UserLoginResolver:
@@ -236,6 +254,18 @@ Resources:
     Properties:
       ApiId: !Ref HTTPApiGWAppId
       RouteKey: 'POST /create_user'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref ApiGatewayGraphQLIntegration
+
+  UpdateUserLocationRouteGraphQL:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HTTPApiGWAppId
+      RouteKey: 'POST /update_user_location'
+      AuthorizationType: CUSTOM
+      AuthorizerId: !GetAtt ApiGWAuthorizer.AuthorizerId
       Target: !Join
         - /
         - - integrations

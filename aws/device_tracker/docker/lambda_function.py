@@ -8,6 +8,7 @@ from pydantic import BaseModel, ValidationError
 
 load_dotenv() #Need to load environment variables below reference entities.
 
+from entity.location import UserLocation, update_user_location
 from entity.user import User, UserToken, create_user, get_user, login_for_access_token
 from util import auth
 
@@ -71,6 +72,16 @@ def create_user_handler(info: dict, /) -> User:
     response: User = create_user(**input) 
     return response
 
+@appsync_decorator("Update User Location")
+def update_user_location_handler(info: dict, /) -> UserLocation:
+    """
+    Handler for updating user GPS location.
+    """
+    input: dict = info['variables']
+    response: UserLocation = update_user_location(**input) 
+    return response
+
+
 @appsync_decorator("Get User")
 def get_user_handler(info: dict, /) -> User:
     """
@@ -113,7 +124,7 @@ def lambda_handler(event, context):
             # event from API GW. 
             logger.debug(f'API GW authorization handler hit: {rawPath=}')
             match rawPath:
-                case '/get_user':
+                case '/get_user' | '/update_user_location':
                     response = lambda_handler_auth(event, context)
                     return response
                 case _:
@@ -123,6 +134,9 @@ def lambda_handler(event, context):
             match info:
                 case {'parentTypeName': 'Mutation', 'fieldName': 'createUser'}:
                     response = create_user_handler(info)
+                    return response
+                case {'parentTypeName': 'Mutation', 'fieldName': 'updateUserLocation'}:
+                    response = update_user_location_handler(info)
                     return response                
                 case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
                     response = get_user_handler(info)
