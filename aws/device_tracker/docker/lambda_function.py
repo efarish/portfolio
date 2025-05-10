@@ -91,23 +91,27 @@ def lambda_handler_auth(event, context):
     user = auth.get_current_user(headers['authorization'])
     return {"isAuthorized": bool(user)}
 
-def lambda_handler_auth_always(event, context):
+def lambda_handler_appsync_auth(token):
     """
-    Used to authorize API GW and AppSync endpoint access.
-    This handler always authorizes access.
+    Used to authorize AppSync endpoint access.
     """
-    print(f'{event=} {context=}')
-
-    return {"isAuthorized": False}
+    user = auth.get_current_user(token)
+    logger.debug(f'AppSync authorization for {user=}')
+    return {"isAuthorized": bool(user)}
+    #return {"isAuthorized": False}
 
 def lambda_handler(event, context):
     logger.debug(f'{event=} {context=}')
     
     match event:
+        case {'authorizationToken': token}:
+            #This is for authorization requests from AppSync Subscriptions
+            logger.debug(f'AppSync authorization handler hit.')
+            return lambda_handler_appsync_auth(token)
         case {'rawPath': rawPath}: 
             #The only event taking this path should be authorizations
             # event from API GW. 
-            logger.info(f'Authorization handler hit: {rawPath=}')
+            logger.debug(f'API GW authorization handler hit: {rawPath=}')
             match rawPath:
                 case '/get_user':
                     response = lambda_handler_auth(event, context)

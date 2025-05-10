@@ -98,32 +98,6 @@ Resources:
                 - dynamodb:*
               Resource: '*'
 
-  LambdaAuthorizer:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: 'DTLambdaAuthorizer'
-      CodeUri: .
-      Description: 'Authorizer for Subscriptions.'
-      MemorySize: 128
-      Timeout: 10
-      Architectures:
-        - x86_64
-      EphemeralStorage:
-        Size: 512
-      ImageUri: !Ref ImageUrl
-      ImageConfig:
-        Command:
-          - lambda_function.lambda_handler_auth_always
-      PackageType: Image
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - logs:CreateLogGroup
-                - logs:CreateLogStream
-                - logs:PutLogEvents
-              Resource: '*'
-
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
     Properties:
@@ -132,7 +106,7 @@ Resources:
       AdditionalAuthenticationProviders:
         - AuthenticationType: AWS_LAMBDA
           LambdaAuthorizerConfig:
-            AuthorizerUri: !GetAtt LambdaAuthorizer.Arn
+            AuthorizerUri: !GetAtt AppFunctions.Arn
             AuthorizerResultTtlInSeconds: 300
       LogConfig:
         CloudWatchLogsRoleArn: !GetAtt AppSyncLoggingServiceRole.Arn
@@ -142,7 +116,7 @@ Resources:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !GetAtt LambdaAuthorizer.Arn
+      FunctionName: !GetAtt AppFunctions.Arn
       Principal: appsync.amazonaws.com
       SourceArn: !GetAtt GraphQLApi.Arn  
 
