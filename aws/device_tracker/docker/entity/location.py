@@ -9,8 +9,8 @@ USER_LOCATION_TABLE =  os.environ.get('PROJECT_NAME') + '_location'
 @dataclass
 class UserLocation:
     user_name: str
-    lat: Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
-    lon: Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
+    latitude: Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
+    longitude: Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
 
     def model_dump(self):
         return asdict(self)
