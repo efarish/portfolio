@@ -15,18 +15,18 @@ def test_login_auth_handlers(mock_dynamodb_client, user_request):
     mt = MockTable(query_result=[user_request])
     mb = MockBoto3(mockTable=mt)
     mock_dynamodb_client.return_value = mb
+    mock_event = {'info': {'parentTypeName': 'Query', 'fieldName': 'login', 
+                           'selectionSetList': ['user_name', 'token'],
+                           'variables':{'user_name': user_request.get('user_name'), 'password': 'a_password'}}
+                  }
+    result1 = lambda_function.lambda_handler(mock_event, None)
+    assert isinstance(result1, dict)
+    assert result1['user_name'] == user_request.get('user_name')
+    assert result1['token']
 
-    mock_event = {'rawPath': '/login',
-                  'body': '{"user_name": "a_user", "password": "a_password"}'}
-    result = lambda_function.lambda_handler(mock_event, None)
-    assert isinstance(result, dict)
-    assert result['statusCode'] == 200
-    token = json.loads(result['body'])['access_token']
-    assert token
-
-    mock_event = {'rawPath': '/authorize',
-                  'headers': {"authorization": token } }
-    assert lambda_function.lambda_handler(mock_event, None)['isAuthorized'] == True
+    result2 = lambda_function.lambda_handler_appsync_auth(result1['token'])
+    assert isinstance(result2, dict)
+    assert result2['isAuthorized']
 
 
 @pt.mark.parametrize('get_user, user_request, selection_list', 
