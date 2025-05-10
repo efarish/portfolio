@@ -20,7 +20,7 @@ import websocket
 # Constants Copied from AppSync API 'Settings'
 API_GW_URL = "ADD A API GW URL HERE" 
 API_URL = "ADD APP SYNC HTTP URL HERE"
-#API_KEY = "da2-mof6zr5b55ec7jsizfhtx3dwsy"
+#API_KEY = "ADD API KEY HERE" THIS ISN'T NEEDED BUT KEPT AS ALTERNATIVE.
 
 
 user = {"user_name": "user_1", "password": "password"}
