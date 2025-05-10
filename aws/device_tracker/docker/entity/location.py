@@ -18,9 +18,9 @@ class UserLocation:
 def get_client():
     return boto3.resource('dynamodb')
     
-def update_user_location(user_name: str, lat: Decimal, lon: Decimal) -> UserLocation:
+def update_user_location(user_name: str, latitude: Decimal, longitude: Decimal) -> UserLocation:
     client = get_client()
     table = client.Table(USER_LOCATION_TABLE)
-    loc: dict = {"user_name": user_name,"lat": lat,"lon": lon}
+    loc: dict = {"user_name": user_name,"latitude": latitude,"longitude": longitude}
     table.put_item(Item=loc)
     return UserLocation(**loc)
