@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import boto3
 
-USER_LOCATION_TABLE =  os.environ.get('PROJECT_NAME') + '_location'
+USER_LOCATION_TABLE =  os.environ.get('PROJECT_NAME') + '_user_location'
 
 @dataclass
 class UserLocation:
