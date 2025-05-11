@@ -143,8 +143,8 @@ Resources:
 
         type UserLocation {
           user_name: ID
-          latitude: Float
-          longitude: Float
+          latitude: String
+          longitude: String
         }
 
         type Query {
@@ -154,7 +154,7 @@ Resources:
 
         type Mutation {
           createUser(user_name: ID!, role: String!, password: String!): User
-          updateUserLocation(user_name: ID!, latitude: Float!, longitude: Float!): UserLocation
+          updateUserLocation(user_name: ID!, latitude: String!, longitude: String!): UserLocation
         }
 
         type Subscription  @aws_lambda {

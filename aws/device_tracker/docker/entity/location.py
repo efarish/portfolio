@@ -9,8 +9,8 @@ USER_LOCATION_TABLE =  os.environ.get('PROJECT_NAME') + '_location'
 @dataclass
 class UserLocation:
     user_name: str
-    latitude: Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
-    longitude: Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
+    latitude: str #Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
+    longitude: str #Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
 
     def model_dump(self):
         return asdict(self)
@@ -18,7 +18,7 @@ class UserLocation:
 def get_client():
     return boto3.resource('dynamodb')
     
-def update_user_location(user_name: str, latitude: Decimal, longitude: Decimal) -> UserLocation:
+def update_user_location(user_name: str, latitude: str, longitude: str) -> UserLocation:
     client = get_client()
     table = client.Table(USER_LOCATION_TABLE)
     loc: dict = {"user_name": user_name,"latitude": latitude,"longitude": longitude}
