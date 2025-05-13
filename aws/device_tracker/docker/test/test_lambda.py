@@ -98,3 +98,27 @@ def test_get_user(mock_dynamodb_client, user_request, selection_list, get_user_r
 
     assert isinstance(result, dict) 
     assert len(result) == 3
+
+
+
+@pt.mark.parametrize('selection_list, get_user_locations_response', 
+                     [(['user_name', 'latitude', 'longitude'],
+                       [{'user_name':'a_user', 'latitude ': '1.0', 'longitude': '1.0'}]), 
+                      ])
+@mock.patch('entity.user.get_client')
+def test_get_user_locations(mock_dynamodb_client, selection_list, get_user_locations_response):
+
+    mt = MockTable(query_result=[get_user_locations_response])
+    mb = MockBoto3(mockTable=mt)
+    mock_dynamodb_client.return_value = mb
+    
+    event = {'info': {'parentTypeName': 'Query', 
+                      'fieldName': 'getUserLocations', 
+                      'selectionSetList': selection_list
+                    }
+            }
+             
+    result = lambda_function.lambda_handler(event, None)
+
+    assert isinstance(result, list) 
+    assert len(result[0]) == 3

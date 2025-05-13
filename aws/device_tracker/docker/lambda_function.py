@@ -2,13 +2,14 @@ import json
 import logging
 import os
 from functools import wraps
+from typing import Union
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
 load_dotenv() #Need to load environment variables below reference entities.
 
-from entity.location import UserLocation, update_user_location
+from entity.location import UserLocation, get_user_locations, update_user_location
 from entity.user import User, UserToken, create_user, get_user, login_for_access_token
 from util import auth
 
@@ -38,7 +39,7 @@ def login_handler(event) -> dict:
 def appsync_decorator(op_name: str):
     def appsync_wrapper(func):
         @wraps(func)
-        def wrapper(*args, **kwargs) -> dict:
+        def wrapper(*args, **kwargs) -> dict | list[dict]:
             info = args[0]
             selectionSetList = info['selectionSetList']
             try:
@@ -48,8 +49,11 @@ def appsync_decorator(op_name: str):
             except Exception as e:
                 logger.error(f'{e=}')
                 raise Exception(f'Unexpected error occurred for [{op_name}]') from e
-            user: dict = result.model_dump()
-            response = {key: user[key] for key in selectionSetList} 
+            if isinstance(result, list):
+                response: list[dict] = [ {key: getattr(model, key) for key in selectionSetList} for model in result]
+            else:
+                model = result.model_dump()
+                response: dict = {key: model[key] for key in selectionSetList} 
             return response
         return wrapper
     return appsync_wrapper
@@ -81,7 +85,6 @@ def update_user_location_handler(info: dict, /) -> UserLocation:
     response: UserLocation = update_user_location(**input) 
     return response
 
-
 @appsync_decorator("Get User")
 def get_user_handler(info: dict, /) -> User:
     """
@@ -89,6 +92,14 @@ def get_user_handler(info: dict, /) -> User:
     """
     user_name: str = info['variables'].get('user_name')
     response: User = get_user(user_name) 
+    return response
+
+@appsync_decorator("Get User Locations")
+def get_user_locations_handler(info: dict, /) -> list[User]:
+    """
+    Handler for retrieving a user.
+    """
+    response: list[UserLocation] = get_user_locations() 
     return response
 
 def lambda_handler_auth(event, context):
@@ -140,6 +151,9 @@ def lambda_handler(event, context):
                     return response                
                 case {'parentTypeName': 'Query', 'fieldName': 'getUser'}:
                     response = get_user_handler(info)
+                    return response
+                case {'parentTypeName': 'Query', 'fieldName': 'getUserLocations'}:
+                    response = get_user_locations_handler(info)
                     return response
                 case {'parentTypeName': 'Query', 'fieldName': 'login'}:
                     response = login_handler_appsync(info)

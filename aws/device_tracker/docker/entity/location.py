@@ -9,8 +9,8 @@ USER_LOCATION_TABLE =  os.environ.get('PROJECT_NAME') + '_user_location'
 @dataclass
 class UserLocation:
     user_name: str
-    latitude: str #Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
-    longitude: str #Decimal = field(metadata={'max_digits': 12, 'decimal_places': 8})
+    latitude: str 
+    longitude: str 
 
     def model_dump(self):
         return asdict(self)
@@ -24,3 +24,11 @@ def update_user_location(user_name: str, latitude: str, longitude: str) -> UserL
     loc: dict = {"user_name": user_name,"latitude": latitude,"longitude": longitude}
     table.put_item(Item=loc)
     return UserLocation(**loc)
+
+def get_user_locations() -> list[UserLocation]:
+    client = get_client()
+    table = client.Table(USER_LOCATION_TABLE)
+    response = table.scan()    
+    if response["Count"] == 0:
+        raise ValueError("No locations found.")
+    return [UserLocation(**item) for item in response['Items']]

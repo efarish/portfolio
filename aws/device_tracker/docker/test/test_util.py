@@ -10,6 +10,9 @@ class MockTable:
         
     def query(self, **kwargs) -> dict:
         return {'Items': self.query_result, 'Count': len(self.query_result)}
+    
+    def scan(self) -> dict:
+        return {'Items': self.query_result, 'Count': len(self.query_result)}
 
 class MockBoto3:
 
