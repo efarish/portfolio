@@ -18,8 +18,8 @@ import requests
 import websocket
 
 # Constants Copied from AppSync API 'Settings'
-API_GW_URL = "ADD A API GW URL HERE" 
-API_URL = "ADD APP SYNC HTTP URL HERE"
+API_GW_URL = "https://6b6b55pkcd.execute-api.us-east-1.amazonaws.com" 
+API_URL = "https://qxgk5oirgzhbzgufgldbmaceoy.appsync-api.us-east-1.amazonaws.com/graphql"
 #API_KEY = "ADD API KEY HERE" THIS ISN'T NEEDED BUT KEPT AS ALTERNATIVE.
 
 
@@ -46,7 +46,8 @@ token = json_response['data']['login']['token']
 
 # GraphQL subscription Registration object
 GQL_SUBSCRIPTION = json.dumps({
-        'query': 'subscription OnCreateUser { createdUser { user_name role } }',
+        #'query': 'subscription OnCreateUser { createdUser { user_name role } }',
+        'query': 'subscription OnUpdateUserLocation { updatedUserLocation { user_name latitude longitude } }',
         'variables': {}
 })
 
@@ -129,6 +130,7 @@ def on_message(ws, message):
             end_sub = json.dumps(deregister)
             print('>> ' + end_sub )
             ws.send(end_sub)
+            ws.close()
 
     elif(message_object['type'] == 'error'):
         print ('Error from AppSync: ' + str(message_object['payload']))
