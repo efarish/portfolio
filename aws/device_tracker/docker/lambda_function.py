@@ -95,7 +95,7 @@ def get_user_handler(info: dict, /) -> User:
     return response
 
 @appsync_decorator("Get User Locations")
-def get_user_locations_handler(info: dict, /) -> list[User]:
+def get_user_locations_handler(info: dict, /) -> list[UserLocation]:
     """
     Handler for retrieving a user.
     """
@@ -154,6 +154,7 @@ def lambda_handler(event, context):
                     return response
                 case {'parentTypeName': 'Query', 'fieldName': 'getUserLocations'}:
                     response = get_user_locations_handler(info)
+                    logger.info(f'getUserLocations: {response=}')
                     return response
                 case {'parentTypeName': 'Query', 'fieldName': 'login'}:
                     response = login_handler_appsync(info)
