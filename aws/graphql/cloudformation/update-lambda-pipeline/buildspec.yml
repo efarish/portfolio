@@ -4,8 +4,8 @@ env:
 phases:
   pre_build:
     commands:
-      - PROJECT_NAME=DeviceTracker  # Used build path to source files.
-      - PROJECT_DIR=device_tracker
+      - PROJECT_NAME=graphql  # Used build path to source files.
+      - PROJECT_DIR=graphql
       - ECR_REPO=ecs1                 # Name of ECR image repository.
       - LAMBDA_FUNC_NAME=DTLambdaFunctions
       - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"

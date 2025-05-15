@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "device-tracker-stack"
+stack_name = "graphql-stack"
 
 [default.build.parameters]
 parallel = true

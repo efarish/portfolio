@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "DeviceTracker-UpdateLambda"
+stack_name = "graphql-UpdateLambda"
 
 [default.build.parameters]
 parallel = true
