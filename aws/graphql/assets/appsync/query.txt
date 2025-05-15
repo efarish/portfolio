@@ -1,0 +1,9 @@
+query MyQuery($user_name: ID!) {
+  getUser(user_name: $user_name) {
+    password
+    role
+    user_name
+  }
+}
+
+{"user_name": "a_user"}

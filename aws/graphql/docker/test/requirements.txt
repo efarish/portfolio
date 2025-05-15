@@ -1,0 +1,6 @@
+pytest
+python-dotenv
+boto3
+pydantic
+bcrypt
+python-jose[cryptography]

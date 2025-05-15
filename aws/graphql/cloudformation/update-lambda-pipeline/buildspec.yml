@@ -1,0 +1,23 @@
+version: 0.2
+env:
+  shell: bash
+phases:
+  pre_build:
+    commands:
+      - PROJECT_NAME=DeviceTracker  # Used build path to source files.
+      - PROJECT_DIR=device_tracker
+      - ECR_REPO=ecs1                 # Name of ECR image repository.
+      - LAMBDA_FUNC_NAME=DTLambdaFunctions
+      - ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+      - IMG_NAME=${PROJECT_NAME}
+      - ECR_IMG_NAME=${ECR_REPO}:${IMG_NAME}
+      - ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_IMG_NAME}-${CODEBUILD_RESOLVED_SOURCE_VERSION:0:8}
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
+  build:
+    commands:
+      - docker build -t ${ECR_IMG_NAME} ./aws/${PROJECT_DIR}/docker
+      - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
+      - docker push ${ECR_IMAGE_URI}
+  post_build:
+    commands:
+      - aws lambda update-function-code --function-name ${LAMBDA_FUNC_NAME} --image-uri ${ECR_IMAGE_URI}

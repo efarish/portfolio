@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The Public API for the app.
+
+Parameters:
+  ProjectName:
+    Type: String
+
+Resources: 
+
+  HTTPApiGW:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: The public Api GW for this app.
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 20
+        ThrottlingRateLimit: 10
+      AccessLogSettings:
+        DestinationArn: !GetAtt APILogGroup.Arn 
+        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": "$context.status" }'      
+
+  APILogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/apigateway/${ProjectName}
+        RetentionInDays: 1
+
+Outputs:
+  HTTPApiGWAppId:
+    Description: "AppId of API GW."
+    Value: !Ref HTTPApiGW
+  HTTPApiGWUrl:
+    Description: "API GW URL."
+    Value: !Sub https://${HTTPApiGW}.execute-api.${AWS::Region}.amazonaws.com 
+
+
+  
+
