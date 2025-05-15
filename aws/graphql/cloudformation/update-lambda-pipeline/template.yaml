@@ -6,7 +6,7 @@ Parameters:
   PipeLineName:
     Type: String
     Description: Specifies the ECS Cluster Name with which the resources would be associated.
-    Default: device-tracker-update-pipeline
+    Default: graphql-update-pipeline
   SourceRepository:
     Type: String
     Description: Specifies a GitHub repository to use as the source repository.
@@ -14,7 +14,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: arn:aws:codeconnections:us-east-1:<YOUR CODE CONNECTION HERE>
+    Default: arn:aws:codeconnections:<YOUR CONNECTION HERE>
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
@@ -22,7 +22,7 @@ Parameters:
   ProjectBuildSpec: 
     Type: String
     Description: Specifies the Source Project Name.
-    Default: aws/device_tracker/cloudformation/update-lambda-pipeline/buildspec.yml
+    Default: aws/graphql/cloudformation/update-lambda-pipeline/buildspec.yml
 
 Resources:
 
