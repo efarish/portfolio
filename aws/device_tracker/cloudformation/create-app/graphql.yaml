@@ -150,7 +150,7 @@ Resources:
         type Query {
           login(user_name: ID!, password: String!): UserToken
           getUser(user_name: ID!): User
-          getUserLocations(): [UserLocation]
+          getUserLocations: [UserLocation]
         }
 
         type Mutation {
