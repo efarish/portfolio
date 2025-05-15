@@ -135,7 +135,7 @@ def lambda_handler(event, context):
             # event from API GW. 
             logger.debug(f'API GW authorization handler hit: {rawPath=}')
             match rawPath:
-                case '/get_user' | '/update_user_location':
+                case '/get_user' | '/update_user_location' | '/get_user_locations':
                     response = lambda_handler_auth(event, context)
                     return response
                 case _:
