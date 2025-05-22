@@ -3,12 +3,15 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.tools import QueryEngineTool
 
 
-def get_doc_tools(file_names: str,name_suffix: str):
-
-    docs = SimpleDirectoryReader(input_files=[file_names]).load_data()
+def get_doc_nodes(file_name):
+    docs = SimpleDirectoryReader(input_files=[file_name]).load_data()
     splitter = SentenceSplitter(chunk_size=1024)
     nodes = splitter.get_nodes_from_documents(docs)
+    return nodes
 
+def get_doc_tools(file_name: str, name_suffix: str):
+
+    nodes = get_doc_nodes(file_name)
     summary_index = SummaryIndex(nodes)
     vector_index = VectorStoreIndex(nodes)
 
@@ -16,20 +19,23 @@ def get_doc_tools(file_names: str,name_suffix: str):
         response_mode="tree_summarize",
         use_async=True,
     )
+
+    summarization_response = summary_query_engine.query("Please provide a concise sentence that summarizes the document.")
+
     vector_query_engine = vector_index.as_query_engine()
 
     summary_tool = QueryEngineTool.from_defaults(
         name=f"summary_query_engine_{name_suffix}",
         query_engine=summary_query_engine,
         description=(
-            "Useful for summarization questions related to the document."
+            "Useful for summarization questions related to this document which is about: " + str(summarization_response)
         ),
     )
     vector_tool = QueryEngineTool.from_defaults(
         name=f"vector_query_engine_{name_suffix}",
         query_engine=vector_query_engine,
         description=(
-            "Useful for retrieving specific context from the document."
+            "Useful for retrieving specific context from this document which is about: " + str(summarization_response)
         ),
     )
 
