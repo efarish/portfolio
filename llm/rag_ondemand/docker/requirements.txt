@@ -1,0 +1,12 @@
+python-dotenv
+fastapi
+uvicorn
+python-multipart
+pydantic
+boto3
+requests
+starlette
+passlib
+bcrypt
+python-jose[cryptography]
+python-magic
