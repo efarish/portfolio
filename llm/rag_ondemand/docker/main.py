@@ -1,15 +1,23 @@
+from pathlib import Path
 from typing import Annotated
+from uuid import uuid4
 
 import magic  # brew install libmagic
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, UploadFile
+from pydantic import BaseModel
 from starlette import status
-from pathlib import Path
+from util import storage
 
 load_dotenv()
 
 SUPPORTED_FILES = {"application/pdf": "pdf", "image/png": "png"}
+
+
+class SessionRequest(BaseModel):
+    session_id: str
+
 
 app = FastAPI(
     title="RAG OnDemand",
@@ -17,32 +25,47 @@ app = FastAPI(
 )
 
 
+def _return(statusCode, **kwargs):
+    return {"statusCode": statusCode, **kwargs}
+
+
 @app.get("/", status_code=status.HTTP_200_OK)
 async def health_check():
-    return {"message": "The app is up!"}
+    return _return(status.HTTP_200_OK, body="The app is up!")
 
 
-@app.post("/files/")
-async def create_file(file: Annotated[bytes, File()]):
-    return {"file_size": len(file)}
+@app.get(
+    "/create_session", status_code=status.HTTP_200_OK, response_model=SessionRequest
+)
+async def create_session():
+    return _return(status.HTTP_200_OK, session_id=str(uuid4()))
 
 
-@app.post("/uploaddoc/")
-async def create_upload_file(file: UploadFile):
+@app.post("/upload")
+async def create_upload_file(
+    session_id: Annotated[str, Form()], file: UploadFile = File(...)
+):
     contents = await file.read()
     file_size = len(contents)
     file_type = magic.from_buffer(buffer=contents, mime=True)
     if not file_type in SUPPORTED_FILES:
-        return {
-            "statusCode": status.HTTP_400_BAD_REQUEST,
-            "body": f"Unsupported file type: {file_type}.",
-        }
+        return _return(
+            status.HTTP_400_BAD_REQUEST, body=f"Unsupported file type: {file_type}."
+        )
+    try:
+        storage.save(session_id, Path(file.filename).name, contents)
+    except ValueError as e:
+        return _return(status.HTTP_500_INTERNAL_SERVER_ERROR, body=str(e))
 
-    return {
-        "filename": Path(file.filename).name,
-        "file_size": file_size,
-        "file_type": file_type,
-    }
+    return _return(
+        status.HTTP_201_CREATED,
+        body=f"File {Path(file.filename).name} uploaded.",
+    )
+
+
+@app.post("/fit")
+async def fit(session_request: SessionRequest):
+    print(f"Session id: {session_request.session_id}")
 
 
 if __name__ == "__main__":
