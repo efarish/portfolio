@@ -5,8 +5,8 @@ WORKDIR /app
 COPY .env /app
 COPY *.py /app
 COPY requirements.txt /app
-RUN mkdir /app/routers
-COPY ./routers/*.py /app/routers
+RUN mkdir /app/util
+COPY ./util/*.py /app/util
 
 RUN pip3 install -r requirements.txt
 

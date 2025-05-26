@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, UploadFile
 from pydantic import BaseModel
 from starlette import status
-from util import storage
+from storage import Storage
+import llama_index_util as liu
 
 load_dotenv()
 
@@ -17,6 +18,14 @@ SUPPORTED_FILES = {"application/pdf": "pdf", "image/png": "png"}
 
 class SessionRequest(BaseModel):
     session_id: str
+
+
+class PrepareRequest(SessionRequest):
+    recreate: bool
+
+
+class QueryRequest(SessionRequest):
+    query: str
 
 
 app = FastAPI(
@@ -53,7 +62,7 @@ async def create_upload_file(
             status.HTTP_400_BAD_REQUEST, body=f"Unsupported file type: {file_type}."
         )
     try:
-        storage.save(session_id, Path(file.filename).name, contents)
+        Storage("S3").save(session_id, Path(file.filename).name, contents)
     except ValueError as e:
         return _return(status.HTTP_500_INTERNAL_SERVER_ERROR, body=str(e))
 
@@ -63,9 +72,17 @@ async def create_upload_file(
     )
 
 
-@app.post("/fit")
-async def fit(session_request: SessionRequest):
-    print(f"Session id: {session_request.session_id}")
+@app.post("/prepare")
+async def prepare(prepare_request: PrepareRequest):
+    await liu.create_index(
+        prepare_request.session_id, recreate=prepare_request.recreate
+    )
+
+
+@app.post("/query")
+async def query(query_request: QueryRequest):
+    response = await liu.query(query_request.session_id, query_request.query)
+    return response
 
 
 if __name__ == "__main__":
