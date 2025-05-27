@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: The template used to create the service.
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  DeploymentSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of deployment subnet ID's.
+  ECSCluster:
+    Type: String
+    Description: ARN of the ECS cluster to run the service in.
+  ECSClusterName:
+    Type: String
+    Description: The name of the ECS cluster into which to launch capacity.
+  ECSTaskRole:
+    Type: String
+    Description: ARN of the role used run the task.
+  ECSTaskExecutionRole:
+    Type: String
+    Description: ARN of the role used to start up an ECS task.
+  ECSServiceName:
+    Type: String
+    Description: A name for the service.
+  TaskName:
+    Type: String
+    Description: Name of the task.
+  TaskPort:
+    Type: String
+    Description: The port that the task will listen on.
+  ImageUrl:
+    Type: String
+    Description: The url of a docker image that contains the task application.
+  ServiceSecurityGroup:
+    Type: String
+  DiscoveryService:
+    Type: String
+    Description: ARN of the discovery service.
+     
+Resources:
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${ECSServiceName}-logs    
+
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      ServiceName: !Ref ECSServiceName
+      EnableExecuteCommand: true
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Base: 0
+          Weight: 1
+      TaskDefinition: !Ref "TaskDefinition"
+      SchedulingStrategy: REPLICA
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: [!Ref ServiceSecurityGroup]
+          Subnets:  !Ref DeploymentSubnetIds
+      ServiceConnectConfiguration:
+        Enabled: true
+        Namespace: "internal.com"
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      DeploymentController:
+        Type: ECS
+      ServiceRegistries:
+        - RegistryArn: !Ref DiscoveryService   
+          Port: 80
+      Tags: []
+      EnableECSManagedTags: true
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties: 
+      Family: !Sub ${ECSClusterName}-${TaskName}-family
+      ContainerDefinitions:
+        - Name: !Sub ${ECSClusterName}-${TaskName}-container
+          Image: !Ref ImageUrl
+          Cpu: '1024'
+          PortMappings:
+            - Name: !Ref TaskName
+              ContainerPort: !Ref TaskPort
+              HostPort: !Ref TaskPort
+              Protocol: tcp
+              AppProtocol: http
+          Essential: true
+          EnvironmentFiles: []
+          MountPoints: []
+          VolumesFrom: []
+          Ulimits: []
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              mode: non-blocking
+              max-buffer-size: 25m
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+            SecretOptions: []
+          SystemControls: []
+      TaskRoleArn: !Ref ECSTaskRole
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      NetworkMode: awsvpc
+      Volumes: []
+      PlacementConstraints: []
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '1024'
+      Memory: '3072'
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX

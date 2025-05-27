@@ -1,0 +1,232 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: The template used to create a ECS cluster and task using ECR image.
+
+Parameters:
+  ECSClusterName:
+    Type: String
+    Description: Specifies the ECS Cluster Name with which the resources would be associated.
+    Default: rag-ondemand-cluster
+  ECSServiceName:
+    Type: String
+    Default: rag-ondemand-service
+  ECSTaskName:
+    Type: String
+    Deault: rag_ondemand
+
+Resources:
+
+  #---------------------------------------------------------------------
+  # Deploys VPC
+  #---------------------------------------------------------------------
+  VPC:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./vpc.yml
+
+  # Security group that limits network access to the task
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for service.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+
+  ApiGatewaySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for API gateway.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+
+  ServiceIngressFromApiGateway:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Securty group for ECS service.
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
+
+  VpcEndPointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for VPC Interface Endpoint.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda function.
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      SecurityGroupIngress:
+        - Description: Allow API Gateway to access this function.
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref ApiGatewaySecurityGroup
+      SecurityGroupEgress:
+        - Description: Allow the Lambda to access the ECS service.
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          DestinationSecurityGroupId: !Ref ServiceSecurityGroup
+        - Description: Allow the Lambda to communicate to the VPC endpoint.
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          DestinationSecurityGroupId: !Ref VpcEndPointSecurityGroup
+
+  VPCEndpointIngressFromLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow the Lambda to communicate to the VPC endpoint.
+      GroupId: !Ref VpcEndPointSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref LambdaSecurityGroup
+
+  ECSServiceIngressFromLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow the Lambda to communicate to the VPC endpoint.
+      GroupId: !Ref ServiceSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref LambdaSecurityGroup
+ 
+  ServiceDiscoveryVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      IpAddressType: ipv4
+      DnsOptions:
+        PrivateDnsOnlyForInboundResolverEndpoint: NotSpecified
+        DnsRecordIpType: ipv4
+      SecurityGroupIds: [!Ref VpcEndPointSecurityGroup]
+      SubnetIds: !Split [",", !GetAtt VPC.Outputs.PublicSubnetIds]
+      VpcId: !GetAtt VPC.Outputs.VpcId
+      RouteTableIds: []
+      ServiceName: com.amazonaws.us-east-1.data-servicediscovery
+      PolicyDocument:
+        Statement:
+          - Resource: '*'
+            Action: '*'
+            Effect: Allow
+            Principal: '*'
+
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:        
+        - Effect: Allow
+          Principal:
+            Service: [ecs-tasks.amazonaws.com]
+          Action: ['sts:AssumeRole']
+          Condition:
+            ArnLike:
+              aws:SourceArn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:*
+            StringEquals:
+              aws:SourceAccount: !Ref AWS::AccountId
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ecr-iam-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - execute-api:Invoke
+                  - execute-api:ManageConnections
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - '*'
+                Sid: ''
+
+  #---------------------------------------------------------------------
+  # Deploy Discovery Service: used to integrate API Gateway and ECS.
+  #---------------------------------------------------------------------
+  PrivateNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: !Sub ${ECSClusterName}-api-namespace
+      Vpc: !GetAtt VPC.Outputs.VpcId
+
+  DiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: !Sub ${ECSClusterName}-api-discovery-service
+      DnsConfig:
+        NamespaceId: !Ref PrivateNamespace
+        DnsRecords:   # Note that this type of DNS record is important. The SRV type  
+          - TTL: 0    #  stores the port and the IP address of the ECS tasks in 
+            Type: SRV #  the private DNS namespace which API Gateway accesses to proxy requests to ECS.
+                
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties: 
+      ClusterName: !Sub ${ECSClusterName} 
+      ServiceConnectDefaults:
+        Namespace: "internal.com"
+      CapacityProviders: 
+        - FARGATE
+
+  # Tracker container deployment
+  ServiceStackTracker:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./service.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
+        ECSCluster: !Ref ECSCluster
+        ECSClusterName: !Ref ECSClusterName
+        ECSTaskRole: !Ref ECSTaskRole
+        ECSTaskExecutionRole: !Ref ECSTaskExecutionRole
+        ECSServiceName: !Sub ${ECSServiceName}
+        TaskName: !Sub ${ECSTaskName}
+        TaskPort: '80'
+        ImageUrl: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/ecs1:${ECSTaskName}
+        ServiceSecurityGroup: !Ref ServiceSecurityGroup
+        DiscoveryService: !GetAtt DiscoveryService.Arn 
+
+  # API Gateway
+  APIGatewayStack:
+    DependsOn:
+      - ServiceDiscoveryVPCEndpoint
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./api-gw.yaml
+      Parameters:
+        VpcId: !GetAtt VPC.Outputs.VpcId
+        DeploymentSubnetIds: !GetAtt VPC.Outputs.PublicSubnetIds
+        ECSClusterName: !Ref ECSClusterName
+        ApiGatewaySecurityGroup: !Ref ApiGatewaySecurityGroup
+        DiscoveryService: !GetAtt DiscoveryService.Arn
+
+# -------------------------------------------------------------------------
+# Information about the stack.
+# -------------------------------------------------------------------------
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !GetAtt APIGatewayStack.Outputs.ApiUrl 

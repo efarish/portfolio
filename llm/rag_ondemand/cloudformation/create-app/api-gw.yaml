@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: The template used to create an AWS API Gateway.
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: The VPC that the service is running inside of
+  DeploymentSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of deployment subnet ID's.
+  ECSClusterName:
+    Type: String
+    Description: The name of the ECS cluster into which to launch capacity.
+  ApiGatewaySecurityGroup:
+    Type: String 
+  DiscoveryService:
+    Type: String
+    Description: ARN of the discovery service.
+     
+Resources:
+
+  # -------------------------------------------------------------------------
+  # Deploy API GW HTTP API route and integration to Cloud Map
+  # -------------------------------------------------------------------------
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: Tracker-HTTP-api
+      Description: HTTP API Linking to Tracker Service.
+      ProtocolType: HTTP
+
+  LambdaAuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-auth-iam-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - '*'
+                Sid: ''
+
+  APIRoute1:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'GET /'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute2:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'POST /users/create_user'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute3:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'GET /users/read_all'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute4:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'POST /auth/token'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute5:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'GET /location/get_locations'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute6:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'GET /location/get_latest_locations'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  APIRoute7:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'GET /websoc/get_connected_users'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref APIIntegration
+
+  PrivateAPIGWvpcLink:  
+    Type: AWS::ApiGatewayV2::VpcLink
+    Properties: 
+      Name: private-apigw-vpclink
+      SecurityGroupIds: 
+        - !Ref ApiGatewaySecurityGroup
+      SubnetIds: !Ref DeploymentSubnetIds
+
+  APIIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      Description: A Cloud Map Integration
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      ConnectionType: VPC_LINK
+      ConnectionId: !Ref PrivateAPIGWvpcLink
+      IntegrationUri: !Ref DiscoveryService
+      PayloadFormatVersion: '1.0'
+
+  APILogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: !Sub /aws/apigateway/${ECSClusterName}
+        RetentionInDays: 1
+
+  APIStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: $default
+      AutoDeploy: true
+      ApiId: !Ref HttpApi
+      AccessLogSettings:
+        DestinationArn: !GetAtt APILogGroup.Arn 
+        Format: '{ "requestId": "$context.requestId", "integrationErr": "$context.integrationErrorMessage", "path": "$context.path", "routeKey": "$context.routeKey", "ip": "$context.identity.sourceIp", "requestTime": "$context.requestTime", "httpMethod": "$context.httpMethod","statusCode": $context.status }'      
+
+# -------------------------------------------------------------------------
+# Information about the stack.
+# -------------------------------------------------------------------------
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/ 
+
+
