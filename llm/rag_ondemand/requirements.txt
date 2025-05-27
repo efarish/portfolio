@@ -3,7 +3,6 @@ fastapi
 uvicorn
 python-multipart
 pydantic
-boto3
 requests
 starlette
 passlib
@@ -12,4 +11,5 @@ python-jose[cryptography]
 python-magic
 nest_asyncio
 llama-index
+aiobotocore[awscli,boto3]
 s3fs
