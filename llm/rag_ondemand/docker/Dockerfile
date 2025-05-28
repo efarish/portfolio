@@ -5,8 +5,6 @@ WORKDIR /app
 COPY .env /app
 COPY *.py /app
 COPY requirements.txt /app
-RUN mkdir /app/util
-COPY ./util/*.py /app/util
 
 RUN pip3 install -r requirements.txt
 

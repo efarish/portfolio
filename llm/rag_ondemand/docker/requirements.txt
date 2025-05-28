@@ -1,0 +1,15 @@
+python-dotenv
+fastapi
+uvicorn
+python-multipart
+pydantic
+requests
+starlette
+passlib
+bcrypt
+python-jose[cryptography]
+python-magic
+nest_asyncio
+llama-index
+aiobotocore[awscli,boto3]
+s3fs

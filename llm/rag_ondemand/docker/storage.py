@@ -1,14 +1,15 @@
 import os
 from pathlib import Path
+from typing import Protocol, runtime_checkable
 
 import boto3
 from dotenv import load_dotenv
-from typing import Protocol, runtime_checkable
 
 load_dotenv()
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
-
+AWS_KEY = os.environ.get("AWS_KEY")
+AWS_SECRET = os.environ.get("AWS_SECRET")
 
 class Storage:
 
@@ -21,6 +22,7 @@ class Storage:
             case _:
                 raise ValueError(f"Invalid storage type {storage_type}")
 
+    @staticmethod
     def save(session_id: str, file_name: str, contents: bytes) -> None:
         raise NotImplementedError()
 
@@ -28,9 +30,9 @@ class Storage:
 class S3Storage(Storage):
 
     @staticmethod
-    def save(session_id: str, file_name: str, contents: bytes) -> str:
+    def save(session_id: str, file_name: str, contents: bytes) -> None:
 
-        s3 = boto3.client("s3")
+        s3 = boto3.client("s3", aws_access_key_id=AWS_KEY, aws_secret_access_key=AWS_SECRET)
         key = f"{session_id}/files/{file_name}"
         s3_upload = s3.put_object(Bucket=S3_BUCKET, Key=key, Body=contents)
 
@@ -42,7 +44,7 @@ class S3Storage(Storage):
 class FSStorage(Storage):
 
     @staticmethod
-    def save(session_id: str, file_name: str, contents: bytes) -> str:
+    def save(session_id: str, file_name: str, contents: bytes) -> None:
 
         file_path = f"./storage/{session_id}"
         path = Path(file_path)
