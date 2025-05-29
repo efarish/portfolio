@@ -1,5 +1,4 @@
 import os
-from s3fs import S3FileSystem
 
 from llama_index.core import (
     SimpleDirectoryReader,
@@ -8,10 +7,11 @@ from llama_index.core import (
     VectorStoreIndex,
     load_index_from_storage,
 )
+from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.tools import QueryEngineTool
-from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.llms.openai import OpenAI
+from s3fs import S3FileSystem
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
 AWS_KEY = os.environ.get("AWS_KEY")
@@ -20,14 +20,13 @@ AWS_SECRET = os.environ.get("AWS_SECRET")
 S3_FS = S3FileSystem(
     key=AWS_KEY,
     secret=AWS_SECRET,
+    client_kwargs={'region_name': 'us-east-1'}
     # asynchronous=True,
     # loop=asyncio.get_running_loop(),
 )
 
-
 async def _get_doc_nodes(s3_files_dir):
     docs = await SimpleDirectoryReader(fs=S3_FS, input_dir=s3_files_dir).aload_data()
-    # docs = await SimpleDirectoryReader(fs=S3_FS, input_dir=s3_files_dir).load_data()
     splitter = SentenceSplitter(chunk_size=1024)
     nodes = splitter.get_nodes_from_documents(docs)
     return nodes
@@ -35,15 +34,11 @@ async def _get_doc_nodes(s3_files_dir):
 
 async def create_index(session_id: str, recreate=False):
 
-    # session = await S3_FS.set_session()
-
     s3_dir = S3_BUCKET + "/" + session_id
     s3_files_dir = s3_dir + "/files"
     s3_summary_index_dir = s3_dir + "/summary"
     s3_vector_index_dir = s3_dir + "/vector"
 
-    # summary_exits = await S3_FS._exists(s3_summary_index_dir)
-    # vector_exists = await S3_FS._exists(s3_vector_index_dir)
     summary_exits = S3_FS.exists(s3_summary_index_dir)
     vector_exists = S3_FS.exists(s3_vector_index_dir)
 
@@ -58,8 +53,6 @@ async def create_index(session_id: str, recreate=False):
             fs=S3_FS, persist_dir=s3_summary_index_dir
         )
         vector_index.storage_context.persist(fs=S3_FS, persist_dir=s3_vector_index_dir)
-
-    # await session.close()
 
 
 async def query(session_id: str, query: str):
@@ -107,8 +100,7 @@ async def query(session_id: str, query: str):
         system_prompt=(
             "You are a research agent answering questions based on the context provided. "
             "Only use your tools and the context they provide to answer questions."
-        ),
-        verbose=True,
+        )
     )
 
     response = await agent.run(query)

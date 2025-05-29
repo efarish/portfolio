@@ -12,7 +12,7 @@ Parameters:
     Default: rag-ondemand-service
   ECSTaskName:
     Type: String
-    Deault: rag_ondemand
+    Default: rag_ondemand
 
 Resources:
 
@@ -158,6 +158,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
+                  - s3:*
                 Resource:
                   - '*'
                 Sid: ''
@@ -190,8 +191,7 @@ Resources:
       CapacityProviders: 
         - FARGATE
 
-  # Tracker container deployment
-  ServiceStackTracker:
+  ServiceStack:
     Type: AWS::Serverless::Application
     Properties:
       Location: ./service.yaml

@@ -25,8 +25,8 @@ Resources:
   HttpApi:
     Type: AWS::ApiGatewayV2::Api
     Properties:
-      Name: Tracker-HTTP-api
-      Description: HTTP API Linking to Tracker Service.
+      Name: RAG-OnDemand-HTTP-api
+      Description: HTTP API Linking to RAG OnDemand Service.
       ProtocolType: HTTP
 
   LambdaAuthRole:
@@ -67,7 +67,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApi
-      RouteKey: 'POST /users/create_user'
+      RouteKey: 'POST /upload'
       Target: !Join
         - /
         - - integrations
@@ -77,7 +77,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApi
-      RouteKey: 'GET /users/read_all'
+      RouteKey: 'GET /create_session'
       Target: !Join
         - /
         - - integrations
@@ -87,7 +87,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApi
-      RouteKey: 'POST /auth/token'
+      RouteKey: 'POST /prepare'
       Target: !Join
         - /
         - - integrations
@@ -97,27 +97,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref HttpApi
-      RouteKey: 'GET /location/get_locations'
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref APIIntegration
-
-  APIRoute6:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref HttpApi
-      RouteKey: 'GET /location/get_latest_locations'
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref APIIntegration
-
-  APIRoute7:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref HttpApi
-      RouteKey: 'GET /websoc/get_connected_users'
+      RouteKey: 'POST /query'
       Target: !Join
         - /
         - - integrations
