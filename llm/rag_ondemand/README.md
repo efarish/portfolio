@@ -24,8 +24,6 @@ The stack of AWS service and frameworks is below:
 1. S3 - Where the LlamaIndices are stored are persisted.
 1. s3fs - A Python module that facilitates LlamaIndex accessing S3 like a files system.
 
-The `clients` folder contains a Jupyter notebook wth examples of calling the API.
-
 Below is an architecture diagram.
 
 <p align="center">
@@ -33,6 +31,10 @@ Below is an architecture diagram.
 </p>
 
 ## Implementation Details
+
+### Client
+
+The `clients` folder contains a Jupyter notebook with examples of calling the AWS API Gateway.
 
 ### The RAG Agent
 
