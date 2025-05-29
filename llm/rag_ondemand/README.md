@@ -22,7 +22,7 @@ The stack of AWS service and frameworks is below:
 1. ECS - Where the FastAPI instance runs.
 1. ECR - Where the ECS Docker images are stored.
 1. S3 - Where the LlamaIndices are stored are persisted.
-1. s3fs - A Python module that facilitates LlamaIndex accessing S3 like a files system.
+1. s3fs - A Python module that facilitates LlamaIndex accessing S3 like a file system.
 
 Below is an architecture diagram.
 
