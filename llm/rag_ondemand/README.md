@@ -36,7 +36,7 @@ Below is an architecture diagram.
 
 ### The RAG Agent
 
-The module `docker/lama_index_util.py` provides functions to interact with LlamaIndex. Two indices are build for documents uploaded by a user: An index for summary questions and another for detailed questions. These indices are wrapped using query engine tools and provided to a `FunctionAgent` instance whose agentic workflow determines which tool to use.
+The module `docker/lama_index_util.py` provides functions to interact with LlamaIndex. Two indices are built for documents uploaded by a user: An index for summary questions and another for detailed questions. These indices are wrapped using query engine tools and provided to a `FunctionAgent` instance whose agentic workflow determines which tool to use.
 
 ### LlamaIndex and S3
 
@@ -52,7 +52,7 @@ The `docker/.env` file contains the tokens needed for AWS and OpenAI.
 The `cloudformation` directory contains three directories.
 
 1. `create=app` - The IaC that defines the AWS stack.
-1. `create-pipeline` - A CodePipeline used to build the locker image and deploy the stack defined in `create-app`.
+1. `create-pipeline` - A CodePipeline used to build the Docker image and deploy the stack defined in `create-app`.
 1. `update-pipeline` - A CodePipeline used to rebuild and deploy the Docker image to ECS.
 
 
