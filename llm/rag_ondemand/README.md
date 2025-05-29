@@ -34,7 +34,7 @@ Below is an architecture diagram.
 
 ### Client
 
-The `clients` folder contains a Jupyter notebook with examples of calling the AWS API Gateway.
+The `clients` folder contains a Jupyter notebook with examples of calling the HTTP AWS API Gateway.
 
 ### The RAG Agent
 
