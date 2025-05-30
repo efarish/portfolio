@@ -7,6 +7,8 @@ Mappings:
       CIDR: "10.0.0.0/16"
     Public1:
       CIDR: "10.0.0.0/19"
+    Public2:
+      CIDR: "10.0.32.0/19"
 
 Resources:
   # VPC
@@ -34,7 +36,7 @@ Resources:
       VpcId: !Ref "VPC"
       InternetGatewayId: !Ref VPCInternetGateway
 
-  # Public Subnet
+  # Public Subnet 1
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -73,6 +75,46 @@ Resources:
     DependsOn:
       - VPC
 
+  # Public Subnet 2
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: { Ref: "AWS::Region" }
+      VpcId: !Ref "VPC"
+      CidrBlock: !FindInMap ["SubnetConfig", "Public2", "CIDR"]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Public Subnet 2
+
+  PublicSubnet2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: "VPC"
+      Tags:
+        - Key: Name
+          Value: Public Subnet 2 Route Table
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnet2RouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PublicSubnet2DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PublicSubnet2RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref VPCInternetGateway
+    DependsOn:
+      - VPC
+
   S3GatewayEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
@@ -92,10 +134,11 @@ Resources:
               - '*'
       RouteTableIds:
         - !Ref PublicSubnet1RouteTable
+        - !Ref PublicSubnet2RouteTable
 
 Outputs:
   VpcId:
     Value: !Ref VPC
   PublicSubnetIds:
-    Description: Comma seperated list.
-    Value: !Sub '${PublicSubnet1}' #Comma separated list, e.g. '${PS1},${PS2}'
+    Description: Comma separated list.
+    Value: !Sub '${PublicSubnet1},${PublicSubnet2}'

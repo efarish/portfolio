@@ -29,30 +29,6 @@ Resources:
       Description: HTTP API Linking to RAG OnDemand Service.
       ProtocolType: HTTP
 
-  LambdaAuthRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - apigateway.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Policies:
-        - PolicyName: lambda-auth-iam-policy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource:
-                  - '*'
-                Sid: ''
-
   APIRoute1:
     Type: AWS::ApiGatewayV2::Route
     Properties:
