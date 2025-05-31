@@ -13,3 +13,4 @@ nest_asyncio
 llama-index
 aiobotocore[awscli,boto3]
 s3fs
+black

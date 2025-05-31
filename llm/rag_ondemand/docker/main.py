@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Annotated
 from uuid import uuid4
 
+import llama_index_util as liu
 import magic  # brew install libmagic
 import uvicorn
 from dotenv import load_dotenv
@@ -9,7 +10,6 @@ from fastapi import FastAPI, File, Form, UploadFile
 from pydantic import BaseModel
 from starlette import status
 from storage import Storage
-import llama_index_util as liu
 
 load_dotenv()
 
@@ -77,12 +77,13 @@ async def prepare(prepare_request: PrepareRequest):
     await liu.create_index(
         prepare_request.session_id, recreate=prepare_request.recreate
     )
+    return _return(status.HTTP_200_OK)
 
 
 @app.post("/query")
 async def query(query_request: QueryRequest):
     response = await liu.query(query_request.session_id, query_request.query)
-    return response
+    return _return(status.HTTP_200_OK, body=response)
 
 
 if __name__ == "__main__":

@@ -32,7 +32,7 @@ async def _get_doc_nodes(s3_files_dir):
     return nodes
 
 
-async def create_index(session_id: str, recreate=False):
+async def create_index(session_id: str, recreate=False) -> None:
 
     s3_dir = S3_BUCKET + "/" + session_id
     s3_files_dir = s3_dir + "/files"
@@ -55,7 +55,7 @@ async def create_index(session_id: str, recreate=False):
         vector_index.storage_context.persist(fs=S3_FS, persist_dir=s3_vector_index_dir)
 
 
-async def query(session_id: str, query: str):
+async def query(session_id: str, query: str) -> str:
 
     s3_dir = S3_BUCKET + "/" + session_id
     s3_summary_index_dir = s3_dir + "/summary"
