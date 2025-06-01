@@ -1,5 +1,9 @@
+#
 # This script was used to create load on the ECS cluster
 #   to test the auto-scaling feature.
+#
+#   I used the ECS task defintion to make the scale out easier to trigger:
+#     Cpu: '256' and Memory: '1024'
 #
 # While testing this, notice a OpenAI RateLimitError. Below
 #   is an example of the error message:
