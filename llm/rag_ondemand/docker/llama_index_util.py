@@ -17,6 +17,8 @@ S3_BUCKET = os.environ.get("S3_BUCKET")
 AWS_KEY = os.environ.get("AWS_KEY")
 AWS_SECRET = os.environ.get("AWS_SECRET")
 
+#print(f'{S3_BUCKET} {AWS_KEY} {AWS_SECRET}')
+
 S3_FS = S3FileSystem(
     key=AWS_KEY,
     secret=AWS_SECRET,

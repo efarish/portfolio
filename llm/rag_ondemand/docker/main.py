@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Annotated
 from uuid import uuid4
 
-import llama_index_util as liu
 import magic  # brew install libmagic
 import uvicorn
 from dotenv import load_dotenv
@@ -12,6 +11,8 @@ from starlette import status
 from storage import Storage
 
 load_dotenv()
+
+import llama_index_util as liu
 
 SUPPORTED_FILES = {"application/pdf": "pdf", "image/png": "png"}
 
