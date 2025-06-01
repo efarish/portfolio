@@ -63,6 +63,7 @@ Resources:
                   - servicediscovery:*
                   - lambda:*
                   - iam:*
+                  - application-autoscaling:*
                 Resource:
                   - '*'
       Path: /
