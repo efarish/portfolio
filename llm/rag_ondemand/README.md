@@ -1,8 +1,6 @@
 # Project: RAG OnDemand
 
-A WORK-IN-PROGRESS
-
-This project uses AWS services and LlamaIndex to create RAG agent API to answer questions about users provided PDFs. 
+This project uses AWS services and LlamaIndex to create RAG agent API to answer questions about user provided PDFs. 
 
 I found this [DeepLearning.AI](https://learn.deeplearning.ai/courses/building-agentic-rag-with-llamaindex/lesson/nfa5y/building-a-multi-document-agent) course very helpful. 
 
@@ -21,8 +19,8 @@ The stack of AWS service and frameworks is below:
 1. API Gateway - The public API for the service. 
 1. ECS - Where the FastAPI instance runs.
 1. ECR - Where the ECS Docker images are stored.
-1. S3 - Where the LlamaIndices are stored are persisted.
-1. s3fs - A Python module that facilitates LlamaIndex accessing S3 like a file system.
+1. S3 - Where the LlamaIndex indices are stored.
+1. s3fs - A Python module that enables LlamaIndex to accessing S3 like a file system.
 
 Below is an architecture diagram.
 
@@ -35,6 +33,8 @@ Below is an architecture diagram.
 ### Client
 
 The `clients` folder contains a Jupyter notebook with examples of calling the HTTP AWS API Gateway.
+
+This directory also contains a script to simulate user load on the service. The ECS cluster has been configured to auto-scale when the average CPU utilization exceeds a specified threshold. 
 
 ### The RAG Agent
 
@@ -56,6 +56,11 @@ The `cloudformation` directory contains three directories.
 1. `create=app` - The IaC that defines the AWS stack.
 1. `create-pipeline` - A CodePipeline used to build the Docker image and deploy the stack defined in `create-app`.
 1. `update-pipeline` - A CodePipeline used to rebuild and deploy the Docker image to ECS.
+
+
+## Lessons Learned
+
+LlamaIndex makes it easy to develop RAG services. The limited load testing I did discovered bottlenecks I hadn't considered. In this case, the token rate limit for my OpenAI account limited the number of simultaneous requests I could make to the service.  
 
 
 
