@@ -2,11 +2,11 @@
 # This script was used to create load on the ECS cluster
 #   to test the auto-scaling feature.
 #
-#   I used the ECS task defintion to make the scale out easier to trigger:
+#   I used the ECS task definition attributes below to make the scale out easier to trigger:
 #     Cpu: '256' and Memory: '1024'
 #
-# While testing this, notice a OpenAI RateLimitError. Below
-#   is an example of the error message:
+# While testing this, I encountered a the OpenAI RateLimit Error below:
+#
 #   Rate limit reached for gpt-3.5-turbo in organization org-QTCqb2HqtDhDdhpblbV9rhTL on
 #     tokens per min (TPM): Limit 200000, Used 199299, Requested 14469. Please try again in 4.13s.
 #
