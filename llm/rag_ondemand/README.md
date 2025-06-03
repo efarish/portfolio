@@ -1,8 +1,8 @@
 # Project: RAG OnDemand
 
-This project uses AWS services and LlamaIndex to create RAG agent API to answer questions about user provided PDFs. 
+This project uses AWS services and LlamaIndex to create a RAG agent API to answer questions about user provided PDFs. 
 
-I found this [DeepLearning.AI](https://learn.deeplearning.ai/courses/building-agentic-rag-with-llamaindex/lesson/nfa5y/building-a-multi-document-agent) course very helpful. 
+I found this [DeepLearning.AI](https://learn.deeplearning.ai/courses/building-agentic-rag-with-llamaindex/lesson/nfa5y/building-a-multi-document-agent) course very helpful, although some of the APIs have been deprecated.
 
 The workflow of this services is as follows:
 
