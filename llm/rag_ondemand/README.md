@@ -49,7 +49,7 @@ The service is stateless. To avoid having to rebuild them with each request, the
 The `docker/.env` file contains the tokens needed for AWS and OpenAI. 
 
 
-### Iac and CI/CD
+### IaC and CI/CD
 
 The `cloudformation` directory contains three directories.
 
