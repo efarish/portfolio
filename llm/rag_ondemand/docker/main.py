@@ -6,6 +6,7 @@ import magic  # brew install libmagic
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from starlette import status
 from storage import Storage
@@ -32,6 +33,14 @@ class QueryRequest(SessionRequest):
 app = FastAPI(
     title="RAG OnDemand",
     description="An app enabling ondemand RAG queries on documents.",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
