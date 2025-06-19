@@ -1,44 +1,23 @@
-import { useState, useRef } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {useState} from 'react'
+import UplodFile from './components/UploadFile.jsx'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
   const [sessionId, setSessionId] = useState(null);
-  const [uploadFile, setUploadFile] = useState(null);
-
-  const fileInputRef = useRef(null);
-
-  function handleSession(){
-
-    if(sessionId){
-      console.log(`Old sessionId ${sessionId}, new ${count}.`);
-      setSessionId(`Session Id ${count}`);
-      setUploadFile(null)
-      fileInputRef.current.value = null;
-    }else{
-      console.log("No session Id found.");
-      setSessionId(`Session Id ${count}`);
-    }
-    setCount((count) => count + 1);
+  
+  async function getSessionId(){
+    const response = await fetch('http://localhost/create_session');
+    const new_sessionId = await response.json();
+    return new_sessionId.session_id;
   }
 
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    setUploadFile(selectedFile.name)
-    console.log(`file selected ${selectedFile.name}`)
-  };
+  async function handleSession(){
+    const newSessionId = await getSessionId();
+    setSessionId(newSessionId);
+  }
 
-  function handleUpload() {
-    console.log(`File to upload: ${uploadFile}`)
-    setUploadFile(null)
-  };
-
-  let buttonTxt = sessionId?"New Session": "Create Session";
-  let sessionIdItem = sessionId?<li>{sessionId}</li>: "";
-  let isChooseFileDisabled = sessionId?false: true;
-  let isUploadDisabled = uploadFile?false: true
+  const buttonTxt = sessionId?"New Session": "Create Session";
+  const sessionIdItem = sessionId?<li><p>{sessionId}</p></li>: "";
 
   return (
     <>
@@ -51,12 +30,7 @@ function App() {
               </button>
             </li>
             {sessionIdItem}
-            <li>
-              <input type="file" onChange={handleFileChange} disabled={isChooseFileDisabled} ref={fileInputRef}  />
-            </li>
-            <li>
-              <button onClick={handleUpload} disabled={isUploadDisabled}>Upload</button>
-            </li>            
+            <UplodFile sessionId={sessionId} />
           </ol>
       </div>
     </>
