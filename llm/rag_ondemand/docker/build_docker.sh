@@ -3,8 +3,8 @@
 PROJECT_NAME=rag_ondemand # Used build path to source files.
 ECR_REPO=ecs1                 # Name of ECR image repository.
 DOCKER_IMAGE_NAME=rag_ondemand     # Name of Tracker Docker image.
-#ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 ECR_IMG_NAME=${ECR_REPO}:${DOCKER_IMAGE_NAME}
+#ECR_MAIN_URI="${AWS_ACCT}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 #ECR_IMAGE_URI=${ECR_MAIN_URI}/${ECR_REPO}:${DOCKER_IMAGE_NAME}
 
 #aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
