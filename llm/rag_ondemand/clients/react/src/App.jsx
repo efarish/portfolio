@@ -1,9 +1,11 @@
 import {useState} from 'react'
 import UplodFile from './components/UploadFile.jsx'
+import Query from './components/Query.jsx'
 import './App.css'
 
 function App() {
   const [sessionId, setSessionId] = useState(null);
+  const [files, addSubmittedFile] = useState([]);
   
   async function getSessionId(){
     const response = await fetch('http://localhost/create_session');
@@ -14,6 +16,16 @@ function App() {
   async function handleSession(){
     const newSessionId = await getSessionId();
     setSessionId(newSessionId);
+    addSubmittedFile([])
+  }
+
+  function addFile(file){
+    addSubmittedFile((prevFiles) => {
+      const updatedFiles = [
+        { file, ...prevFiles,}
+      ];
+      return updatedFiles;
+    });
   }
 
   const buttonTxt = sessionId?"New Session": "Create Session";
@@ -30,7 +42,11 @@ function App() {
               </button>
             </li>
             {sessionIdItem}
-            <UplodFile sessionId={sessionId} />
+            <UplodFile sessionId={sessionId} 
+              addFile={addFile} />
+            <Query sessionId={sessionId} 
+              isSubmitDisabled={(files.length>0)?false: true} 
+              onSubmit={() => alert("hi")} />
           </ol>
       </div>
     </>

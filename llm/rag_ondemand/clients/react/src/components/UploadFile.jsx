@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 
-export default function UplodFile({ sessionId }) {
+export default function UplodFile({ sessionId, addFile }) {
 
     const [uploadFile, setUploadFile] = useState(null);
     const fileInputRef = useRef(null);
@@ -12,7 +12,7 @@ export default function UplodFile({ sessionId }) {
                 setUploadFile(null)
             }
         };
-    }, [sessionId]); // Dependency array: effect runs when sessionId
+    }, [sessionId]); 
 
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
@@ -25,6 +25,15 @@ export default function UplodFile({ sessionId }) {
             alert('Please select a file first!');
             return;
         }
+
+        //TEMP
+        addFile(uploadFile.name);
+        if (fileInputRef.current) {
+            addFile(fileInputRef.current.value)
+            fileInputRef.current.value = '';
+        }
+        setUploadFile(null)
+        return;
 
         const formData = new FormData();
         formData.append('session_id', sessionId )
@@ -39,9 +48,10 @@ export default function UplodFile({ sessionId }) {
             if (response.ok) {
                 alert('File uploaded successfully!');
                 if (fileInputRef.current) {
+                    addFile(fileInputRef.current.value)
                     fileInputRef.current.value = '';
                 }
-                setSelectedFile(null)
+                setUploadFile(null)
             } else {
                 alert('File upload failed!');
             }
