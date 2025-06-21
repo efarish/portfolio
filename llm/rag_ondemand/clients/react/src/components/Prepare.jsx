@@ -17,14 +17,14 @@ export default function Prepare({ sessionId, isPrepareDisabled, onPrepared }) {
                 body: JSON.stringify({"session_id": sessionId, "recreate": "false"}),
             });    
             if (response.ok) {
-                alert('Query prepared successful!');
+                alert('File indexing successful!');
                 onPrepared(true);
             } else {
-                alert('Query prepare failed.');
+                alert('File indexing failed.');
                 onPrepared(false);
             }    
         }catch(error){
-            alert(`Failed to prepare query: ${error}`)
+            alert(`Failed to index file: ${error}`)
         }finally{
             setPreparing(false)
         }
@@ -34,7 +34,7 @@ export default function Prepare({ sessionId, isPrepareDisabled, onPrepared }) {
         <section>
           <div>
             <button onClick={handlePrepare}
-              disabled={(isPreparing || isPrepareDisabled)?true: false}>Prepare Query</button>
+              disabled={(isPreparing || isPrepareDisabled)?true: false}>Index File</button>
           </div>
         </section>
     )

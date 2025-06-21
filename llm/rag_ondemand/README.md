@@ -17,7 +17,7 @@ The stack of AWS service and frameworks is below:
 1. Cloudformation/CodePipeline - Provides IaC and CI/CD services. 
 1. VPC - A cloud to where the service is deployed.
 1. API Gateway - The public API for the service. 
-1. ECS - Where the FastAPI instance runs.
+1. ECS - Where the FastAPI instance runs, conifigured for reliability and scalability.
 1. ECR - Where the ECS Docker images are stored.
 1. S3 - Where the LlamaIndex indices are stored.
 1. s3fs - A Python module that enables LlamaIndex to accessing S3 like a file system.
@@ -32,9 +32,14 @@ Below is an architecture diagram.
 
 ### Client
 
-The `clients` folder contains a Jupyter notebook with examples of calling the HTTP AWS API Gateway.
+The `clients` folder contains:
 
-This directory also contains a script to simulate user load on the service. The ECS cluster has been configured to auto-scale when the average CPU utilization exceeds a specified threshold. 
+1. Script clients: Examples of calling the API using a Jupyter notebook and a load simulator.
+1. React client: A React app used to call the API.
+ 
+<p align="center">
+  <img src="./assets/img/react.jpeg" width="500" />
+</p>
 
 ### The RAG Agent
 
