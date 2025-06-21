@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
+import config from '../config.json'
 
 export default function UplodFile({ sessionId, addFile }) {
 
     const [uploadFile, setUploadFile] = useState(null);
     const fileInputRef = useRef(null);
+    const API = config.api;
 
     useEffect(() => {
         return () => {
@@ -25,22 +27,13 @@ export default function UplodFile({ sessionId, addFile }) {
             alert('Please select a file first!');
             return;
         }
-
-        //TEMP
-        addFile(uploadFile.name);
-        if (fileInputRef.current) {
-            addFile(fileInputRef.current.value)
-            fileInputRef.current.value = '';
-        }
-        setUploadFile(null)
-        return;
-
+        
         const formData = new FormData();
         formData.append('session_id', sessionId )
-        formData.append('file', uploadFile);
+        formData.append('file', uploadFile);    
 
         try {
-            const response = await fetch('http://localhost/upload', { // Replace with your actual upload endpoint
+            const response = await fetch(API + '/upload', { // Replace with your actual upload endpoint
                 method: 'POST',
                 body: formData,
             });
@@ -65,15 +58,17 @@ export default function UplodFile({ sessionId, addFile }) {
     let isUploadDisabled = (uploadFile && !isChooseFileDisabled) ? false : true
 
     return (
-        <>
-            <li>
-                <input type="file" onChange={handleFileChange} disabled={isChooseFileDisabled}
-                    ref={fileInputRef} />
-            </li>
-            <li>
-                <button onClick={handleUpload} disabled={isUploadDisabled}>Upload</button>
-            </li>
-        </>
+            <section id="user-input">
+                <div className="input-group">
+                    <p>
+                        <input type="file" onChange={handleFileChange} disabled={isChooseFileDisabled}
+                            ref={fileInputRef} />
+                    </p>
+                    <p>
+                        <button onClick={handleUpload} disabled={isUploadDisabled}>Upload</button>
+                    </p>
+                </div>
+            </section>
     )
 
 }
