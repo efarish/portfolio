@@ -58,7 +58,7 @@ The `docker/.env` file contains the tokens needed for AWS and OpenAI.
 
 The `cloudformation` directory contains three directories.
 
-1. `create=app` - The IaC that defines the AWS stack.
+1. `create-app` - The IaC that defines the AWS stack.
 1. `create-pipeline` - A CodePipeline used to build the Docker image and deploy the stack defined in `create-app`.
 1. `update-pipeline` - A CodePipeline used to rebuild and deploy the Docker image to ECS.
 
