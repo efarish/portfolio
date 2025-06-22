@@ -28,6 +28,15 @@ Resources:
       Name: RAG-OnDemand-HTTP-api
       Description: HTTP API Linking to RAG OnDemand Service.
       ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - '*'
+        AllowHeaders:
+          - '*'
+        MaxAge: 0  
+        #AllowCredentials: true
 
   APIRoute1:
     Type: AWS::ApiGatewayV2::Route
