@@ -1,15 +1,13 @@
 import {useState} from 'react'
-import config from '../config.json'
 
-export default function Prepare({ sessionId, isPrepareDisabled, onPrepared }) {
+export default function Prepare({ sessionId, isPrepareDisabled, onPrepared, config }) {
 
     const [isPreparing, setPreparing] = useState(false);
-    const API = config.api;
 
     async function handlePrepare(){
         try{
             setPreparing(true)
-            const response = await fetch(API + '/prepare', { 
+            const response = await fetch(config.api + '/prepare', { 
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"

@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import config from '../config.json'
 
-export default function UplodFile({ sessionId, addFile }) {
+export default function UplodFile({ sessionId, addFile, config }) {
 
     const [uploadFile, setUploadFile] = useState(null);
     const fileInputRef = useRef(null);
-    const API = config.api;
 
     useEffect(() => {
         return () => {
@@ -33,7 +31,7 @@ export default function UplodFile({ sessionId, addFile }) {
         formData.append('file', uploadFile);    
 
         try {
-            const response = await fetch(API + '/upload', { // Replace with your actual upload endpoint
+            const response = await fetch(config.api + '/upload', { // Replace with your actual upload endpoint
                 method: 'POST',
                 body: formData,
             });

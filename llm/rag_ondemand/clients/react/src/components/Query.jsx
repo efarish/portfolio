@@ -1,12 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
-import config from '../config.json'
 
-export default function Query({ sessionId, isSubmitDisabled}) {
+export default function Query({ sessionId, isSubmitDisabled, config}) {
 
     const [isQuerying, setQuerying] = useState(false);
     const [queryResult, setQueryResult] = useState("");
     const inputRef = useRef(null);
-    const API = config.api
 
     useEffect(() => {
         return () => {
@@ -26,7 +24,7 @@ export default function Query({ sessionId, isSubmitDisabled}) {
 
         try{
             setQuerying(true)
-            const response = await fetch(API + '/query', { 
+            const response = await fetch(config.api + '/query', { 
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"

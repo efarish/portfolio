@@ -1,5 +1,4 @@
-import {useState} from 'react'
-import config from './config.json'
+import {useState, useEffect} from 'react'
 import UplodFile from './components/UploadFile.jsx'
 import Prepare from './components/Prepare.jsx'
 import Query from './components/Query.jsx'
@@ -11,11 +10,26 @@ function App() {
   const [files, addSubmittedFile] = useState([]);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [isPrepared, setPrepared] = useState(false);
-  const API = config.api;
+  const [config, setConfig] = useState(null);
 
-  
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch('/config.json'); // Relative path to public folder
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setConfig(data);
+      } catch (e) {
+        console.log(`Error loading config: ${e}`)
+      } 
+    };
+    fetchConfig();
+  }, []); 
+
   async function getSessionId(){
-    const response = await fetch(API + '/create_session');
+    const response = await fetch(config.api + '/create_session');
     const new_sessionId = await response.json();
     return new_sessionId.session_id;
   }
@@ -62,11 +76,13 @@ function App() {
           </div>
         </section>
         <UplodFile sessionId={sessionId} 
-          addFile={addFile} />
+          addFile={addFile} config={config} />
         <Prepare sessionId={sessionId} 
-          isPrepareDisabled={(fileUploaded && files.length>0)?false: true} onPrepared={handlePrepared} />
+          isPrepareDisabled={(fileUploaded && files.length>0)?false: true} 
+          onPrepared={handlePrepared} config={config} />
         <Query sessionId={sessionId} 
-          isSubmitDisabled={isPrepared?false: true} />
+          isSubmitDisabled={isPrepared?false: true} 
+          config={config} />
       </div>
     </>
   )
