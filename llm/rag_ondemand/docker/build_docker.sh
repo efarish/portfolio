@@ -9,6 +9,7 @@ ECR_IMG_NAME=${ECR_REPO}:${DOCKER_IMAGE_NAME}
 
 #aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
 docker build -t ${ECR_IMG_NAME} ./
+#docker build --platform linux/amd64 -t ${ECR_IMG_NAME} ./
 #aws cloudformation package --template ./llm/${PROJECT_NAME}/cloudformation/create-app/template.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
 #docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
 #docker push ${ECR_IMAGE_URI}

@@ -13,13 +13,21 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
+      - echo "S3_BUCKET=${S3_BUCKET}\nAWS_KEY=${AWS_KEY}\nAWS_SECRET=${AWS_SECRET}\nOPENAI_API_KEY=${OPENAI_API_KEY}" > ./llm/${PROJECT_NAME}/docker/.env
       - docker build -t ${ECR_IMG_NAME} ./llm/${PROJECT_NAME}/docker
       - aws cloudformation package --template ./llm/${PROJECT_NAME}/cloudformation/create-app/template.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
+      - sudo apt-get install -y curl
+      - curl -fsSL https://deb.nodesource.com/setup_current.x -o nodesource_setup.sh
+      - sudo -E bash nodesource_setup.sh
+      - sudo apt-get install -y nodejs
+      - node -v
+      - npm run install --prefix ./llm/${PROJECT_NAME}/clients/react
+      - npm run build --prefix ./llm/${PROJECT_NAME}/clients/react
   post_build:
     commands:
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
-
+      - aws s3 cp --recursive ./llm/${PROJECT_NAME}/clients/react s3://a-unique-public-bucket-name
 artifacts:
   files:
     - packaged-template.yaml
