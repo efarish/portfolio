@@ -16,12 +16,17 @@ phases:
       - echo "S3_BUCKET=${S3_BUCKET}\nAWS_KEY=${AWS_KEY}\nAWS_SECRET=${AWS_SECRET}\nOPENAI_API_KEY=${OPENAI_API_KEY}" > ./llm/${PROJECT_NAME}/docker/.env
       - docker build -t ${ECR_IMG_NAME} ./llm/${PROJECT_NAME}/docker
       - aws cloudformation package --template ./llm/${PROJECT_NAME}/cloudformation/create-app/template.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
-      - sudo apt-get install -y curl
-      - curl -fsSL https://deb.nodesource.com/setup_current.x -o nodesource_setup.sh
-      - sudo -E bash nodesource_setup.sh
-      - sudo apt-get install -y nodejs
+      - sudo apt update
       - node -v
-      - npm run install --prefix ./llm/${PROJECT_NAME}/clients/react
+      - npm -v
+      - curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+      - source ~/.bashrc 
+      - nvm install node
+      - nvm use node
+      - nvm alias default node
+      - node -v
+      - npm -v
+      - npm install --prefix ./llm/${PROJECT_NAME}/clients/react
       - npm run build --prefix ./llm/${PROJECT_NAME}/clients/react
   post_build:
     commands:
