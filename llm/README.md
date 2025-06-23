@@ -1,6 +1,6 @@
 # LLM Projects
 
-Below are my LLM projcts. Each project has a README describing the project. All the code is in Python and the frameworks/platforms used are Hugging Face, LangChain, and Neo4j. LLM models utilized are different versions of OpenAI’s GPT and Meta’s Llama.
+Below are my LLM projcts. Each project has a README describing the project. All the code is in Python and the frameworks/platforms used are Hugging Face, LangChain, LlamaIndex, and Neo4j. LLM models utilized are different versions of OpenAI’s GPT and Meta’s Llama.
 
 ### Knowledge Graphs
 - [Using LLM to Create a Knowledge Graphs](https://github.com/efarish/portfolio/tree/main/llm/graph)
