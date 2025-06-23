@@ -32,7 +32,7 @@ export default function Prepare({ sessionId, isPrepareDisabled, onPrepared, conf
         <section>
           <div>
             <button onClick={handlePrepare}
-              disabled={(isPreparing || isPrepareDisabled)?true: false}>Index File</button>
+              disabled={(isPreparing || isPrepareDisabled)?true: false}>{isPreparing?"Indexing...": "Index File"}</button>
           </div>
         </section>
     )
