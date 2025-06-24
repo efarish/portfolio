@@ -13,7 +13,7 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
-      - echo "S3_BUCKET=${S3_BUCKET}\nAWS_KEY=${AWS_KEY}\nAWS_SECRET=${AWS_SECRET}\nOPENAI_API_KEY=${OPENAI_API_KEY}" > ./llm/${PROJECT_NAME}/docker/.env
+      - echo -e "S3_BUCKET=${S3_BUCKET}\nAWS_KEY=${AWS_KEY}\nAWS_SECRET=${AWS_SECRET}\nOPENAI_API_KEY=${OPENAI_API_KEY}" > ./llm/${PROJECT_NAME}/docker/.env
       - docker build -t ${ECR_IMG_NAME} ./llm/${PROJECT_NAME}/docker
       - aws cloudformation package --template ./llm/${PROJECT_NAME}/cloudformation/create-app/template.yaml --s3-bucket a-unique-artifact-bucket-name --output-template-file packaged-template.yaml
       - npm -v
