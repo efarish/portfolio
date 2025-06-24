@@ -89,6 +89,10 @@ When using the CloudFormation `create-pipeline`, the properties need to set with
 
 If the Docker image is built without using CloudForamtion, the same properties above will need to be populated in the file `./docker/.env`.
 
+### React Web App
+
+The last step in CloudFormation `create-pipeline` is to create a property file for the React app. This file contains the API Gateway URL is copied to `REACT_S3_BUCKET` described above.
+
 ## Lessons Learned
 
 LlamaIndex makes it easy to develop RAG services. The load testing I did discovered bottlenecks I hadn't considered. In this case, the token rate limit for my OpenAI account limited the number of simultaneous requests I could make to the service. It was also easy to build a frontend client using React. 
