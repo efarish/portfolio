@@ -14,7 +14,7 @@ Parameters:
   GitHubConnectionArn:
     Type: String
     Description: Specifies the ARN of the GitHub Connection.
-    Default: arn:aws:codeconnections:<YOUR CODE CONNECTION HERE>
+    Default: arn:aws:codeconnections:us-east-1:598185244415:connection/b45ca0fd-e734-4895-a0d2-42e802be757c
   S3ArtifactBucket:
     Type: String
     Description: Specifies the S3 Bucket that will used by CodePipeLine.
@@ -85,6 +85,16 @@ Resources:
         EnvironmentVariables:
           - Name: AWS_ACCT
             Value: !Sub ${AWS::AccountId}
+          - Name: S3_BUCKET
+            Value: <YOUR PRIVATE S# BUCKET TO STORE UPLOADED DOCUMENTS AND VECTOR INDICIES>
+          - Name: AWS_KEY
+            Value: <KEY OF USER THAT HAS ACCESS TO S3_BUCKET>
+          - Name: AWS_SECRET
+            Value: <SECRET OF USER WITH ACCESS TO S3_BUCKET>
+          - Name: OPENAI_API_KEY
+            Value: <OPENAI KEY> 
+          - Name: REACT_S3_BUCKET
+            Value: <YOUR PUBLIC S3 BUCKET HERE>
         PrivilegedMode: true
         ImagePullCredentialsType: CODEBUILD
       TimeoutInMinutes: 5
@@ -176,9 +186,5 @@ Resources:
               RoleArn: !GetAtt CodePipeLineECSRole.Arn
               Region: !Ref AWS::Region
               Commands:
-                - echo "{\"config\":{\"api\":\"#{DeployVariables.ApiUrl}\", \"ws_api\":\"#{DeployVariables.WebSocketURI}\", \"debug\":\"\" }}" > config.json
+                - echo "{\"api\":\"#{DeployVariables.ApiUrl}\"}" > config.json
                 - aws s3 cp ./config.json s3://a-unique-public-bucket-name
-
-           
-
-

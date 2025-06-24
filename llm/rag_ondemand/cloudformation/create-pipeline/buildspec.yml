@@ -23,7 +23,7 @@ phases:
     commands:
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
       - docker push ${ECR_IMAGE_URI}
-      - aws s3 cp --recursive ./llm/${PROJECT_NAME}/clients/react/dist s3://a-unique-public-bucket-name
+      - aws s3 cp --recursive ./llm/${PROJECT_NAME}/clients/react/dist s3://${REACT_S3_BUCKET}
 artifacts:
   files:
     - packaged-template.yaml
