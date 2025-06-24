@@ -24,7 +24,7 @@ export default function Query({ sessionId, isSubmitDisabled, config}) {
 
         try{
             setQuerying(true)
-            const response = await fetch(config.api + '/query', { 
+            const response = await fetch(config.api + 'query', { 
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"

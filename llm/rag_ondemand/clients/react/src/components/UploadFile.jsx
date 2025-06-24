@@ -31,7 +31,7 @@ export default function UplodFile({ sessionId, addFile, config }) {
         formData.append('file', uploadFile);    
 
         try {
-            const response = await fetch(config.api + '/upload', { // Replace with your actual upload endpoint
+            const response = await fetch(config.api + 'upload', { // Replace with your actual upload endpoint
                 method: 'POST',
                 body: formData,
             });

@@ -29,7 +29,7 @@ function App() {
   }, []); 
 
   async function getSessionId(){
-    const response = await fetch(config.api + '/create_session');
+    const response = await fetch(config.api + 'create_session');
     const new_sessionId = await response.json();
     return new_sessionId.session_id;
   }

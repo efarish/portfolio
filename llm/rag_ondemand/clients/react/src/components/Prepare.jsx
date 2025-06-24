@@ -7,7 +7,7 @@ export default function Prepare({ sessionId, isPrepareDisabled, onPrepared, conf
     async function handlePrepare(){
         try{
             setPreparing(true)
-            const response = await fetch(config.api + '/prepare', { 
+            const response = await fetch(config.api + 'prepare', { 
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
