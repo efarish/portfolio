@@ -12,7 +12,7 @@ The workflow for this services is as follows:
 
 Below is the app stack:
 
-1. FastAPI - Used to implement the microservices. 
+1. FastAPI - Used to implement the microservice. 
 1. OpenAI - The o4-mini model provides LLM services.
 1. AWS Cloudformation/CodePipeline - Provides IaC and CI/CD services. 
 1. AWS VPC - A cloud to where the service is deployed.
@@ -43,15 +43,15 @@ The `clients` folder contains:
 
 ### The RAG Agent
 
-The module `docker/lama_index_util.py` provides functions to interact with LlamaIndex. Two indices are built for documents uploaded by a user: An index for summary questions and another for detailed questions. These indices are wrapped using query engine tools and provided to a `FunctionAgent` instance whose agentic workflow determines which tool to use.
+The module `docker/lama_index_util.py` provides functions to interact with LlamaIndex. Two indices are built for documents uploaded by a user: An index for summary questions and another for detailed questions. These indices are wrapped using query engine tools and provided to a LlamaIndex `FunctionAgent` instance whose agentic workflow determines which tool to use.
 
 ### LlamaIndex and S3
 
-The service is stateless. To avoid having to rebuild them with each request, the indices are stored in AWS S3. When persisting files, LlamaIndex has alternatives to using the files system. It supports the [fsspec](https://filesystem-spec.readthedocs.io/en/latest/intro.html) standard which is an attempt to provide a common interface for files. The Python module [s3fs](https://github.com/s3fs-fuse/s3fs-fuse) provides an implementation of this standard for AWS S3. The service uses `s3fs` to store the file index file in S3.
+The service is stateless. To avoid having to rebuild the vector indicies used for making the RAG requests for each request, the indices are stored in AWS S3. When persisting files, LlamaIndex has alternatives to using the files system. It supports the [fsspec](https://filesystem-spec.readthedocs.io/en/latest/intro.html) standard which is an attempt to provide a common interface for files. The Python module [s3fs](https://github.com/s3fs-fuse/s3fs-fuse) provides an implementation of this standard for AWS S3. The service uses `s3fs` to store the file index file in S3.
 
 ### IaC and CI/CD
 
-The `cloudformation` directory contains three directories.
+The `cloudformation` directory contains three pipelines.
 
 1. `create-app` - The IaC that defines the AWS stack.
 1. `create-pipeline` - A CodePipeline used to build the Docker image and deploy the stack defined in `create-app`.
@@ -92,8 +92,3 @@ If the Docker image is built without using CloudForamtion, the same properties a
 ## Lessons Learned
 
 LlamaIndex makes it easy to develop RAG services. The load testing I did discovered bottlenecks I hadn't considered. In this case, the token rate limit for my OpenAI account limited the number of simultaneous requests I could make to the service. It was also easy to build a frontend client using React. 
-
-
-
-
-
