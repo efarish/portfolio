@@ -15,7 +15,7 @@ phases:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
   build:
     commands:
-      - docker build -t ${ECR_IMG_NAME} ./llm/${PROJECT_NAME}/docker
+      - docker build -t ${ECR_IMG_NAME} ./llm/${PROJECT_NAME}/src
   post_build:
     commands:
       - docker tag ${ECR_IMG_NAME} ${ECR_IMAGE_URI}
