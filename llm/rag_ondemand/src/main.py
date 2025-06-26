@@ -9,11 +9,12 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from starlette import status
-from storage import Storage
 
 load_dotenv()
 
 from util import llama_index_util as liu
+from util.storage import Storage
+
 
 SUPPORTED_FILES = {"application/pdf": "pdf", "image/png": "png"}
 
