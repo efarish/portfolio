@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Protocol, runtime_checkable
 
 import boto3
 from dotenv import load_dotenv
