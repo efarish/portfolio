@@ -43,7 +43,7 @@ The `clients` folder contains:
 
 ### The RAG Agent
 
-The module `docker/lama_index_util.py` provides functions to interact with LlamaIndex. Two indices are built for documents uploaded by a user: An index for summary questions and another for detailed questions. These indices are wrapped using query engine tools and provided to a LlamaIndex `FunctionAgent` instance whose agentic workflow determines which tool to use.
+The module `src/util/lama_index_util.py` provides functions to interact with LlamaIndex. Two indices are built for documents uploaded by a user: An index for summary questions and another for detailed questions. These indices are wrapped using query engine tools and provided to a LlamaIndex `FunctionAgent` instance whose agentic workflow determines which tool to use.
 
 ### LlamaIndex and S3
 
@@ -87,7 +87,7 @@ When using the CloudFormation `create-pipeline`, the properties need to set with
 
 ### Docker
 
-If the Docker image is built without using CloudForamtion, the same properties above will need to be populated in the file `./docker/.env`.
+If the Docker image is built without using CloudForamtion, the same properties above will need to be populated in the file `./src/.env`.
 
 ### React Web App
 
