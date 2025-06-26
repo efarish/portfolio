@@ -13,7 +13,7 @@ from storage import Storage
 
 load_dotenv()
 
-import llama_index_util as liu
+from util import llama_index_util as liu
 
 SUPPORTED_FILES = {"application/pdf": "pdf", "image/png": "png"}
 
