@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 
+import ResultModal from './ResultModal';
+
 export default function UplodFile({ sessionId, addFile, config }) {
 
     const [uploadFile, setUploadFile] = useState(null);
+    const [uploadResult, setUploadResult] = useState(null);
     const fileInputRef = useRef(null);
+    const dialog = useRef();
 
     useEffect(() => {
         return () => {
@@ -25,7 +29,7 @@ export default function UplodFile({ sessionId, addFile, config }) {
             alert('Please select a file first!');
             return;
         }
-        
+
         const formData = new FormData();
         formData.append('session_id', sessionId )
         formData.append('file', uploadFile);    
@@ -37,18 +41,23 @@ export default function UplodFile({ sessionId, addFile, config }) {
             });
 
             if (response.ok) {
-                alert('File uploaded successfully!');
+                setUploadResult('File uploaded successfully!');
+                dialog.current.open()
                 if (fileInputRef.current) {
-                    addFile(fileInputRef.current.value)
+                    addFile(fileInputRef.current.value);
                     fileInputRef.current.value = '';
                 }
                 setUploadFile(null)
             } else {
-                alert('File upload failed!');
+                //alert('File upload failed!');
+                setUploadResult('File upload failed!');
+                dialog.current.open();
             }
         } catch (error) {
-            console.error('Error uploading file:', error);
-            alert('An error occurred during upload.');
+            //console.error('Error uploading file:', error);
+            //alert('An error occurred during upload.');
+            setUploadResult(`Error uploading file: ${error}`)
+            dialog.current.open()
         }
     };
 
@@ -56,6 +65,8 @@ export default function UplodFile({ sessionId, addFile, config }) {
     let isUploadDisabled = (uploadFile && !isChooseFileDisabled) ? false : true
 
     return (
+            <>
+            <ResultModal ref={dialog} result_type={"File Upload"} result={uploadResult} />
             <section id="user-input">
                 <div className="input-group">
                     <p>
@@ -67,6 +78,7 @@ export default function UplodFile({ sessionId, addFile, config }) {
                     </p>
                 </div>
             </section>
+            </>
     )
 
 }
