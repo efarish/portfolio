@@ -1,0 +1,28 @@
+import { useImperativeHandle, useRef } from "react";
+
+
+
+export default function ResultModal({ref, result_type, result}){
+
+    const dialog = useRef();
+
+    useImperativeHandle(ref, ()=>{
+        return {
+            open(){
+                dialog.current.showModal();
+            }
+        }
+    });
+
+    return (
+        <dialog ref={dialog} className="result-modal">
+            <h2>{result_type} Result</h2>
+            <p>
+                {result}
+            </p>
+            <form method="dialog">
+                <button>Close</button>
+            </form>                
+        </dialog>
+    )
+}
