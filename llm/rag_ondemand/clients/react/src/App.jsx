@@ -1,7 +1,8 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import UplodFile from './components/UploadFile.jsx'
 import Prepare from './components/Prepare.jsx'
 import Query from './components/Query.jsx'
+import ResultModal from './components/ResultModal';
 import './App.css'
 
 function App() {
@@ -10,8 +11,10 @@ function App() {
   const [files, addSubmittedFile] = useState([]);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [isPrepared, setPrepared] = useState(false);
+  const [sessionStatus, setSessionStatus] = useState(null);
   const [config, setConfig] = useState(null);
-
+  const dialog = useRef();
+  
   useEffect(() => {
     const fetchConfig = async () => {
       try {
@@ -41,7 +44,9 @@ function App() {
       addSubmittedFile([])
       setPrepared(false);
     }catch(error){
-      alert(`Failed to create new session: ${error}`)
+      //alert(`Failed to create new session: ${error}`)
+      setSessionStatus(`Failed to create new session: ${error}`);
+      dialog.current.open();
     }
   }
 
@@ -71,6 +76,7 @@ function App() {
         <h1>RAG OnDemand</h1>
         <section>
           <div>
+            <ResultModal ref={dialog} result_type={"Session Request"} result={sessionStatus} />
             <button onClick={handleSession}>{buttonTxt}</button>
             {sessionIdItem}
           </div>
