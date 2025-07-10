@@ -19,22 +19,19 @@ export default function Prepare({ sessionId, isPrepareDisabled, onPrepared, conf
                 body: JSON.stringify({"session_id": sessionId, "recreate": "false"}),
             });    
             if (response.ok) {
-                //alert('File indexing successful!');
                 setPrepareResult('File indexing successful!')
                 dialog.current.open();
                 onPrepared(true);
             } else {
-                //alert('File indexing failed.');
                 setPrepareResult('File indexing failed.')
                 dialog.current.open();
                 onPrepared(false);
             }    
         }catch(error){
-            //alert(`Failed to index file: ${error}`)
-            setPrepareResult(`Failed to index file: ${error}`)
+            setPrepareResult(`Failed to index file: ${error}`);
             dialog.current.open();
         }finally{
-            setPreparing(false)
+            setPreparing(false);
         }
     }
 

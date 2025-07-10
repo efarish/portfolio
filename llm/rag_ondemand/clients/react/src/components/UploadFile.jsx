@@ -49,13 +49,10 @@ export default function UplodFile({ sessionId, addFile, config }) {
                 }
                 setUploadFile(null)
             } else {
-                //alert('File upload failed!');
                 setUploadResult('File upload failed!');
                 dialog.current.open();
             }
         } catch (error) {
-            //console.error('Error uploading file:', error);
-            //alert('An error occurred during upload.');
             setUploadResult(`Error uploading file: ${error}`)
             dialog.current.open()
         }

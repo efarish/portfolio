@@ -37,13 +37,11 @@ export default function Query({ sessionId, isSubmitDisabled, config}) {
             if (!response.ok) {
                 setQueryStatus('Query failed.')
                 dialog.current.open();
-                //alert('Query failed.');
             }else{
                 const queryJSON = await response.json()
                 setQueryResult(queryJSON.body)
             }    
         }catch(error){
-            //alert(`Failed to submit query: ${error}`)
             setQueryStatus(`Failed to submit query: ${error}`);
             dialog.current.open();
         }finally{

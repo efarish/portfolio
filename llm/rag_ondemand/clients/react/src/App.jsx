@@ -44,7 +44,6 @@ function App() {
       addSubmittedFile([])
       setPrepared(false);
     }catch(error){
-      //alert(`Failed to create new session: ${error}`)
       setSessionStatus(`Failed to create new session: ${error}`);
       dialog.current.open();
     }
