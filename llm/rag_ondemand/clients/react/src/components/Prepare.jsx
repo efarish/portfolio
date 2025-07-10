@@ -1,9 +1,11 @@
 import {useState, useRef} from 'react'
-
+import { useContext } from 'react';
+import { RagContext } from '../store/RagContext';
 import ResultModal from './ResultModal';
 
-export default function Prepare({ sessionId, isPrepareDisabled, onPrepared, config }) {
+export default function Prepare({ sessionId, isPrepareDisabled, onPrepared}) {
 
+    const { config } = useContext(RagContext);
     const [isPreparing, setPreparing] = useState(false);
     const [prepareResult, setPrepareResult] = useState(null);
     const dialog = useRef();

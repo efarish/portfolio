@@ -3,6 +3,7 @@ import UplodFile from './components/UploadFile.jsx'
 import Prepare from './components/Prepare.jsx'
 import Query from './components/Query.jsx'
 import ResultModal from './components/ResultModal';
+import { RagContext } from './store/RagContext.jsx';
 import './App.css'
 
 function App() {
@@ -68,9 +69,12 @@ function App() {
 
   const buttonTxt = sessionId?"New Session": "Create Session";
   const sessionIdItem = sessionId?<p>{sessionId}</p>: "";
+  const ctx = {
+    config: config
+  };
 
   return (
-    <>
+    <RagContext.Provider value={ctx}>
       <div>
         <h1>RAG OnDemand</h1>
         <section>
@@ -80,16 +84,12 @@ function App() {
             {sessionIdItem}
           </div>
         </section>
-        <UplodFile sessionId={sessionId} 
-          addFile={addFile} config={config} />
+        <UplodFile sessionId={sessionId} addFile={addFile} />
         <Prepare sessionId={sessionId} 
-          isPrepareDisabled={(fileUploaded && files.length>0)?false: true} 
-          onPrepared={handlePrepared} config={config} />
-        <Query sessionId={sessionId} 
-          isSubmitDisabled={isPrepared?false: true} 
-          config={config} />
+          isPrepareDisabled={(fileUploaded && files.length>0)?false: true} onPrepared={handlePrepared} />
+        <Query sessionId={sessionId} isSubmitDisabled={isPrepared?false: true} />
       </div>
-    </>
+    </RagContext.Provider>
   )
 }
 
