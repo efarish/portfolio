@@ -3,9 +3,9 @@ import { useContext } from 'react';
 import ResultModal from './ResultModal';
 import { RagContext } from '../store/RagContext';
 
-export default function Query({ sessionId, isSubmitDisabled}) {
+export default function Query({ isSubmitDisabled}) {
 
-    const { config } = useContext(RagContext);
+    const { sessionId, config } = useContext(RagContext);
     const [isQuerying, setQuerying] = useState(false);
     const [queryResult, setQueryResult] = useState("");
     const [queryStatus, setQueryStatus] = useState(null);

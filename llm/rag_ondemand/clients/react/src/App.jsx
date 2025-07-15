@@ -1,9 +1,9 @@
-import {useState, useEffect, useRef} from 'react'
+import {useState, useEffect} from 'react'
 import UplodFile from './components/UploadFile.jsx'
 import Prepare from './components/Prepare.jsx'
 import Query from './components/Query.jsx'
-import ResultModal from './components/ResultModal';
 import { RagContext } from './store/RagContext.jsx';
+import CreateSession from './components/CreateSession.jsx';
 import './App.css'
 
 function App() {
@@ -12,9 +12,7 @@ function App() {
   const [files, addSubmittedFile] = useState([]);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [isPrepared, setPrepared] = useState(false);
-  const [sessionStatus, setSessionStatus] = useState(null);
   const [config, setConfig] = useState(null);
-  const dialog = useRef();
   
   useEffect(() => {
     const fetchConfig = async () => {
@@ -32,22 +30,10 @@ function App() {
     fetchConfig();
   }, []); 
 
-  async function getSessionId(){
-    const response = await fetch(config.api + 'create_session');
-    const new_sessionId = await response.json();
-    return new_sessionId.session_id;
-  }
-
-  async function handleSession(){
-    try{
-      const newSessionId = await getSessionId();
-      setSessionId(newSessionId);
-      addSubmittedFile([])
-      setPrepared(false);
-    }catch(error){
-      setSessionStatus(`Failed to create new session: ${error}`);
-      dialog.current.open();
-    }
+  async function updateSession(newSessionId){  
+    setSessionId(newSessionId);
+    addSubmittedFile([])
+    setPrepared(false);
   }
 
   function addFile(file){
@@ -67,27 +53,19 @@ function App() {
     }
   }
 
-  const buttonTxt = sessionId?"New Session": "Create Session";
-  const sessionIdItem = sessionId?<p>{sessionId}</p>: "";
   const ctx = {
-    config: config
+    config: config,
+    sessionId: sessionId
   };
 
   return (
     <RagContext.Provider value={ctx}>
       <div>
         <h1>RAG OnDemand</h1>
-        <section>
-          <div>
-            <ResultModal ref={dialog} result_type={"Session Request"} result={sessionStatus} />
-            <button onClick={handleSession}>{buttonTxt}</button>
-            {sessionIdItem}
-          </div>
-        </section>
-        <UplodFile sessionId={sessionId} addFile={addFile} />
-        <Prepare sessionId={sessionId} 
-          isPrepareDisabled={(fileUploaded && files.length>0)?false: true} onPrepared={handlePrepared} />
-        <Query sessionId={sessionId} isSubmitDisabled={isPrepared?false: true} />
+        <CreateSession onSessionUpdate={updateSession} />
+        <UplodFile addFile={addFile} />
+        <Prepare isPrepareDisabled={(fileUploaded && files.length>0)?false: true} onPrepared={handlePrepared} />
+        <Query isSubmitDisabled={isPrepared?false: true} />
       </div>
     </RagContext.Provider>
   )

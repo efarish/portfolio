@@ -3,9 +3,9 @@ import { useContext } from 'react';
 import { RagContext } from '../store/RagContext';
 import ResultModal from './ResultModal';
 
-export default function UplodFile({ sessionId, addFile }) {
+export default function UplodFile({ addFile }) {
 
-    const { config } = useContext(RagContext);
+    const { sessionId, config } = useContext(RagContext);
     const [uploadFile, setUploadFile] = useState(null);
     const [uploadResult, setUploadResult] = useState(null);
     const fileInputRef = useRef(null);
