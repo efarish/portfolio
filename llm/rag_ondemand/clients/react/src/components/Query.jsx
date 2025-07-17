@@ -12,6 +12,9 @@ export default function Query({ isSubmitDisabled}) {
     const inputRef = useRef(null);
     const dialog = useRef();
 
+    //Run when dependency (sessionId) changes.
+    // useEffect runs after compoents function runs.
+    // So runs when component is rendered and dependency has change.
     useEffect(() => {
         return () => {
             if (inputRef.current) {

@@ -8,9 +8,12 @@ export default function ResultModal({ref, result_type, result}){
 
     useImperativeHandle(ref, ()=>{
         return {
-            open(){
+            open: () => {
                 dialog.current.showModal();
-            }
+            },
+            close: () => {
+                dialog.current.close();
+            },
         }
     });
 

@@ -14,6 +14,9 @@ function App() {
   const [isPrepared, setPrepared] = useState(false);
   const [config, setConfig] = useState(null);
   
+  // Useful in cases:
+  // 1. Async call
+  // 2. Need compoents to be rendered first. i.e. components that reference something in the DOM.
   useEffect(() => {
     const fetchConfig = async () => {
       try {
@@ -28,6 +31,11 @@ function App() {
       } 
     };
     fetchConfig();
+    
+    return () => { //called when component App is removed.
+      console.log("App closed.")
+    };
+    
   }, []); 
 
   async function updateSession(newSessionId){  
